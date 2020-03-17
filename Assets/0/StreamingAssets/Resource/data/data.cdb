@@ -1,0 +1,32 @@
+{
+	"sheets": [
+		{
+			"name": "data",
+			"columns": [
+				{
+					"typeStr": "3",
+					"name": "id"
+				},
+				{
+					"typeStr": "3",
+					"name": "kind"
+				},
+				{
+					"typeStr": "13",
+					"name": "file"
+				}
+			],
+			"lines": [
+				{
+					"id": 9,
+					"file": "girl/girl.cdb",
+					"kind": 0
+				}
+			],
+			"separators": [],
+			"props": {}
+		}
+	],
+	"customTypes": [],
+	"compress": false
+}

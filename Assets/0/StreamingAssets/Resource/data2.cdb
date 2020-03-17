@@ -1,0 +1,2799 @@
+{
+	"sheets": [
+		{
+			"name": "constant",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "id"
+				},
+				{
+					"typeStr": "1",
+					"name": "comment"
+				},
+				{
+					"typeStr": "16",
+					"name": "value"
+				}
+			],
+			"lines": [
+				{
+					"id": "Pixel",
+					"comment": "test",
+					"value": 3
+				},
+				{
+					"id": "Block",
+					"comment": "test",
+					"value": 16
+				},
+				{
+					"id": "Rate",
+					"comment": "1pixel=2cm",
+					"value": 0.5
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "block",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "id"
+				},
+				{
+					"typeStr": "14",
+					"name": "icon"
+				},
+				{
+					"typeStr": "3",
+					"name": "sort"
+				}
+			],
+			"lines": [
+				{
+					"id": "No",
+					"icon": {
+						"file": "map/tile_block.png",
+						"size": 16,
+						"x": 7,
+						"y": 7
+					},
+					"sort": 0
+				},
+				{
+					"id": "Block",
+					"icon": {
+						"file": "map/tile_block.png",
+						"size": 16,
+						"x": 0,
+						"y": 0
+					},
+					"sort": -1
+				},
+				{
+					"id": "Terrace",
+					"icon": {
+						"file": "map/tile_block.png",
+						"size": 16,
+						"x": 1,
+						"y": 0
+					},
+					"sort": 1
+				},
+				{
+					"id": "Hidden",
+					"icon": {
+						"file": "map/tile_block.png",
+						"size": 16,
+						"x": 2,
+						"y": 0
+					},
+					"sort": 0
+				},
+				{
+					"id": "Ladder",
+					"icon": {
+						"file": "map/tile_block.png",
+						"size": 16,
+						"x": 3,
+						"y": 0
+					},
+					"sort": 1
+				},
+				{
+					"id": "Passage",
+					"icon": {
+						"file": "map/tile_block.png",
+						"size": 16,
+						"x": 4,
+						"y": 0
+					},
+					"sort": 0
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "link",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "id",
+					"display": null
+				},
+				{
+					"typeStr": "14",
+					"name": "icon"
+				},
+				{
+					"typeStr": "3",
+					"name": "sort"
+				}
+			],
+			"lines": [
+				{
+					"id": "No",
+					"icon": {
+						"file": "map/tile_link.png",
+						"size": 16,
+						"x": 7,
+						"y": 7
+					},
+					"sort": 0
+				},
+				{
+					"id": "Linker1",
+					"icon": {
+						"file": "map/tile_link.png",
+						"size": 16,
+						"x": 0,
+						"y": 0
+					},
+					"sort": 0
+				},
+				{
+					"id": "Linker2",
+					"icon": {
+						"file": "map/tile_link.png",
+						"size": 16,
+						"x": 1,
+						"y": 0
+					},
+					"sort": 0
+				},
+				{
+					"id": "Linker3",
+					"icon": {
+						"file": "map/tile_link.png",
+						"size": 16,
+						"x": 2,
+						"y": 0
+					},
+					"sort": 0
+				},
+				{
+					"id": "Linker4",
+					"icon": {
+						"file": "map/tile_link.png",
+						"size": 16,
+						"x": 3,
+						"y": 0
+					},
+					"sort": 0
+				},
+				{
+					"id": "Linker1Delete",
+					"icon": {
+						"file": "map/tile_link.png",
+						"size": 16,
+						"x": 4,
+						"y": 0
+					},
+					"sort": 0
+				},
+				{
+					"id": "Linker2Delete",
+					"icon": {
+						"file": "map/tile_link.png",
+						"size": 16,
+						"x": 5,
+						"y": 0
+					},
+					"sort": 0
+				},
+				{
+					"id": "Linker3Delete",
+					"sort": 0,
+					"icon": {
+						"file": "map/tile_link.png",
+						"size": 16,
+						"x": 6,
+						"y": 0
+					}
+				},
+				{
+					"id": "Linker4Delete",
+					"sort": 0,
+					"icon": {
+						"file": "map/tile_link.png",
+						"size": 16,
+						"x": 7,
+						"y": 0
+					}
+				},
+				{
+					"id": "DoubleLinker1",
+					"sort": 0,
+					"icon": {
+						"file": "map/tile_link.png",
+						"size": 16,
+						"x": 0,
+						"y": 1
+					}
+				},
+				{
+					"id": "DoubleLinker2",
+					"sort": 0,
+					"icon": {
+						"file": "map/tile_link.png",
+						"size": 16,
+						"x": 1,
+						"y": 1
+					}
+				},
+				{
+					"id": "DoubleLinker1Delete",
+					"sort": 0,
+					"icon": {
+						"file": "map/tile_link.png",
+						"size": 16,
+						"x": 2,
+						"y": 1
+					}
+				},
+				{
+					"id": "DoubleLinker2Delete",
+					"sort": 0,
+					"icon": {
+						"file": "map/tile_link.png",
+						"size": 16,
+						"x": 3,
+						"y": 1
+					}
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "marker",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "id"
+				},
+				{
+					"typeStr": "14",
+					"name": "icon"
+				},
+				{
+					"typeStr": "3",
+					"name": "sort"
+				}
+			],
+			"lines": [
+				{
+					"id": "CommonDoor",
+					"icon": {
+						"file": "map/marker.png",
+						"size": 16,
+						"x": 0,
+						"y": 0
+					},
+					"sort": 0
+				},
+				{
+					"id": "LockedDoor",
+					"icon": {
+						"file": "map/marker.png",
+						"size": 16,
+						"x": 1,
+						"y": 0
+					},
+					"sort": 0
+				}
+			],
+			"separators": [],
+			"props": {
+				"displayIcon": "icon"
+			}
+		},
+		{
+			"name": "levelData",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "level",
+					"opt": true
+				},
+				{
+					"typeStr": "6:levelType",
+					"name": "type",
+					"display": null
+				},
+				{
+					"typeStr": "5:Square,X-Strip,Y-Strip",
+					"name": "feature",
+					"opt": true
+				},
+				{
+					"typeStr": "5:Rotation,X-Mirror,Y-Mirror",
+					"name": "deformation",
+					"opt": true
+				},
+				{
+					"typeStr": "3",
+					"name": "width"
+				},
+				{
+					"typeStr": "3",
+					"name": "height",
+					"display": null
+				},
+				{
+					"typeStr": "16",
+					"name": "props"
+				},
+				{
+					"typeStr": "8",
+					"name": "tileProps"
+				},
+				{
+					"typeStr": "8",
+					"name": "layers"
+				},
+				{
+					"typeStr": "8",
+					"name": "triggers"
+				},
+				{
+					"typeStr": "12:block",
+					"name": "blocks"
+				},
+				{
+					"typeStr": "12:link",
+					"name": "linkers"
+				},
+				{
+					"typeStr": "8",
+					"name": "markers"
+				}
+			],
+			"lines": [
+				{
+					"type": "combat",
+					"width": 80,
+					"height": 20,
+					"tileProps": [],
+					"layers": [],
+					"triggers": [],
+					"blocks": "AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQICAgICAgICAgICAgICAgICAgICAgIBAQEBAQEBAQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBBAAAAAAAAAAAAAQAAAAAAAAAAAAABAEBAQEBAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEEAAAAAAAAAAAABAAAAAAAAAAAAAAEAQEBAQEBAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQQAAAAAAAAAAAAEAAAAAAAAAAAAAAQBAQEBAQEBAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBBAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQEEAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBAQQAAAAAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAQEBBAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQEBAQEEAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBAQEBAQQAAAAAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAQEBAQEBBAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQEBAQEBAQEEAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQ==",
+					"linkers": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+					"markers": [],
+					"group": 0,
+					"level": "test0",
+					"props": {
+						"tileSize": 16,
+						"layers": [
+							{
+								"l": "triggers",
+								"p": {
+									"alpha": 0.53,
+									"color": 5119
+								}
+							},
+							{
+								"l": "blocks",
+								"p": {
+									"alpha": 0.5
+								}
+							},
+							{
+								"l": "linkers",
+								"p": {
+									"alpha": 0.5
+								}
+							},
+							{
+								"l": "markers",
+								"p": {
+									"alpha": 1
+								}
+							}
+						]
+					}
+				},
+				{
+					"type": "combat",
+					"width": 80,
+					"height": 20,
+					"tileProps": [],
+					"layers": [],
+					"triggers": [],
+					"blocks": "AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAQEBAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAQEAAAEBAQEAAAEBAAAAAAABAQEAAAAAAQEBAAAAAQAAAAEBAQAAAAAAAAAAAAAAAAABAQEBAAAAAAAAAAAAAAAAAAAAAQEAAQEAAAAAAQEBAQAAAQEBAQABAQEBAQAAAQEBAQEAAAABAAEAAAEAAQAAAQABAAAAAAAAAAAAAAAAAAEBAQEAAAAAAAAAAAAAAAEAAAABAAAAAQAAAAABAQAAAAAAAAEBAAAAAQAAAAAAAQEBAAAAAAEBAQAAAAEAAQEBAAEBAQAAAAAAAAAAAAAAAQEBAQAAAAEAAAEBAAABAQEAAAAAAAAAAAAAAAEBAAAAAAAAAQEAAAABAAAAAAAAAQAAAAAAAAAAAAAAAAABAAAAAAABAAAAAAAAAAAAAAABAQEBAAAAAAAAAAAAAAABAAAAAQAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAQABAQEAAAAAAAAAAAAAAAEBAQEAAAAAAAAAAAAAAAAAAAABAQABAQAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAQAAAAAAAAABAAEAAAAAAAAAAAAAAAAAAQEBAQAAAAEBAAAAAQEAAAAAAAAAAAAAAAAAAAEBAAAAAAAAAQEAAAABAQAAAAAAAAEAAAAAAAABAAAAAAAAAAEBAQAAAAAAAAEBAQEBAQEBAQEBAAAAAQEAAAABAQAAAAAAAAABAAAAAAAAAQEAAAAAAAABAQABAQEBAQAAAAEBAQEBAAABAQEBAQAAAAAAAAAAAAAAAAAAAQEBAQEBAQEBAQEAAAAAAAABAQEBAQEAAAAAAAEAAAAAAAABAQEBAAAAAQEBAAAAAQAAAAAAAAEBAAAAAAAAAQEAAAAAAQEBAAAAAAAAAAABAQEBAQEBAQEBAQAAAAAAAAEBAQEBAQAAAAEBAQEBAAAAAAEBAQEAAAABAQEAAAABAAAAAAAAAAEAAAAAAAABAAAAAAEBAAEBAAAAAAAAAAEBAQEBAQEBAQEBAAAAAAAAAAABAQAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAEAAAAAAAAAAQEBAQEBAQEBAQEAAAAAAAAAAAEBAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQABAQAAAAAAAAABAQEBAQEBAQEBAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAQEAAAAAAAAAAAEBAQEBAQEBAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQ==",
+					"linkers": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+					"markers": [],
+					"group": 0,
+					"level": "test333",
+					"props": {
+						"tileSize": 16,
+						"layers": [
+							{
+								"l": "triggers",
+								"p": {
+									"alpha": 0.53,
+									"color": 5119
+								}
+							},
+							{
+								"l": "blocks",
+								"p": {
+									"alpha": 0.5
+								}
+							},
+							{
+								"l": "linkers",
+								"p": {
+									"alpha": 0.5
+								}
+							},
+							{
+								"l": "markers",
+								"p": {
+									"alpha": 1
+								}
+							}
+						]
+					}
+				},
+				{
+					"width": 30,
+					"height": 20,
+					"layers": [],
+					"triggers": [],
+					"props": {
+						"tileSize": 16,
+						"layers": [
+							{
+								"l": "triggers",
+								"p": {
+									"alpha": 0.53,
+									"color": 5119
+								}
+							},
+							{
+								"l": "blocks",
+								"p": {
+									"alpha": 0.5
+								}
+							},
+							{
+								"l": "linkers",
+								"p": {
+									"alpha": 0.5
+								}
+							},
+							{
+								"l": "markers",
+								"p": {
+									"alpha": 1
+								}
+							}
+						]
+					},
+					"tileProps": [],
+					"level": "test1",
+					"group": 0,
+					"type": "combat",
+					"blocks": "AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQICAgIBAQAAAQEAAAEBAAABAQAAAQEAAAAAAAAAAAAAAAQBAQAAAQEAAAEBAAABAQAAAAAAAAAAAAAAAAAAAAQBAQAAAQEAAAEBAAAAAAAAAAAAAAAAAAAAAAAAAAQBAQICAQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQBAQAAAAAAAAAAAAAAAAAAAAACAQEBAQEBAQEBAQEBAQAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAQICAgICAgICAgICAgICAgEBAQEBAQEBAQEBAQEBAQAAAAAAAAAAAAAAAAQAAAEBAAAAAQEBAQEBAQEBAQICAgIAAAAAAAAAAAQAAAEBAAAAAQEBAQEBAQEBAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAQEBAQEBAQEBAAAAAAEBAQAAAAABAQEBAQEBAQEB",
+					"linkers": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBAQEAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBAQEAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBAQEAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBAQEAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEBAQEAAAAAAAAAAAAAQEBAQAAAAEBAQEAAAAAAAAAAAAA",
+					"markers": [
+						{
+							"x": 19,
+							"y": 4,
+							"kind": "CommonDoor",
+							"width": 1,
+							"height": 4
+						},
+						{
+							"x": 21,
+							"y": 18,
+							"kind": "CommonDoor",
+							"width": 1,
+							"height": 4
+						}
+					]
+				},
+				{
+					"type": "combat",
+					"width": 20,
+					"height": 19,
+					"tileProps": [],
+					"layers": [],
+					"triggers": [],
+					"blocks": "AQEBAQEBAQEBAQEBAQEBAgICAgEAAAAAAAAAAAAAAAAAAAAAAAAEAQAAAAAAAAAAAAAAAAAAAAAAAAQBAAAAAAAAAAAAAAAAAAAAAAAABAEAAAAAAAAAAAAAAAAAAAAAAAAEAQAAAAAAAAAAAAAAAgEBAQECAgIBAQICAgICAgICAAAAAQEBAQAAAAEBAAAAAAAAAAQAAAABAQEBAAAAAQEAAAAAAAAABAAAAAEBAQEAAAABAQAAAAAAAAAEAAACAQEBAQEBAQEBAAAAAAAAAAQAAAABAQEBAQEBAQEAAAAAAAAABAAAAAEBAQEBAQEBAQEBAQEAAAIBAQEBAQEBAQEBAQEAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQE=",
+					"group": 0,
+					"level": "test2",
+					"props": {
+						"tileSize": 16,
+						"layers": [
+							{
+								"l": "triggers",
+								"p": {
+									"alpha": 0.53,
+									"color": 5119
+								}
+							},
+							{
+								"l": "blocks",
+								"p": {
+									"alpha": 0.5
+								}
+							},
+							{
+								"l": "linkers",
+								"p": {
+									"alpha": 0.5
+								}
+							},
+							{
+								"l": "markers",
+								"p": {
+									"alpha": 1
+								}
+							}
+						]
+					},
+					"linkers": "AAAAAAAAAAAAAAAAAAAAAwMDAwACBgAAAAAAAAAAAAAAAAAAAAAHAAIGAAAAAAAAAAAAAAAAAAAAAAcAAgYAAAAAAAAAAAAAAAAAAAAABwACBgAAAAAAAAAAAAAAAAAAAAAHAAIGAAAAAAAAAAAAAAAAAAAAAAAAAAYGBgYGBgYGAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAACAgICAgICAgIAAAAAAAAAAAAAAAICAgICAgICAgAAAAAAAAAAAAAAAgICAgICAgICAAAAAAAAAAAAAAACAgICAgICAgIAAAAAAAAAAAAAAAICAgICAgICAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+					"markers": [
+						{
+							"x": 12,
+							"y": 4,
+							"kind": "CommonDoor",
+							"width": 1,
+							"height": 4
+						},
+						{
+							"x": 8,
+							"y": 17,
+							"kind": "CommonDoor",
+							"width": 1,
+							"height": 4
+						}
+					]
+				},
+				{
+					"type": "combat",
+					"width": 60,
+					"height": 10,
+					"tileProps": [],
+					"layers": [],
+					"triggers": [],
+					"blocks": "AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAEBAQAAAAEBAQAAAAEBAQAAAAEBAQAAAAEBAQAAAAEBAQAAAAEBAQAAAAEBAQAAAAEBAQAAAAABAQAAAAEBAQAAAAEBAQAAAAEBAQAAAAEBAQAAAAEBAQAAAAEBAQAAAAEBAQAAAAEBAQAAAAEBAQAAAAABAQICAgEBAQICAgEBAQICAgEBAQICAgEBAQICAgEBAQICAgEBAQICAgEBAQICAgEBAQICAgEBAQIAAAIBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAABAQEBAQEBAQEBAQEBAQEBAQEBAAAAAAAAAAAAAAAAAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAB",
+					"group": 0,
+					"level": "test3",
+					"props": {
+						"tileSize": 16,
+						"layers": [
+							{
+								"l": "triggers",
+								"p": {
+									"alpha": 0.53,
+									"color": 5119
+								}
+							},
+							{
+								"l": "blocks",
+								"p": {
+									"alpha": 0.5
+								}
+							},
+							{
+								"l": "linkers",
+								"p": {
+									"alpha": 0.5
+								}
+							},
+							{
+								"l": "markers",
+								"p": {
+									"alpha": 1
+								}
+							}
+						]
+					},
+					"linkers": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAEBAQEAAAAAAAAAAAAAAAAAAAAAAAAAAQEBAQMDAwMBAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAEBAQEA",
+					"markers": [],
+					"feature": 1
+				},
+				{
+					"type": "combat",
+					"width": 26,
+					"height": 15,
+					"tileProps": [],
+					"layers": [],
+					"triggers": [],
+					"group": 1,
+					"level": "boss1",
+					"props": {
+						"tileSize": 16,
+						"layers": [
+							{
+								"l": "triggers",
+								"p": {
+									"alpha": 0.53,
+									"color": 5119
+								}
+							},
+							{
+								"l": "blocks",
+								"p": {
+									"alpha": 0.5
+								}
+							},
+							{
+								"l": "linkers",
+								"p": {
+									"alpha": 0.5
+								}
+							},
+							{
+								"l": "markers",
+								"p": {
+									"alpha": 1
+								}
+							}
+						]
+					},
+					"blocks": "AQICAgIBAQEBAQECAgICAQEBAQEBAgICAgEBBAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAEAQEEAAAAAAAAAAAABAAAAAAAAAAAAAAAAAQBAQQAAAAAAAAAAAAEAAAAAAAAAAAAAAAABAEBBAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAEAQEEAAAAAAAAAAAABAAAAAAAAAAAAAAAAAQBAQQAAAAAAAAAAAAEAAAAAAAAAAAAAAAABAEBBAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAEAQECAgICAgICAgICAgICAgICAgICAgICAgIBAAAAAAAEAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAQAAAAAAAEAAAAAAQEBAQEBAAAAAAEBAQEBAQAAAAAB",
+					"linkers": "AAEBAQEAAAAAAAABAQEBAAAAAAAAAQEBAQAABQAAAAAAAAAAAAUAAAAAAAAAAAAAAAAFAAAFAAAAAAAAAAAABQAAAAAAAAAAAAAAAAUAAAUAAAAAAAAAAAAFAAAAAAAAAAAAAAAABQAABQAAAAAAAAAAAAUAAAAAAAAAAAAAAAAFAAAFAAAAAAAAAAAABQAAAAAAAAAAAAAAAAUAAAUAAAAAAAAAAAAFAAAAAAAAAAAAAAAABQAABQAAAAAAAAAAAAUAAAAAAAAAAAAAAAAFAAAAAAAAAAUFBQUFBQUFBQUFBQUFAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgADAwMDAAAAAAAAAwMDAwAAAAAAAAMDAwMA",
+					"markers": []
+				},
+				{
+					"type": "combat",
+					"width": 7,
+					"height": 30,
+					"tileProps": [],
+					"layers": [],
+					"triggers": [],
+					"blocks": "AQICAgIBAQEEAAAAAAABBAAAAAAAAQQAAAAAAAEEAAAAAAABBAAAAAAAAQICAgICAQEAAAAABAEBAAAAAAQBAAAAAAAEAQAAAAAABAEAAAAAAAQBAAAAAAAEAQAAAAAABAEBAgICAgIBAQQAAAAAAQEEAAAAAAEBBAAAAAABAQQAAAAAAQEEAAAAAAEBBAAAAAABAQQAAAAAAQEEAAAAAAEBBAAAAAABAQQAAAAAAAEEAAAAAAABBAAAAAAAAQQAAAAAAAEEAAAAAAABAQAAAAAB",
+					"linkers": "AAMDAwMAAAAHAAAAAAQABwAAAAAEAAcAAAAABAAHAAAAAAQABwAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAIAAAAAAAACAAAAAAAAAgAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAIAAAAAAAACAAAAAAAAAgAAAAAAAAIAAAEBAQEA",
+					"markers": [],
+					"group": 1,
+					"props": {
+						"tileSize": 16,
+						"layers": [
+							{
+								"l": "triggers",
+								"p": {
+									"alpha": 0.53,
+									"color": 5119
+								}
+							},
+							{
+								"l": "blocks",
+								"p": {
+									"alpha": 0.5
+								}
+							},
+							{
+								"l": "linkers",
+								"p": {
+									"alpha": 0.5
+								}
+							},
+							{
+								"l": "markers",
+								"p": {
+									"alpha": 1
+								}
+							}
+						]
+					},
+					"level": "boos2",
+					"feature": 2
+				}
+			],
+			"separators": [
+				0,
+				5
+			],
+			"props": {
+				"level": {
+					"tileSets": {
+						"forest.png": {
+							"stride": 16,
+							"sets": [
+								{
+									"x": 0,
+									"y": 0,
+									"w": 1,
+									"h": 1,
+									"t": "ground",
+									"opts": {
+										"name": "herb",
+										"priority": 2
+									}
+								},
+								{
+									"x": 1,
+									"y": 0,
+									"w": 1,
+									"h": 1,
+									"t": "ground",
+									"opts": {
+										"name": "foam",
+										"priority": 3
+									}
+								},
+								{
+									"x": 1,
+									"y": 2,
+									"w": 1,
+									"h": 1,
+									"t": "object",
+									"opts": {}
+								},
+								{
+									"x": 0,
+									"y": 1,
+									"w": 1,
+									"h": 1,
+									"t": "object",
+									"opts": {}
+								},
+								{
+									"x": 1,
+									"y": 1,
+									"w": 1,
+									"h": 1,
+									"t": "object",
+									"opts": {}
+								},
+								{
+									"x": 0,
+									"y": 3,
+									"w": 1,
+									"h": 1,
+									"t": "object",
+									"opts": {}
+								},
+								{
+									"x": 1,
+									"y": 3,
+									"w": 1,
+									"h": 1,
+									"t": "object",
+									"opts": {}
+								},
+								{
+									"x": 0,
+									"y": 2,
+									"w": 1,
+									"h": 1,
+									"t": "group",
+									"opts": {
+										"name": "tree"
+									}
+								},
+								{
+									"x": 1,
+									"y": 2,
+									"w": 1,
+									"h": 1,
+									"t": "group",
+									"opts": {
+										"name": "tree2"
+									}
+								},
+								{
+									"x": 0,
+									"y": 0,
+									"w": 1,
+									"h": 1,
+									"t": "object",
+									"opts": {}
+								},
+								{
+									"x": 0,
+									"y": 2,
+									"w": 1,
+									"h": 1,
+									"t": "object",
+									"opts": {}
+								}
+							],
+							"props": [
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								{
+									"hideHero": 0,
+									"collide": "Ladder"
+								},
+								{
+									"hideHero": 0,
+									"collide": "No"
+								},
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								{
+									"hideHero": 2,
+									"collide": "Small"
+								},
+								{
+									"hideHero": 2,
+									"collide": "Small"
+								},
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								{
+									"hideHero": 0
+								},
+								{
+									"hideHero": 0
+								},
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								{
+									"hideHero": 2,
+									"collide": "Small"
+								},
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null,
+								{
+									"hideHero": 2,
+									"collide": "Small"
+								},
+								{
+									"hideHero": 2,
+									"collide": "Small"
+								}
+							]
+						},
+						"collide.png": {
+							"stride": 8,
+							"sets": [],
+							"props": []
+						}
+					}
+				},
+				"hasGroup": true,
+				"separatorTitles": [
+					"test",
+					"boss"
+				]
+			}
+		},
+		{
+			"name": "levelData@layers",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "1",
+					"name": "name",
+					"display": null
+				},
+				{
+					"typeStr": "15",
+					"name": "data",
+					"display": null
+				},
+				{
+					"typeStr": "5:Add,Multiply,Erase",
+					"name": "blending",
+					"opt": true
+				}
+			]
+		},
+		{
+			"name": "levelData@triggers",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "3",
+					"name": "x",
+					"display": null
+				},
+				{
+					"typeStr": "3",
+					"name": "y",
+					"display": null
+				},
+				{
+					"typeStr": "3",
+					"name": "width",
+					"display": null
+				},
+				{
+					"typeStr": "3",
+					"name": "height",
+					"display": null
+				},
+				{
+					"typeStr": "9:Action",
+					"name": "action",
+					"opt": true
+				}
+			]
+		},
+		{
+			"name": "levelData@markers",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:marker",
+					"name": "kind"
+				},
+				{
+					"typeStr": "3",
+					"name": "x",
+					"display": null
+				},
+				{
+					"typeStr": "3",
+					"name": "y",
+					"display": null
+				},
+				{
+					"typeStr": "3",
+					"name": "width"
+				},
+				{
+					"typeStr": "3",
+					"name": "height"
+				}
+			]
+		},
+		{
+			"name": "levelData@tileProps",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:block",
+					"name": "collide",
+					"opt": true
+				},
+				{
+					"typeStr": "5:None,Yes,Vertical,Always",
+					"name": "hideHero"
+				}
+			]
+		},
+		{
+			"name": "levelType",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "id"
+				},
+				{
+					"typeStr": "11",
+					"name": "color"
+				}
+			],
+			"lines": [
+				{
+					"color": 16711680,
+					"id": "combat"
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "worldMap",
+			"columns": [
+				{
+					"name": "id",
+					"typeStr": "0"
+				},
+				{
+					"name": "width",
+					"typeStr": "3"
+				},
+				{
+					"name": "height",
+					"typeStr": "3"
+				},
+				{
+					"name": "props",
+					"typeStr": "16"
+				},
+				{
+					"name": "tileProps",
+					"typeStr": "8"
+				},
+				{
+					"name": "layers",
+					"typeStr": "8"
+				}
+			],
+			"lines": [
+				{
+					"id": "WorldMap",
+					"width": 40,
+					"height": 30,
+					"tileProps": [],
+					"layers": [],
+					"props": {
+						"tileSize": 16,
+						"layers": []
+					}
+				}
+			],
+			"separators": [],
+			"props": {
+				"level": {
+					"tileSets": {}
+				}
+			}
+		},
+		{
+			"name": "worldMap@tileProps",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": []
+		},
+		{
+			"name": "worldMap@layers",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"name": "name",
+					"typeStr": "1"
+				},
+				{
+					"name": "data",
+					"typeStr": "15"
+				}
+			]
+		},
+		{
+			"name": "tileSet",
+			"columns": [
+				{
+					"name": "id",
+					"typeStr": "0"
+				},
+				{
+					"name": "width",
+					"typeStr": "3"
+				},
+				{
+					"name": "height",
+					"typeStr": "3"
+				},
+				{
+					"name": "props",
+					"typeStr": "16"
+				},
+				{
+					"name": "tileProps",
+					"typeStr": "8"
+				},
+				{
+					"name": "layers",
+					"typeStr": "8"
+				},
+				{
+					"typeStr": "6:block",
+					"name": "tileType"
+				}
+			],
+			"lines": [
+				{
+					"id": "test0",
+					"width": 3,
+					"height": 3,
+					"tileProps": [],
+					"layers": [
+						{
+							"name": "t1",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAAAAAAAAAAAAAAAAAAAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 7,
+								"y": 0
+							},
+							"active": true,
+							"rules": [],
+							"tiles": [
+								{
+									"tile": {
+										"file": "map/Image7.png",
+										"size": 16,
+										"x": 7,
+										"y": 0
+									},
+									"random": 0.9
+								},
+								{
+									"tile": {
+										"file": "map/Image7.png",
+										"size": 16,
+										"x": 7,
+										"y": 1
+									},
+									"random": 0
+								},
+								{
+									"tile": {
+										"file": "map/Image7.png",
+										"size": 16,
+										"x": 7,
+										"y": 2
+									},
+									"random": 0
+								},
+								{
+									"tile": {
+										"file": "map/Image7.png",
+										"size": 16,
+										"x": 7,
+										"y": 3
+									},
+									"random": 0
+								}
+							]
+						}
+					],
+					"props": {
+						"tileSize": 15,
+						"layers": [
+							{
+								"l": "t1",
+								"p": {
+									"alpha": 1
+								}
+							}
+						]
+					},
+					"tileType": "No"
+				},
+				{
+					"id": "test1",
+					"width": 3,
+					"height": 3,
+					"tileProps": [],
+					"layers": [
+						{
+							"name": "t0",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAFAAAABQAAAAUAAAAFAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 3,
+								"y": 6
+							},
+							"active": true,
+							"rules": [],
+							"tiles": [],
+							"walls": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 11,
+								"y": 0
+							}
+						},
+						{
+							"name": "t1",
+							"tiles": [],
+							"rules": [],
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAFAAAABAAAAAYABwAIAAkA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 1,
+								"y": 0
+							}
+						},
+						{
+							"name": "t2",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAFAAAABQAAAAYAAAAIAAkA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 0,
+								"y": 0
+							},
+							"active": true,
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t3",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAFAAAABAAAAAUABwAIAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 2,
+								"y": 0
+							},
+							"active": true,
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t4",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAMABQAAAAYAAAAIAAkA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 0,
+								"y": 1
+							},
+							"active": true,
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t5",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AQACAAAABAAAAAUABwAIAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 2,
+								"y": 1
+							},
+							"active": true,
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t6",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAMABQAAAAYAAAAFAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 0,
+								"y": 2
+							},
+							"active": true,
+							"rules": [],
+							"tiles": [],
+							"walls": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 8,
+								"y": 0
+							}
+						},
+						{
+							"name": "t7",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AQACAAAABAAAAAUAAAAFAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 2,
+								"y": 2
+							},
+							"active": true,
+							"rules": [],
+							"tiles": [],
+							"walls": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 10,
+								"y": 0
+							}
+						},
+						{
+							"name": "t21_2",
+							"tiles": [],
+							"rules": [],
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "BQACAAUABAAAAAYAAAAFAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 4,
+								"y": 4
+							},
+							"walls": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 9,
+								"y": 0
+							}
+						},
+						{
+							"name": "t22_2",
+							"tiles": [],
+							"rules": [],
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "BQACAAAABAAAAAYAAAAFAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 4,
+								"y": 5
+							},
+							"walls": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 9,
+								"y": 0
+							}
+						},
+						{
+							"name": "t23_2",
+							"tiles": [],
+							"rules": [],
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAUABAAAAAYAAAAFAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 4,
+								"y": 6
+							},
+							"walls": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 9,
+								"y": 0
+							}
+						},
+						{
+							"name": "t8",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAAABAAAAAYAAAAFAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 1,
+								"y": 2
+							},
+							"active": true,
+							"rules": [],
+							"tiles": [],
+							"walls": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 9,
+								"y": 0
+							}
+						},
+						{
+							"name": "t19",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "BQACAAUABAAAAAYABQAIAAUA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 1,
+								"y": 5
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t19_1",
+							"tiles": [],
+							"rules": [],
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "BQACAAMABAAAAAYABQAIAAUA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 0,
+								"y": 6
+							}
+						},
+						{
+							"name": "t19_2",
+							"tiles": [],
+							"rules": [],
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AQACAAUABAAAAAYABQAIAAUA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 2,
+								"y": 6
+							}
+						},
+						{
+							"name": "t19_3",
+							"tiles": [],
+							"rules": [],
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "BQACAAUABAAAAAYABQAIAAkA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 0,
+								"y": 7
+							}
+						},
+						{
+							"name": "t19_4",
+							"tiles": [],
+							"rules": [],
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "BQACAAUABAAAAAYABwAIAAUA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 2,
+								"y": 7
+							}
+						},
+						{
+							"name": "t19_5",
+							"tiles": [],
+							"rules": [],
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "BQACAAMABAAAAAYABQAIAAkA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 0,
+								"y": 5
+							}
+						},
+						{
+							"name": "t19_6",
+							"tiles": [],
+							"rules": [],
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AQACAAUABAAAAAYABwAIAAUA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 2,
+								"y": 5
+							}
+						},
+						{
+							"name": "t17",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "BQACAAUABAAAAAYAAAAIAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 3,
+								"y": 3
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t18",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAAABAAAAAYABQAIAAUA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 3,
+								"y": 4
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t9",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "BQACAAAABAAAAAYAAAAIAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 0,
+								"y": 3
+							},
+							"active": true,
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t10",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAUABAAAAAYAAAAIAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 2,
+								"y": 3
+							},
+							"active": true,
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t11",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAAABAAAAAYABQAIAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 0,
+								"y": 4
+							},
+							"active": true,
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t12",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAAABAAAAAYAAAAIAAUA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 2,
+								"y": 4
+							},
+							"active": true,
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t13",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAAABAAAAAYAAAAIAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 1,
+								"y": 1
+							},
+							"active": true,
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t14",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAFAAAABQAAAAUAAAAIAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 3,
+								"y": 0
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t15",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAAABQAAAAUAAAAIAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 3,
+								"y": 1
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t16",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAAABQAAAAUAAAAFAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 3,
+								"y": 2
+							},
+							"rules": [],
+							"tiles": [],
+							"walls": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 11,
+								"y": 0
+							}
+						},
+						{
+							"name": "t20",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAFAAAABAAAAAYAAAAFAAAA"
+							},
+							"active": true,
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 4,
+								"y": 0
+							},
+							"rules": [],
+							"tiles": [],
+							"walls": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 9,
+								"y": 0
+							}
+						},
+						{
+							"name": "t21",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAFAAAABAAAAAYABQAIAAUA"
+							},
+							"active": true,
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 4,
+								"y": 1
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t22",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAFAAAABAAAAAYABQAIAAAA"
+							},
+							"active": true,
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 4,
+								"y": 2
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t23",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAFAAAABAAAAAYAAAAIAAUA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 4,
+								"y": 3
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t24",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAFAAAABQAAAAYAAAAIAAUA"
+							},
+							"active": true,
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 5,
+								"y": 0
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t25",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAFAAAABAAAAAUABQAIAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 6,
+								"y": 0
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t26",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAUABQAAAAYAAAAIAAkA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 5,
+								"y": 1
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t27",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "BQACAAAABAAAAAUABwAIAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 6,
+								"y": 1
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t28",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAMABQAAAAYAAAAIAAUA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 5,
+								"y": 2
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t29",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AQACAAAABAAAAAUABQAIAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 6,
+								"y": 2
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t30",
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAUABQAAAAYAAAAIAAUA"
+							},
+							"active": true,
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 5,
+								"y": 3
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t31",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "BQACAAAABAAAAAUABQAIAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 6,
+								"y": 3
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t32",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAUABQAAAAYAAAAFAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 5,
+								"y": 4
+							},
+							"rules": [],
+							"tiles": [],
+							"walls": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 8,
+								"y": 0
+							}
+						},
+						{
+							"name": "t33",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "BQACAAAABAAAAAUAAAAFAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 6,
+								"y": 4
+							},
+							"rules": [],
+							"tiles": [],
+							"walls": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 10,
+								"y": 0
+							}
+						},
+						{
+							"name": "t34",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAFAAAABQAAAAYAAAAFAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 5,
+								"y": 5
+							},
+							"rules": [],
+							"tiles": [],
+							"walls": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 8,
+								"y": 0
+							}
+						},
+						{
+							"name": "t35",
+							"active": true,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAFAAAABAAAAAUAAAAFAAAA"
+							},
+							"tile": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 6,
+								"y": 5
+							},
+							"rules": [],
+							"tiles": [],
+							"walls": {
+								"file": "map/Image7.png",
+								"size": 16,
+								"x": 10,
+								"y": 0
+							}
+						}
+					],
+					"tileType": "Block",
+					"props": {
+						"tileSize": 15,
+						"layers": [
+							{
+								"l": "t1",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t4",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t5",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t6",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t7",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t8",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t13",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t9",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t10",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t11",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t12",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t14",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t15",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t16",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t18",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t19",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t17",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t20",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t21",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t22",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t24",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t25",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t26",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t27",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t28",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t29",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t30",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t31",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t32",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t33",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t34",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t23",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t35",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t3",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t2",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t0",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t19_1",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t19_2",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t19_3",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t19_4",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t19_5",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t19_6",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t21_2",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t22_2",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t23_2",
+								"p": {
+									"alpha": 1
+								}
+							}
+						]
+					}
+				},
+				{
+					"id": "test2",
+					"width": 3,
+					"height": 3,
+					"tileProps": [],
+					"layers": [
+						{
+							"name": "t1",
+							"active": false,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAAAAAABAAAAAYAAAAAAAAA"
+							},
+							"tile": {
+								"file": "map/tiletile.png",
+								"size": 24,
+								"x": 9,
+								"y": 0
+							},
+							"rules": [
+								{
+									"x": -1,
+									"y": 0,
+									"block": "Block"
+								},
+								{
+									"x": -1,
+									"y": 0,
+									"block": "Terrace"
+								},
+								{
+									"x": 1,
+									"y": 0,
+									"block": "Block"
+								},
+								{
+									"x": 1,
+									"y": 0,
+									"block": "Terrace"
+								}
+							],
+							"tiles": []
+						},
+						{
+							"name": "t2",
+							"active": false,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAAAAAABQAAAAYAAAAAAAAA"
+							},
+							"tile": {
+								"file": "map/tiletile.png",
+								"size": 24,
+								"x": 8,
+								"y": 0
+							},
+							"rules": [
+								{
+									"x": 1,
+									"y": 0,
+									"block": "Block"
+								},
+								{
+									"x": 1,
+									"y": 0,
+									"block": "Terrace"
+								}
+							],
+							"tiles": []
+						},
+						{
+							"name": "t3",
+							"active": false,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAAAAAABAAAAAUAAAAAAAAA"
+							},
+							"tile": {
+								"file": "map/tiletile.png",
+								"size": 24,
+								"x": 10,
+								"y": 0
+							},
+							"rules": [
+								{
+									"x": -1,
+									"y": 0,
+									"block": "Block"
+								},
+								{
+									"x": -1,
+									"y": 0,
+									"block": "Terrace"
+								}
+							],
+							"tiles": []
+						}
+					],
+					"props": {
+						"tileSize": 15,
+						"layers": [
+							{
+								"l": "t1",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t2",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t3",
+								"p": {
+									"alpha": 1
+								}
+							}
+						]
+					},
+					"tileType": "Terrace"
+				},
+				{
+					"id": "test3",
+					"width": 3,
+					"height": 3,
+					"tileProps": [],
+					"layers": [
+						{
+							"name": "t1",
+							"active": false,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAAFAAAAAAAAAAAAAAAIAAAA"
+							},
+							"tile": {
+								"file": "map/tiletile.png",
+								"size": 24,
+								"x": 12,
+								"y": 0
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t2",
+							"active": false,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAAAAAAAAAAAAAAIAAAA"
+							},
+							"tile": {
+								"file": "map/tiletile.png",
+								"size": 24,
+								"x": 12,
+								"y": 1
+							},
+							"rules": [],
+							"tiles": []
+						},
+						{
+							"name": "t3",
+							"active": false,
+							"data": {
+								"file": "map/tileSet_mark.png",
+								"size": 15,
+								"stride": 3,
+								"data": "AAACAAAAAAAAAAAAAAAFAAAA"
+							},
+							"tile": {
+								"file": "map/tiletile.png",
+								"size": 24,
+								"x": 12,
+								"y": 2
+							},
+							"rules": [],
+							"tiles": []
+						}
+					],
+					"tileType": "Ladder",
+					"props": {
+						"tileSize": 15,
+						"layers": [
+							{
+								"l": "t1",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t2",
+								"p": {
+									"alpha": 1
+								}
+							},
+							{
+								"l": "t3",
+								"p": {
+									"alpha": 1
+								}
+							}
+						]
+					}
+				}
+			],
+			"separators": [],
+			"props": {
+				"level": {
+					"tileSets": {
+						"map/tileSet_mark.png": {
+							"stride": 3,
+							"sets": [],
+							"props": []
+						},
+						"collide.png": {
+							"stride": 8,
+							"sets": [],
+							"props": []
+						},
+						"map/tile_block.png": {
+							"stride": 8,
+							"sets": [],
+							"props": []
+						}
+					}
+				}
+			}
+		},
+		{
+			"name": "tileSet@tileProps",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": []
+		},
+		{
+			"name": "tileSet@layers",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"name": "name",
+					"typeStr": "1"
+				},
+				{
+					"name": "data",
+					"typeStr": "15"
+				},
+				{
+					"typeStr": "14",
+					"name": "tile",
+					"display": null
+				},
+				{
+					"typeStr": "8",
+					"name": "tiles"
+				},
+				{
+					"typeStr": "14",
+					"name": "walls"
+				},
+				{
+					"typeStr": "8",
+					"name": "rules",
+					"display": null
+				},
+				{
+					"typeStr": "2",
+					"name": "active",
+					"display": null
+				}
+			]
+		},
+		{
+			"name": "tileSet@layers@rules",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "3",
+					"name": "x"
+				},
+				{
+					"typeStr": "3",
+					"name": "y"
+				},
+				{
+					"typeStr": "6:block",
+					"name": "block",
+					"display": null
+				}
+			]
+		},
+		{
+			"name": "tileSet@layers@tiles",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "14",
+					"name": "tile",
+					"display": null
+				},
+				{
+					"typeStr": "4",
+					"name": "random",
+					"display": 1
+				}
+			]
+		}
+	],
+	"customTypes": [
+		{
+			"name": "Action",
+			"cases": [
+				{
+					"name": "Anchor",
+					"args": [
+						{
+							"name": "id",
+							"typeStr": "1"
+						}
+					]
+				},
+				{
+					"name": "Goto",
+					"args": [
+						{
+							"name": "l",
+							"typeStr": "1"
+						},
+						{
+							"name": "anchor",
+							"typeStr": "1",
+							"opt": true
+						}
+					]
+				},
+				{
+					"name": "ScrollStop",
+					"args": []
+				}
+			]
+		}
+	],
+	"compress": false
+}

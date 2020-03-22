@@ -31,14 +31,20 @@ local LFont = nil
 local LFontTexture2D = nil
 local LFontMaterial = nil
 
-local LObjectShader = CS.UnityEngine.Shader.Find("Sprites/Beat/Diffuse-Shadow")
+-- local LObjectShader = CS.UnityEngine.Shader.Find("Sprites/Beat/Diffuse-Shadow")
+-- local LObjectShader = CS.UnityEngine.Shader.Find("Tutorial/007_Sprite")
+local LObjectShader = CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph")
+-- local LObjectShader = CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph 1")
 
 local LDatas = {}
 local objects = {}
 
+utils.CAMERA = nil
 utils.PLAYER = nil
 utils.CURSOR = nil
 utils.LUABEHAVIOUR = nil
+utils.SPRITESDEFAULT = CS.UnityEngine.Material(CS.UnityEngine.Shader.Find("Sprites/Default"))
+utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY = CS.UnityEngine.Material(CS.UnityEngine.Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"))
 local LSystem = nil
 
 local hp = nil
@@ -510,8 +516,8 @@ end
 
 function utils.runObjectsFrame()
 	for i, v in pairs(objects) do
-		v:runEvent()
-		-- v:runFrame()
+		-- v:runEvent()
+		v:runFrame()
 		-- if v.AI then
 		-- 	v.database.AI:judgeAI(v)
 		-- end

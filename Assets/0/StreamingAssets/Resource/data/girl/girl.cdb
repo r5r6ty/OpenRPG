@@ -3840,6 +3840,46 @@
 					"action": "standUp",
 					"level": 999,
 					"frame": 3
+				},
+				{
+					"name": "walkU",
+					"command": "/U",
+					"time": 1,
+					"action": "walking",
+					"frame": 0,
+					"mp": 0,
+					"active": true,
+					"level": 0
+				},
+				{
+					"name": "walkU2idle",
+					"command": "~U",
+					"time": 1,
+					"action": "standing",
+					"frame": 0,
+					"mp": 0,
+					"active": true,
+					"level": 999
+				},
+				{
+					"name": "walkD",
+					"command": "/D",
+					"time": 1,
+					"action": "walking",
+					"frame": 0,
+					"mp": 0,
+					"active": true,
+					"level": 0
+				},
+				{
+					"name": "walkD2idle",
+					"command": "~D",
+					"time": 1,
+					"action": "standing",
+					"frame": 0,
+					"mp": 0,
+					"active": true,
+					"level": 999
 				}
 			],
 			"props": [],
@@ -4604,6 +4644,10 @@
 				{
 					"id": "catch",
 					"file": "sounds/catch.wav"
+				},
+				{
+					"id": "shot2",
+					"file": "sounds/P90.wav"
 				}
 			],
 			"props": [],
@@ -4804,89 +4848,48 @@
 			],
 			"lines": [
 				{
-					"name": "body_front",
+					"name": "body_idle_front",
 					"clips": [
 						{
-							"category": "Act",
-							"wait": 60,
-							"clip": "body_back",
-							"kind": 6,
-							"frame": 0,
-							"id": 1
-						},
-						{
-							"category": "Object",
-							"kind": 2,
-							"clip": "aim_left_hand",
-							"x": 2,
-							"y": 13,
-							"layer": -1,
-							"id": 0,
-							"wait": 60
-						},
-						{
-							"category": "Object",
-							"kind": 2,
-							"clip": "aim_right_hand",
+							"category": "Body",
 							"x": -4,
-							"y": 13,
-							"layer": -3,
-							"id": 1,
-							"wait": 60
+							"wait": 60,
+							"y": -15,
+							"width": 8,
+							"height": 15,
+							"id": 0,
+							"bodyFlags": 3,
+							"layers": "0"
 						},
 						{
-							"category": "Sprite",
 							"sprite": "21cdb5f86564db3840ff7daa4c46ac53",
 							"x": -9,
 							"y": -27,
-							"wait": 30
-						},
-						{
-							"category": "Sprite",
-							"sprite": "fb4b9394f9c841d48434bce45e99cb92",
-							"wait": 30,
-							"x": -8,
-							"y": -27
+							"wait": 60,
+							"category": "Sprite"
 						}
 					]
 				},
 				{
-					"name": "body_back",
+					"name": "body_idle_back",
 					"clips": [
 						{
-							"category": "Act",
+							"category": "Body",
 							"wait": 60,
-							"clip": "body_front",
-							"kind": 5,
-							"frame": 0,
-							"id": 1
-						},
-						{
-							"category": "Object",
-							"kind": 2,
-							"clip": "aim_left_hand",
-							"x": -3,
-							"y": 13,
-							"layer": 2,
+							"x": -4,
+							"y": -15,
+							"width": 8,
+							"height": 15,
 							"id": 0,
-							"wait": 60
+							"bodyFlags": 3,
+							"layers": "0"
 						},
 						{
-							"category": "Object",
-							"kind": 2,
-							"clip": "aim_right_hand",
-							"x": 3,
-							"y": 13,
-							"layer": 1,
-							"id": 1,
-							"wait": 60
-						},
-						{
-							"category": "Sprite",
 							"sprite": "fb4b9394f9c841d48434bce45e99cb92",
 							"x": -8,
 							"y": -27,
-							"wait": 60
+							"wait": 60,
+							"category": "Sprite"
 						}
 					]
 				},
@@ -4894,60 +4897,211 @@
 					"name": "body_run_front",
 					"clips": [
 						{
-							"category": "Sprite",
+							"category": "Act",
+							"wait": 40,
+							"kind": 6,
+							"id": 1,
+							"frame": 0
+						},
+						{
+							"category": "Object",
+							"wait": 5,
+							"x": 2,
+							"y": 13,
+							"kind": 2,
+							"id": 0,
+							"layer": -1
+						},
+						{
+							"category": "Object",
+							"wait": 5,
+							"x": -4,
+							"y": 13,
+							"kind": 2,
+							"id": 1,
+							"layer": -3
+						},
+						{
 							"sprite": "d3f31815b508e3a4c258bc9009cf4833",
 							"x": -10,
 							"y": -27,
-							"wait": 5
+							"wait": 5,
+							"category": "Sprite"
 						},
 						{
-							"category": "Sprite",
+							"category": "Object",
+							"wait": 5,
+							"x": 2,
+							"y": 13,
+							"kind": 2,
+							"id": 0,
+							"layer": -1
+						},
+						{
+							"category": "Object",
+							"wait": 5,
+							"x": -4,
+							"y": 13,
+							"kind": 2,
+							"id": 1,
+							"layer": -3
+						},
+						{
 							"sprite": "fc8ff7d6f693a98f351cbf3c7b0457ec",
 							"wait": 5,
 							"x": -10,
-							"y": -27
+							"y": -27,
+							"category": "Sprite"
 						},
 						{
-							"category": "Sprite",
+							"category": "Object",
+							"wait": 5,
+							"x": 2,
+							"y": 14,
+							"kind": 2,
+							"id": 0,
+							"layer": -1
+						},
+						{
+							"category": "Object",
+							"wait": 5,
+							"x": -4,
+							"y": 14,
+							"kind": 2,
+							"id": 1,
+							"layer": -3
+						},
+						{
 							"sprite": "e9fbc16505df2fb91acf4522dc91d35c",
 							"wait": 5,
 							"x": -9,
-							"y": -28
+							"y": -28,
+							"category": "Sprite"
 						},
 						{
-							"category": "Sprite",
+							"category": "Object",
+							"wait": 5,
+							"x": 2,
+							"y": 14,
+							"kind": 2,
+							"id": 0,
+							"layer": -1
+						},
+						{
+							"category": "Object",
+							"wait": 5,
+							"x": -4,
+							"y": 14,
+							"kind": 2,
+							"id": 1,
+							"layer": -3
+						},
+						{
 							"sprite": "259d58e9e8a94f39c3e9c26b39cd4b6e",
 							"wait": 5,
 							"x": -9,
-							"y": -28
+							"y": -28,
+							"category": "Sprite"
 						},
 						{
-							"category": "Sprite",
+							"category": "Object",
+							"wait": 5,
+							"x": 2,
+							"y": 13,
+							"kind": 2,
+							"id": 0,
+							"layer": -1
+						},
+						{
+							"category": "Object",
+							"wait": 5,
+							"x": -4,
+							"y": 13,
+							"kind": 2,
+							"id": 1,
+							"layer": -3
+						},
+						{
 							"sprite": "1cb8d1efac9e2d7b276e501266c844ef",
 							"wait": 5,
 							"x": -10,
-							"y": -27
+							"y": -27,
+							"category": "Sprite"
 						},
 						{
-							"category": "Sprite",
+							"category": "Object",
+							"wait": 5,
+							"x": 2,
+							"y": 13,
+							"kind": 2,
+							"id": 0,
+							"layer": -1
+						},
+						{
+							"category": "Object",
+							"wait": 5,
+							"x": -4,
+							"y": 13,
+							"kind": 2,
+							"id": 1,
+							"layer": -3
+						},
+						{
 							"sprite": "b935a8ca8f78142b4a4ecf6d6a76cfa7",
 							"wait": 5,
 							"x": -10,
-							"y": -27
+							"y": -27,
+							"category": "Sprite"
 						},
 						{
-							"category": "Sprite",
+							"category": "Object",
+							"wait": 5,
+							"x": 2,
+							"y": 14,
+							"kind": 2,
+							"id": 0,
+							"layer": -1
+						},
+						{
+							"category": "Object",
+							"wait": 5,
+							"x": -4,
+							"y": 14,
+							"kind": 2,
+							"id": 1,
+							"layer": -3
+						},
+						{
 							"sprite": "2e60afb940073823a142fb25efdb2d56",
 							"wait": 5,
 							"x": -9,
-							"y": -28
+							"y": -28,
+							"category": "Sprite"
 						},
 						{
-							"category": "Sprite",
+							"category": "Object",
+							"wait": 5,
+							"x": 2,
+							"y": 14,
+							"kind": 2,
+							"id": 0,
+							"layer": -1
+						},
+						{
+							"category": "Object",
+							"wait": 5,
+							"x": -4,
+							"y": 14,
+							"kind": 2,
+							"id": 1,
+							"layer": -3
+						},
+						{
 							"sprite": "ce93b7cf1cbee059f5d6dab8b066cf24",
 							"wait": 5,
 							"x": -9,
-							"y": -28
+							"y": -28,
+							"category": "Sprite"
 						}
 					]
 				},
@@ -4955,60 +5109,60 @@
 					"name": "body_run_back",
 					"clips": [
 						{
-							"category": "Sprite",
 							"sprite": "1d13f41f5b90be246740cedf9323daeb",
-							"x": -10,
+							"x": -9,
 							"y": -27,
-							"wait": 5
+							"wait": 5,
+							"category": "Sprite"
 						},
 						{
-							"category": "Sprite",
 							"sprite": "23ba3a994a76d7edb07b73a2899f1336",
 							"wait": 5,
-							"x": -10,
-							"y": -27
+							"x": -9,
+							"y": -27,
+							"category": "Sprite"
 						},
 						{
-							"category": "Sprite",
 							"sprite": "e49170e57a440fcbe1bb398e7ed0f733",
 							"wait": 5,
-							"x": -9,
-							"y": -28
+							"x": -8,
+							"y": -28,
+							"category": "Sprite"
 						},
 						{
-							"category": "Sprite",
 							"sprite": "5a96611ad7f5638c72e288e9e701ac4d",
 							"wait": 5,
-							"x": -9,
-							"y": -28
+							"x": -8,
+							"y": -28,
+							"category": "Sprite"
 						},
 						{
-							"category": "Sprite",
 							"sprite": "442c1aa99d010795f300d7094b0778ea",
 							"wait": 5,
-							"x": -10,
-							"y": -27
+							"x": -9,
+							"y": -27,
+							"category": "Sprite"
 						},
 						{
-							"category": "Sprite",
 							"sprite": "08a10ceaa642fe26e220aa3517a3230e",
 							"wait": 5,
-							"x": -10,
-							"y": -27
+							"x": -9,
+							"y": -27,
+							"category": "Sprite"
 						},
 						{
-							"category": "Sprite",
 							"sprite": "650c25b904acb245388888780b85c07b",
 							"wait": 5,
-							"x": -9,
-							"y": -28
+							"x": -8,
+							"y": -28,
+							"category": "Sprite"
 						},
 						{
-							"category": "Sprite",
 							"sprite": "36f669f4b209f0a00b178d3ff852f6e6",
 							"wait": 5,
-							"x": -9,
-							"y": -28
+							"x": -8,
+							"y": -28,
+							"category": "Sprite"
 						}
 					]
 				},
@@ -5016,11 +5170,27 @@
 					"name": "aim_weapon",
 					"clips": [
 						{
-							"category": "Sprite",
 							"sprite": "c17edd9a009e17594a7934bf316b8510",
 							"x": -17,
 							"y": -5,
-							"wait": 60
+							"wait": 60,
+							"category": "Sprite"
+						}
+					]
+				},
+				{
+					"name": "fire_weapon",
+					"clips": [
+						{
+							"category": "Sound",
+							"sfx": "shot2"
+						},
+						{
+							"sprite": "c17edd9a009e17594a7934bf316b8510",
+							"x": -18,
+							"y": -5,
+							"wait": 60,
+							"category": "Sprite"
 						}
 					]
 				},
@@ -5028,11 +5198,11 @@
 					"name": "aim_hand",
 					"clips": [
 						{
-							"category": "Sprite",
 							"sprite": "191f30a9d803ee3629cbf486ebb0d328",
 							"x": 0,
 							"y": -1,
-							"wait": 60
+							"wait": 60,
+							"category": "Sprite"
 						}
 					]
 				},
@@ -5041,25 +5211,24 @@
 					"clips": [
 						{
 							"category": "Act",
-							"wait": 60,
+							"wait": 5,
 							"kind": 4
 						},
 						{
 							"category": "Object",
 							"kind": 2,
-							"clip": "aim_weapon",
 							"x": 8,
 							"y": 1,
 							"layer": 1,
 							"id": 0,
-							"wait": 60
+							"wait": 5
 						},
 						{
-							"category": "Sprite",
 							"sprite": "191f30a9d803ee3629cbf486ebb0d328",
 							"x": 0,
 							"y": -1,
-							"wait": 60
+							"wait": 5,
+							"category": "Sprite"
 						}
 					]
 				},
@@ -5068,25 +5237,24 @@
 					"clips": [
 						{
 							"category": "Act",
-							"wait": 60,
+							"wait": 5,
 							"kind": 4
 						},
 						{
 							"category": "Object",
 							"kind": 2,
-							"clip": "aim_weapon",
 							"x": 8,
 							"y": 1,
 							"layer": 1,
 							"id": 0,
-							"wait": 60
+							"wait": 5
 						},
 						{
-							"category": "Sprite",
 							"sprite": "e119642dce295078d17bf7514a85485b",
 							"x": 0,
 							"y": -1,
-							"wait": 60
+							"wait": 5,
+							"category": "Sprite"
 						}
 					]
 				},
@@ -5095,13 +5263,35 @@
 					"clips": [
 						{
 							"category": "Trigger",
-							"wait": 60
+							"wait": 1
 						},
 						{
-							"category": "Sprite",
-							"sprite": "191f30a9d803ee3629cbf486ebb0d328",
+							"wait": 1,
+							"x": 0,
+							"y": -1,
+							"category": "Sprite"
+						}
+					]
+				},
+				{
+					"name": "bullet",
+					"clips": [
+						{
 							"wait": 60,
 							"x": 0,
+							"y": -1,
+							"category": "Sprite"
+						}
+					]
+				},
+				{
+					"name": "shell",
+					"clips": [
+						{
+							"sprite": "52c3a3ff78f2d5ee224f9e794be9d923",
+							"category": "Sprite",
+							"x": 2,
+							"wait": 60,
 							"y": -1
 						}
 					]
@@ -5119,110 +5309,353 @@
 					"display": null
 				},
 				{
+					"typeStr": "6:animations",
+					"name": "animation",
+					"opt": true,
+					"display": null
+				},
+				{
 					"typeStr": "8",
-					"name": "animations",
+					"name": "state"
+				},
+				{
+					"typeStr": "4",
+					"name": "x",
+					"opt": true
+				},
+				{
+					"typeStr": "4",
+					"name": "y",
+					"opt": true,
 					"display": null
 				}
 			],
 			"lines": [
 				{
-					"name": "aim_front",
-					"animations": [
+					"name": "global",
+					"state": [
 						{
-							"object": "body",
-							"animation": "body_front",
-							"layer": 0,
-							"kind": 0,
-							"x": 0,
-							"y": 0,
-							"kind2": 0
+							"command": "walk",
+							"kind": "Command",
+							"stateChange": "run",
+							"trigger": "controller ~= nil and controller.commands[\"walk\"].UIActive ~= nil and state ~= \"run\"",
+							"comment": ""
 						},
 						{
-							"object": "left_hand",
-							"animation": "aim_hand",
+							"stateChange": "aim",
+							"command": "walk2idle",
+							"kind": "Command",
+							"trigger": "controller ~= nil and controller.commands[\"walk2idle\"].UIActive ~= nil and state == \"run\"",
+							"comment": ""
+						},
+						{
+							"stateChange": "run",
+							"command": "walkU",
+							"kind": "Command",
+							"trigger": "controller ~= nil and controller.commands[\"walkU\"].UIActive ~= nil and state ~= \"run\"",
+							"comment": ""
+						},
+						{
+							"stateChange": "aim",
+							"command": "walkU2idle",
+							"kind": "Command",
+							"trigger": "controller ~= nil and controller.commands[\"walkU2idle\"].UIActive ~= nil and state == \"run\"",
+							"comment": ""
+						},
+						{
+							"stateChange": "run",
+							"command": "walkD",
+							"kind": "Command",
+							"trigger": "controller ~= nil and controller.commands[\"walkD\"].UIActive ~= nil and state ~= \"run\"",
+							"comment": ""
+						},
+						{
+							"stateChange": "aim",
+							"command": "walkD2idle",
+							"kind": "Command",
+							"trigger": "controller ~= nil and controller.commands[\"walkD2idle\"].UIActive ~= nil and state == \"run\"",
+							"comment": ""
+						}
+					]
+				},
+				{
+					"name": "aim",
+					"state": [
+						{
+							"kind": "Move",
+							"x2": 0,
+							"y2": 0,
+							"comment": "Move"
+						},
+						{
+							"trigger": "action == \"body_idle_front\" and target.gameObject.transform.position.y >= gameObject.transform.position.y",
+							"kind": "ChangeAnimation",
+							"animationChange": "body_idle_back",
+							"comment": "body_front"
+						},
+						{
+							"trigger": "action == \"body_idle_back\" and target.gameObject.transform.position.y < gameObject.transform.position.y",
+							"kind": "ChangeAnimation",
+							"animationChange": "body_idle_front",
+							"comment": "body_back"
+						},
+						{
+							"trigger": "direction.x == -1 and gameObject.transform.position.x - target.gameObject.transform.position.x < 0",
+							"kind": "TurnRight",
+							"comment": "body"
+						},
+						{
+							"trigger": "direction.x == 1 and gameObject.transform.position.x - target.gameObject.transform.position.x >= 0",
+							"kind": "TurnLeft",
+							"comment": "body"
+						},
+						{
 							"layer": -1,
-							"kind": 1,
 							"x": 2,
 							"y": 13,
-							"parent": "body",
-							"kind2": 0
+							"id": "0",
+							"kind": "Child",
+							"trigger": "action == \"body_idle_front\"",
+							"comment": "left_hand"
 						},
 						{
-							"object": "right_hand",
 							"layer": -3,
-							"animation": "aim_hand",
-							"kind": 1,
 							"x": -4,
 							"y": 13,
-							"parent": "body",
-							"kind2": 1
+							"id": "1",
+							"kind": "Child",
+							"trigger": "action == \"body_idle_front\"",
+							"comment": "right_hand"
 						},
 						{
-							"object": "gun",
-							"animation": "aim_weapon",
 							"layer": 1,
-							"kind": 0,
-							"x": 8,
-							"y": 1,
-							"parent": "right_hand",
-							"kind2": 0
-						}
-					]
-				},
-				{
-					"name": "aim_back",
-					"animations": [
-						{
-							"object": "body",
-							"animation": "body_back",
-							"layer": 0,
-							"kind": 0,
-							"x": 0,
-							"y": 0,
-							"kind2": 0
-						},
-						{
-							"object": "left_hand",
-							"animation": "aim_hand",
-							"layer": 2,
-							"kind": 1,
-							"x": -3,
-							"y": 13,
-							"parent": "body",
-							"kind2": 0
-						},
-						{
-							"object": "right_hand",
-							"layer": 1,
-							"animation": "aim_hand",
-							"kind": 1,
 							"x": 3,
 							"y": 13,
-							"parent": "body",
-							"kind2": 1
+							"kind": "Child",
+							"id": "0",
+							"trigger": "action == \"body_idle_back\"",
+							"comment": "left_hand"
 						},
 						{
-							"object": "gun",
-							"animation": "aim_weapon",
-							"layer": 1,
-							"kind": 0,
-							"x": 8,
-							"y": 1,
-							"parent": "left_hand",
-							"kind2": 0
+							"layer": 2,
+							"x": -3,
+							"y": 13,
+							"kind": "Child",
+							"id": "1",
+							"trigger": "action == \"body_idle_back\"",
+							"comment": "right_hand"
 						}
-					]
+					],
+					"animation": "body_idle_front"
 				},
 				{
-					"name": "run_front",
-					"animations": []
+					"name": "run",
+					"state": [
+						{
+							"kind": "Move",
+							"trigger": "controller ~= nil and controller.commands[\"walk\"].UIActive ~= nil and controller.commands[\"walk\"].UIActive == 1",
+							"x2": 1,
+							"comment": "Move"
+						},
+						{
+							"trigger": "controller ~= nil and controller.commands[\"walk\"].UIActive ~= nil and controller.commands[\"walk\"].UIActive == -1",
+							"kind": "Move",
+							"x2": -1,
+							"comment": "Move"
+						},
+						{
+							"trigger": "controller ~= nil and controller.commands[\"walkU\"].UIActive ~= nil",
+							"kind": "Move",
+							"y2": 1,
+							"comment": "Move"
+						},
+						{
+							"trigger": "controller ~= nil and controller.commands[\"walkD\"].UIActive ~= nil",
+							"kind": "Move",
+							"y2": -1,
+							"comment": "Move"
+						},
+						{
+							"kind": "ChangeAnimation",
+							"animationChange": "body_run_back",
+							"trigger": "action == \"body_run_front\" and target.gameObject.transform.position.y >= gameObject.transform.position.y",
+							"comment": "body_front"
+						},
+						{
+							"kind": "ChangeAnimation",
+							"animationChange": "body_run_front",
+							"trigger": "action == \"body_run_back\" and target.gameObject.transform.position.y < gameObject.transform.position.y",
+							"comment": "body_back"
+						},
+						{
+							"trigger": "direction.x == -1 and gameObject.transform.position.x - target.gameObject.transform.position.x < 0",
+							"kind": "TurnRight",
+							"comment": "body"
+						},
+						{
+							"trigger": "direction.x == 1 and gameObject.transform.position.x - target.gameObject.transform.position.x >= 0",
+							"kind": "TurnLeft",
+							"comment": "body"
+						},
+						{
+							"layer": -1,
+							"x": 2,
+							"y": 13,
+							"kind": "Child",
+							"id": "0",
+							"trigger": "action == \"body_run_front\" and (delayCounter == 1 or delayCounter == 2 or delayCounter == 5 or delayCounter == 6)",
+							"comment": "left_hand_front"
+						},
+						{
+							"layer": -3,
+							"x": -4,
+							"y": 13,
+							"kind": "Child",
+							"id": "1",
+							"trigger": "action == \"body_run_front\" and (delayCounter == 1 or delayCounter == 2 or delayCounter == 5 or delayCounter == 6)",
+							"comment": "right_hand_front"
+						},
+						{
+							"layer": -1,
+							"x": 2,
+							"y": 14,
+							"kind": "Child",
+							"id": "0",
+							"trigger": "action == \"body_run_front\" and (delayCounter == 3 or delayCounter == 4 or delayCounter == 7 or delayCounter == 8)",
+							"comment": "left_hand_front"
+						},
+						{
+							"layer": -3,
+							"x": -4,
+							"y": 14,
+							"kind": "Child",
+							"id": "1",
+							"trigger": "action == \"body_run_front\" and (delayCounter == 3 or delayCounter == 4 or delayCounter == 7 or delayCounter == 8)",
+							"comment": "right_hand_front"
+						},
+						{
+							"layer": 1,
+							"x": 3,
+							"y": 13,
+							"trigger": "action == \"body_run_back\" and (delayCounter == 1 or delayCounter == 2 or delayCounter == 5 or delayCounter == 6)",
+							"kind": "Child",
+							"id": "0",
+							"comment": "left_hand_back"
+						},
+						{
+							"layer": 2,
+							"x": -3,
+							"y": 13,
+							"trigger": "action == \"body_run_back\" and (delayCounter == 1 or delayCounter == 2 or delayCounter == 5 or delayCounter == 6)",
+							"kind": "Child",
+							"id": "1",
+							"comment": "right_hand_back"
+						},
+						{
+							"layer": 1,
+							"x": 3,
+							"y": 14,
+							"trigger": "action == \"body_run_back\" and (delayCounter == 3 or delayCounter == 4 or delayCounter == 7 or delayCounter == 8)",
+							"kind": "Child",
+							"id": "0",
+							"comment": "left_hand_back"
+						},
+						{
+							"layer": 2,
+							"x": -3,
+							"y": 14,
+							"trigger": "action == \"body_run_back\" and (delayCounter == 3 or delayCounter == 4 or delayCounter == 7 or delayCounter == 8)",
+							"kind": "Child",
+							"id": "1",
+							"comment": "right_hand_back"
+						}
+					],
+					"animation": "body_run_front"
+				},
+				{
+					"name": "aim_hand",
+					"state": [
+						{
+							"kind": "TurnToTarget",
+							"comment": ""
+						},
+						{
+							"layer": 1,
+							"x": 8,
+							"y": 1,
+							"kind": "Child",
+							"id": "0",
+							"comment": "right_hand"
+						}
+					],
+					"animation": "aim_left_hand"
+				},
+				{
+					"name": "weapon_idle",
+					"state": [
+						{
+							"stateChange": "weapon_shoot",
+							"command": "punch_l",
+							"trigger": "root.controller ~= nil and root.controller.commands[\"punch_l\"].UIActive ~= nil",
+							"kind": "Command",
+							"comment": ""
+						}
+					],
+					"animation": "aim_weapon"
+				},
+				{
+					"name": "weapon_shoot",
+					"state": [
+						{
+							"kind": "Object",
+							"id": "9",
+							"x": 24,
+							"y": -2,
+							"x2": 40,
+							"animationChange": "bullet",
+							"stateChange": "bullet",
+							"y2": 0,
+							"comment": "",
+							"colors": [
+								{
+									"color": 16768346
+								},
+								{
+									"color": 16758797
+								},
+								{
+									"color": 16749056
+								},
+								{
+									"color": 16731904
+								}
+							]
+						},
+						{
+							"kind": "ChangeState",
+							"stateChange": "weapon_idle",
+							"trigger": "timeLine >= 0.017",
+							"comment": "",
+							"colors": []
+						}
+					],
+					"animation": "fire_weapon"
+				},
+				{
+					"name": "bullet",
+					"state": [
+						{
+							"kind": "Collison",
+							"comment": "drawline"
+						}
+					]
 				}
 			],
 			"separators": [],
 			"props": {}
 		},
 		{
-			"name": "states@animations",
+			"name": "states@state",
 			"props": {
 				"hide": true
 			},
@@ -5231,39 +5664,72 @@
 			"columns": [
 				{
 					"typeStr": "1",
-					"name": "object"
+					"name": "comment"
 				},
 				{
-					"typeStr": "1",
-					"name": "parent",
+					"typeStr": "3",
+					"name": "layer",
 					"opt": true
 				},
 				{
 					"typeStr": "3",
-					"name": "layer"
-				},
-				{
-					"typeStr": "6:animations",
-					"name": "animation",
-					"display": null
-				},
-				{
-					"typeStr": "3",
-					"name": "x"
+					"name": "x",
+					"opt": true
 				},
 				{
 					"typeStr": "3",
 					"name": "y",
+					"opt": true
+				},
+				{
+					"typeStr": "4",
+					"name": "x2",
+					"opt": true
+				},
+				{
+					"typeStr": "4",
+					"name": "y2",
+					"opt": true,
 					"display": null
 				},
 				{
-					"typeStr": "3",
+					"typeStr": "6:states",
+					"name": "stateChange",
+					"opt": true,
+					"display": null
+				},
+				{
+					"typeStr": "6:animations",
+					"name": "animationChange",
+					"opt": true,
+					"display": null
+				},
+				{
+					"typeStr": "6:commands",
+					"name": "command",
+					"opt": true
+				},
+				{
+					"typeStr": "1",
+					"name": "trigger",
+					"opt": true,
+					"display": null
+				},
+				{
+					"typeStr": "1",
 					"name": "kind",
+					"opt": true
+				},
+				{
+					"typeStr": "1",
+					"name": "id",
+					"opt": true,
 					"display": null
 				},
 				{
-					"typeStr": "3",
-					"name": "kind2",
+					"typeStr": "8",
+					"name": "colors",
+					"opt": true,
 					"display": null
 				}
 			]
@@ -5279,7 +5745,7 @@
 				{
 					"typeStr": "6:frameType",
 					"name": "category",
-					"display": null
+					"opt": true
 				},
 				{
 					"typeStr": "7",
@@ -5305,6 +5771,17 @@
 				},
 				{
 					"typeStr": "3",
+					"name": "width",
+					"opt": true
+				},
+				{
+					"typeStr": "3",
+					"name": "height",
+					"opt": true,
+					"display": null
+				},
+				{
+					"typeStr": "3",
 					"name": "kind",
 					"opt": true,
 					"display": null
@@ -5316,10 +5793,9 @@
 					"display": null
 				},
 				{
-					"typeStr": "1",
-					"name": "clip",
-					"opt": true,
-					"display": null
+					"typeStr": "10:Collide,Injury,Catch,Defence",
+					"name": "bodyFlags",
+					"opt": true
 				},
 				{
 					"typeStr": "3",
@@ -5331,6 +5807,33 @@
 					"typeStr": "3",
 					"name": "layer",
 					"opt": true
+				},
+				{
+					"typeStr": "1",
+					"name": "layers",
+					"opt": true
+				},
+				{
+					"typeStr": "6:sounds",
+					"name": "sfx",
+					"opt": true,
+					"display": null
+				}
+			]
+		},
+		{
+			"name": "states@state@colors",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "11",
+					"name": "color",
+					"opt": true,
+					"display": null
 				}
 			]
 		}

@@ -28,6 +28,7 @@ function start()
     print("injected object", LCanvas)
     camera = LMainCamera:GetComponent(typeof(CS.UnityEngine.Camera))
     camera.orthographicSize = CS.UnityEngine.Screen.height / 1 / 100 / zoom
+    utils.CAMERA = camera
     
     utils.LUABEHAVIOUR = self:GetComponent(typeof(CS.XLuaTest.LuaBehaviour))
 
@@ -47,23 +48,43 @@ function start()
 
     -- LMap.gen()
 
-    -- utils.CURSOR = utils.createObject(nil, 9, "cursor", 0, 0, 0, 0, 0, 0)
+    utils.CURSOR = utils.createObject(nil, 9, "cursor", 0, 0, 0, 0, 0, 0)
 
-    for i = 100, 100, -1 do
+    local t = utils.CURSOR
+
+    local f = {}
+
+    for i = 100, 99, -1 do
         -- 生成测试用角色
-        local p, sid = utils.createObject(nil, 9, "body_run_back", 0, i - 100, 0, 0, 0, 0)
+        local p, sid = utils.createObject(nil, 9, "body_idle_front", 0, i - 100, 0, 0, 0, 0)
         mychar = p
 
-        -- mychar.children["0"] = utils.createObject(nil, 9, "aim_left_hand", 0, 0, 0, 0, 0, 0)
-        -- mychar.children["1"] = utils.createObject(nil, 9, "aim_right_hand", 0, 0, 0, 0, 0, 0)
-        -- mychar.children["1"].children["0"] = utils.createObject(nil, 9, "aim_weapon", 0, 0, 0, 0, 0, 0)
+        mychar.speed = (100 - i) / 100 + 1
+        mychar:changeState("aim")
+        mychar.target = t
+        t = mychar
+
+        mychar.children["0"] = utils.createObject(nil, 9, "aim_left_hand", 0, 0, 0, 0, 0, 0)
+        mychar.children["0"]:SetParentAndRoot(mychar)
+
+        mychar.children["0"]:changeState("aim_hand")
+
+
+        mychar.children["1"] = utils.createObject(nil, 9, "aim_right_hand", 0, 0, 0, 0, 0, 0)
+        mychar.children["1"]:SetParentAndRoot(mychar)
+
+        mychar.children["1"]:changeState("aim_hand")
+
+
+        mychar.children["1"].children["0"] = utils.createObject(nil, 9, "aim_weapon", 0, 0, 0, 0, 0, 0)
+        mychar.children["1"].children["0"]:SetParentAndRoot(mychar.children["1"])
+        mychar.children["1"].children["0"]:changeState("weapon_idle")
 
         -- CS.Tools.Instance:GetAnimationState(p.animation, "body_run_front").speed = (100 - i) / 100 + 1
 
-        p.speed = (100 - i) / 100 + 1
-
+        table.insert(f, mychar)
     end
-
+    mychar = f[1]
 
 
 
@@ -75,7 +96,9 @@ function start()
 	utils.setLSystem(system)
 
 
-	utils.PLAYER = player
+    utils.PLAYER = player
+    
+    mychar.controller = utils.PLAYER
 
     -- -- 测试动画
 
@@ -152,7 +175,7 @@ function update()
     --     camera.orthographicSize = CS.UnityEngine.Screen.height / 2 / 100 / zoom
     -- end
 
-    player:followCharacter()
+    -- player:followCharacter()
 	player:input()
 	player:judgeCommand()
 
@@ -174,10 +197,14 @@ function update()
     utils.runObjectsFrame2()
 end
 
+function lateupdate()
+    player:followCharacter()
+end
+
 function fixedupdate()
     -- mychar:runState()
 
-    -- utils.runObjectsFrame()
+    utils.runObjectsFrame()
 	-- if system.object ~= nil then
 	-- 	system:resetCommands()
 	-- end

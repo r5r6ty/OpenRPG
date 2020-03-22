@@ -1211,7 +1211,8 @@
 										"x": 7,
 										"y": 0
 									},
-									"random": 0.9
+									"random": 0.9,
+									"tile2": "8adcc8b3320158a20e9b090761540c2d"
 								},
 								{
 									"tile": {
@@ -1220,7 +1221,8 @@
 										"x": 7,
 										"y": 1
 									},
-									"random": 0
+									"random": 0,
+									"tile2": "9d51775ccd9a3a90f3c90c52434dd8c0"
 								},
 								{
 									"tile": {
@@ -1229,7 +1231,8 @@
 										"x": 7,
 										"y": 2
 									},
-									"random": 0
+									"random": 0,
+									"tile2": "c8ce3d97799d84fb07739bfafe42fc8d"
 								},
 								{
 									"tile": {
@@ -1238,9 +1241,12 @@
 										"x": 7,
 										"y": 3
 									},
-									"random": 0
+									"random": 0,
+									"tile2": "4536aaedb575691e87943c86e2cb1b97"
 								}
-							]
+							],
+							"tile2": "8adcc8b3320158a20e9b090761540c2d",
+							"walls2": ""
 						}
 					],
 					"props": {
@@ -1284,7 +1290,9 @@
 								"size": 16,
 								"x": 11,
 								"y": 0
-							}
+							},
+							"tile2": "e88f09cf3d993c37d8161ae46e07fbc9",
+							"walls2": "f3233f95d797241e48768b4ec945f1ae"
 						},
 						{
 							"name": "t1",
@@ -1302,7 +1310,9 @@
 								"size": 16,
 								"x": 1,
 								"y": 0
-							}
+							},
+							"tile2": "921b9001f28b85575559cd69bb5ef51a",
+							"walls2": ""
 						},
 						{
 							"name": "t2",
@@ -1320,7 +1330,9 @@
 							},
 							"active": true,
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "43bae5e7483c6d40524283fa528629b5",
+							"walls2": ""
 						},
 						{
 							"name": "t3",
@@ -1338,7 +1350,9 @@
 							},
 							"active": true,
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "44971634bf450c4b43931660deb2c91a",
+							"walls2": ""
 						},
 						{
 							"name": "t4",
@@ -1356,7 +1370,9 @@
 							},
 							"active": true,
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "d1dca3ca9a433180bd2d070262433f66",
+							"walls2": ""
 						},
 						{
 							"name": "t5",
@@ -1374,7 +1390,9 @@
 							},
 							"active": true,
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "d735a63925761896e7392ee5207ff644",
+							"walls2": ""
 						},
 						{
 							"name": "t6",
@@ -1398,7 +1416,9 @@
 								"size": 16,
 								"x": 8,
 								"y": 0
-							}
+							},
+							"tile2": "0ea7a96d6d6ea6383642a8b1e3b16879",
+							"walls2": "e398c611259449bc52230dd21ad5adce"
 						},
 						{
 							"name": "t7",
@@ -1422,7 +1442,9 @@
 								"size": 16,
 								"x": 10,
 								"y": 0
-							}
+							},
+							"tile2": "cbfec34439ae9954189fd5aa2dfd128e",
+							"walls2": "4f729192eda5db865fcb2a78c2ac87d3"
 						},
 						{
 							"name": "t21_2",
@@ -1446,7 +1468,9 @@
 								"size": 16,
 								"x": 9,
 								"y": 0
-							}
+							},
+							"tile2": "f979b805982e37e98396841a6479cb81",
+							"walls2": "1b8d6dc5c366e2d5021a2ff7ca1ec500"
 						},
 						{
 							"name": "t22_2",
@@ -1470,7 +1494,9 @@
 								"size": 16,
 								"x": 9,
 								"y": 0
-							}
+							},
+							"tile2": "6aed778b2f6ec81c864140a2148be43f",
+							"walls2": "1b8d6dc5c366e2d5021a2ff7ca1ec500"
 						},
 						{
 							"name": "t23_2",
@@ -1494,7 +1520,9 @@
 								"size": 16,
 								"x": 9,
 								"y": 0
-							}
+							},
+							"tile2": "a63d290bcbb964a1b3e3ae28fa23fba9",
+							"walls2": "1b8d6dc5c366e2d5021a2ff7ca1ec500"
 						},
 						{
 							"name": "t8",
@@ -1518,7 +1546,9 @@
 								"size": 16,
 								"x": 9,
 								"y": 0
-							}
+							},
+							"tile2": "2ef03de7a282aa3fb3bdea3602e58819",
+							"walls2": "1b8d6dc5c366e2d5021a2ff7ca1ec500"
 						},
 						{
 							"name": "t19",
@@ -1536,7 +1566,9 @@
 								"y": 5
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "3a93f4ea102aad61f58bbbd4911b2741",
+							"walls2": ""
 						},
 						{
 							"name": "t19_1",
@@ -1554,7 +1586,9 @@
 								"size": 16,
 								"x": 0,
 								"y": 6
-							}
+							},
+							"tile2": "3247b266a7189cc55dd662055537407d",
+							"walls2": ""
 						},
 						{
 							"name": "t19_2",
@@ -1572,7 +1606,9 @@
 								"size": 16,
 								"x": 2,
 								"y": 6
-							}
+							},
+							"tile2": "d4cb41f3e82c056fb36adc2852621076",
+							"walls2": ""
 						},
 						{
 							"name": "t19_3",
@@ -1590,7 +1626,9 @@
 								"size": 16,
 								"x": 0,
 								"y": 7
-							}
+							},
+							"tile2": "c5740a4892cfa28243a06a93b28e0798",
+							"walls2": ""
 						},
 						{
 							"name": "t19_4",
@@ -1608,7 +1646,9 @@
 								"size": 16,
 								"x": 2,
 								"y": 7
-							}
+							},
+							"tile2": "bfbeefdf1befe41078d01934b6d53237",
+							"walls2": ""
 						},
 						{
 							"name": "t19_5",
@@ -1626,7 +1666,9 @@
 								"size": 16,
 								"x": 0,
 								"y": 5
-							}
+							},
+							"tile2": "e2d8aaa409e23b8f8a090d9c06b3ce7f",
+							"walls2": ""
 						},
 						{
 							"name": "t19_6",
@@ -1644,7 +1686,9 @@
 								"size": 16,
 								"x": 2,
 								"y": 5
-							}
+							},
+							"tile2": "a23d31e863b252e79f095551f5e537e0",
+							"walls2": ""
 						},
 						{
 							"name": "t17",
@@ -1662,7 +1706,9 @@
 								"y": 3
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "e4c0493f0a1698cd5bcee9525f88ced2",
+							"walls2": ""
 						},
 						{
 							"name": "t18",
@@ -1680,7 +1726,9 @@
 								"y": 4
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "420041d16be1433341128d80b821ffbe",
+							"walls2": ""
 						},
 						{
 							"name": "t9",
@@ -1698,7 +1746,9 @@
 							},
 							"active": true,
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "0a12c9084330d96ddadb98fd8c173430",
+							"walls2": ""
 						},
 						{
 							"name": "t10",
@@ -1716,7 +1766,9 @@
 							},
 							"active": true,
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "492450d93e37cfcc7f9d0a1bddc99d42",
+							"walls2": ""
 						},
 						{
 							"name": "t11",
@@ -1734,7 +1786,9 @@
 							},
 							"active": true,
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "ac567ebcffa5d8c6367b37d334a79513",
+							"walls2": ""
 						},
 						{
 							"name": "t12",
@@ -1752,7 +1806,9 @@
 							},
 							"active": true,
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "4034e5176d07edb059c3488102ef8e42",
+							"walls2": ""
 						},
 						{
 							"name": "t13",
@@ -1770,7 +1826,9 @@
 							},
 							"active": true,
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "74a326808d224b053730a0aedaa86399",
+							"walls2": ""
 						},
 						{
 							"name": "t14",
@@ -1788,7 +1846,9 @@
 								"y": 0
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "067ad29df77c638bdf0b8c68d874eaa3",
+							"walls2": ""
 						},
 						{
 							"name": "t15",
@@ -1806,7 +1866,9 @@
 								"y": 1
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "21e5d499b96227b8477000f3dc9936e1",
+							"walls2": ""
 						},
 						{
 							"name": "t16",
@@ -1830,7 +1892,9 @@
 								"size": 16,
 								"x": 11,
 								"y": 0
-							}
+							},
+							"tile2": "557983867949772b9795373b9d75642b",
+							"walls2": "f3233f95d797241e48768b4ec945f1ae"
 						},
 						{
 							"name": "t20",
@@ -1854,7 +1918,9 @@
 								"size": 16,
 								"x": 9,
 								"y": 0
-							}
+							},
+							"tile2": "2cd014ae7c63e068f87e4089a4d07578",
+							"walls2": "1b8d6dc5c366e2d5021a2ff7ca1ec500"
 						},
 						{
 							"name": "t21",
@@ -1872,7 +1938,9 @@
 								"y": 1
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "114061a1818c2e2e395a54c65d9b1b54",
+							"walls2": ""
 						},
 						{
 							"name": "t22",
@@ -1890,7 +1958,9 @@
 								"y": 2
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "838391dffd7492bdcdaace505372238d",
+							"walls2": ""
 						},
 						{
 							"name": "t23",
@@ -1908,7 +1978,9 @@
 								"y": 3
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "4e22a88c8fe741d52a194a1b7fdd8c20",
+							"walls2": ""
 						},
 						{
 							"name": "t24",
@@ -1926,7 +1998,9 @@
 								"y": 0
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "5dfdd55cc1f78e89226036073cd257ff",
+							"walls2": ""
 						},
 						{
 							"name": "t25",
@@ -1944,7 +2018,9 @@
 								"y": 0
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "2d990563f2eb34ddbe2233acf31f8cf7",
+							"walls2": ""
 						},
 						{
 							"name": "t26",
@@ -1962,7 +2038,9 @@
 								"y": 1
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "9874923a1e24a1f709c299d26be19842",
+							"walls2": ""
 						},
 						{
 							"name": "t27",
@@ -1980,7 +2058,9 @@
 								"y": 1
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "c6467fa33214ef8c3160e9215ca6ea48",
+							"walls2": ""
 						},
 						{
 							"name": "t28",
@@ -1998,7 +2078,9 @@
 								"y": 2
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "2df617ba4a7d073f681060cdcaae4513",
+							"walls2": ""
 						},
 						{
 							"name": "t29",
@@ -2016,7 +2098,9 @@
 								"y": 2
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "d1fd634dbc802198292f680a0d840009",
+							"walls2": ""
 						},
 						{
 							"name": "t30",
@@ -2034,7 +2118,9 @@
 								"y": 3
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "7553e9aca3c92a1d912d67a8cef2f4e6",
+							"walls2": ""
 						},
 						{
 							"name": "t31",
@@ -2052,7 +2138,9 @@
 								"y": 3
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "c9a460276da4671d2d41f38d9a7f7ce3",
+							"walls2": ""
 						},
 						{
 							"name": "t32",
@@ -2076,7 +2164,9 @@
 								"size": 16,
 								"x": 8,
 								"y": 0
-							}
+							},
+							"tile2": "2e249199fd322995850284e3695f0b30",
+							"walls2": "e398c611259449bc52230dd21ad5adce"
 						},
 						{
 							"name": "t33",
@@ -2100,7 +2190,9 @@
 								"size": 16,
 								"x": 10,
 								"y": 0
-							}
+							},
+							"tile2": "c90ce84b7cfd28a7a0e073939966dfcb",
+							"walls2": "4f729192eda5db865fcb2a78c2ac87d3"
 						},
 						{
 							"name": "t34",
@@ -2124,7 +2216,9 @@
 								"size": 16,
 								"x": 8,
 								"y": 0
-							}
+							},
+							"tile2": "426a96e51d4f3f20b600561cd141f9f6",
+							"walls2": "e398c611259449bc52230dd21ad5adce"
 						},
 						{
 							"name": "t35",
@@ -2148,7 +2242,9 @@
 								"size": 16,
 								"x": 10,
 								"y": 0
-							}
+							},
+							"tile2": "f1c5339ef418b084d3817966c9b07f6e",
+							"walls2": "4f729192eda5db865fcb2a78c2ac87d3"
 						}
 					],
 					"tileType": "Block",
@@ -2471,7 +2567,9 @@
 									"block": "Terrace"
 								}
 							],
-							"tiles": []
+							"tiles": [],
+							"tile2": "",
+							"walls2": ""
 						},
 						{
 							"name": "t2",
@@ -2500,7 +2598,9 @@
 									"block": "Terrace"
 								}
 							],
-							"tiles": []
+							"tiles": [],
+							"tile2": "",
+							"walls2": ""
 						},
 						{
 							"name": "t3",
@@ -2529,7 +2629,9 @@
 									"block": "Terrace"
 								}
 							],
-							"tiles": []
+							"tiles": [],
+							"tile2": "",
+							"walls2": ""
 						}
 					],
 					"props": {
@@ -2579,7 +2681,9 @@
 								"y": 0
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "",
+							"walls2": ""
 						},
 						{
 							"name": "t2",
@@ -2597,7 +2701,9 @@
 								"y": 1
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "",
+							"walls2": ""
 						},
 						{
 							"name": "t3",
@@ -2615,7 +2721,9 @@
 								"y": 2
 							},
 							"rules": [],
-							"tiles": []
+							"tiles": [],
+							"tile2": "",
+							"walls2": ""
 						}
 					],
 					"tileType": "Ladder",
@@ -2698,12 +2806,22 @@
 					"display": null
 				},
 				{
+					"typeStr": "7",
+					"name": "tile2",
+					"display": null
+				},
+				{
 					"typeStr": "8",
 					"name": "tiles"
 				},
 				{
 					"typeStr": "14",
 					"name": "walls"
+				},
+				{
+					"typeStr": "7",
+					"name": "walls2",
+					"display": null
 				},
 				{
 					"typeStr": "8",
@@ -2754,11 +2872,41 @@
 					"display": null
 				},
 				{
+					"typeStr": "7",
+					"name": "tile2",
+					"opt": true,
+					"display": null
+				},
+				{
 					"typeStr": "4",
 					"name": "random",
 					"display": 1
 				}
 			]
+		},
+		{
+			"name": "palettes",
+			"columns": [
+				{
+					"typeStr": "13",
+					"name": "file",
+					"display": null
+				}
+			],
+			"lines": [
+				{
+					"file": "map/t1.pal"
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "sounds",
+			"columns": [],
+			"lines": [],
+			"separators": [],
+			"props": {}
 		}
 	],
 	"customTypes": [

@@ -32,14 +32,14 @@ local dataBase = {data = nil,
                   linkersTiles = {}, -- sprites
                   markersTiles = {}, -- sprites
                   levels = {},
-				  tiles = {}, -- sprites
+				--   tiles = {}, -- sprites
 				  tileSets = {}}
 
 local gameMap = {}
 
 -- 数据库new
 function tool2_castleDB.new(path, file)
-    castleDBInstance = castleDB:new(path, file)
+    castleDBInstance = LCastleDBMap:new(path, file)
     castleDBInstance:readDB()
 
 --    local str = ""
@@ -236,18 +236,22 @@ function loadTileSet(index)
 		for i, v in ipairs(data) do
 			if v["active"] == true then
 				-- 读取texture和sprite
-				local ff = v["tile"]["file"]
-				if dataBase.textures[ff] == nil then
-					dataBase.textures[ff] = utils.LoadImageToTexture2DByPath(castleDBInstance.DBPath .. ff)
-				end
-				local s = utils.CreateSprite(dataBase.textures[ff], v["tile"]["x"], v["tile"]["y"], v["tile"]["size"])
-				table.insert(dataBase.tiles, s)
+				-- local ff = v["tile"]["file"]
+				-- if dataBase.textures[ff] == nil then
+				-- 	dataBase.textures[ff] = utils.LoadImageToTexture2DByPath(castleDBInstance.DBPath .. ff)
+				-- end
+				-- local s = utils.CreateSprite(dataBase.textures[ff], v["tile"]["x"], v["tile"]["y"], v["tile"]["size"])
+				-- table.insert(dataBase.tiles, s)
+				-- table.insert(dataBase.tiles, s)
+
+				local s = castleDBInstance.sprites[v["tile2"]]
 
 				local sa = {}
 				for i2, v2 in ipairs(v["tiles"]) do
-					local s2 = utils.CreateSprite(dataBase.textures[ff], v2["tile"]["x"], v2["tile"]["y"], v2["tile"]["size"])
-					table.insert(dataBase.tiles, s2)
-					table.insert(sa, s2)
+					-- local s2 = utils.CreateSprite(dataBase.textures[ff], v2["tile"]["x"], v2["tile"]["y"], v2["tile"]["size"])
+					-- table.insert(dataBase.tiles, s2)
+					-- table.insert(sa, s2)
+					table.insert(sa, castleDBInstance.sprites[v2["tile2"]])
 				end
 
 				local sa_wall = {}
@@ -258,8 +262,11 @@ function loadTileSet(index)
 				-- end
 
 				local wall_s = nil
-				if v["walls"] ~= nil then
-					wall_s = utils.CreateSprite(dataBase.textures[ff], v["walls"]["x"], v["walls"]["y"], v["walls"]["size"])
+				-- if v["walls"] ~= nil then
+				-- 	wall_s = utils.CreateSprite(dataBase.textures[ff], v["walls"]["x"], v["walls"]["y"], v["walls"]["size"])
+				-- end
+				if v["walls2"] ~= nil then
+					wall_s = castleDBInstance.sprites[v["walls2"]]
 				end
 
 				-- 读取tile规则
@@ -686,6 +693,7 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 				if sortArray[10] == nil then
 					local sortObject = CS.UnityEngine.GameObject("Sort " .. 10)
 					sortObject.transform.parent = unityobject.transform
+					sortObject.transform.localPosition = CS.UnityEngine.Vector3(0, 0, 10 / 100)
 					sortArray[10] = sortObject
 				end
 
@@ -697,6 +705,7 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 				unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, -k * ts.size / 100, 0)
 				local sr = unityobject_child:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
 				sr.sprite = ts.spriteArray[CS.Tools.Instance:RandomRangeInt(1, #ts.spriteArray + 1)]
+				sr.material = castleDBInstance.palettes[1]
 				sr.sortingOrder = -10
 			end
 			if gameMap[p][k] ~= 0 then -- 生成碰撞场景
@@ -729,6 +738,7 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 					unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, -(k - 1) * ts.size / 100, 0)
 					local sr = unityobject_child:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
 					sr.sprite = ts.sprite
+					sr.material = castleDBInstance.palettes[1]
 					sr.sortingOrder = -s
 
 					unityobject_child.layer = gameMap[p][k]
@@ -757,6 +767,7 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 					if sortArray[10] == nil then
 						local sortObject = CS.UnityEngine.GameObject("Sort " .. 10)
 						sortObject.transform.parent = unityobject.transform
+						sortObject.transform.localPosition = CS.UnityEngine.Vector3(0, 0, 10 / 100)
 						sortArray[10] = sortObject
 					end
 
@@ -765,6 +776,7 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 					unityobject_child2.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, -k * ts.size / 100, 0)
 					local sr2 = unityobject_child2:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
 					sr2.sprite = ts.walls
+					sr2.material = castleDBInstance.palettes[1]
 					sr2.sortingOrder = -10
 				end
 
@@ -773,6 +785,7 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 				unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, -(k - 1) * ts.size / 100, 0)
 				local sr = unityobject_child:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
 				sr.sprite = ts.sprite
+				sr.material = castleDBInstance.palettes[1]
 				sr.sortingOrder = -s
 
 				unityobject_child.layer = gameMap[p][k]

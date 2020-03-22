@@ -82,7 +82,7 @@ public class GameLoader : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 
     //public string Base64Decode(string str)
@@ -221,6 +221,13 @@ public class Tools
     public float RandomRangeFloat(float a, float b)
     {
         return UnityEngine.Random.Range(a, b);
+    }
+
+    public Color ColorTryParseHtmlString(string hs)
+    {
+        Color c;
+        ColorUtility.TryParseHtmlString(hs, out c);
+        return c;
     }
 
     public RaycastHit2D[] RigidBody2DCastA(Rigidbody2D r2D, Vector2 dr, RaycastHit2D[] r)

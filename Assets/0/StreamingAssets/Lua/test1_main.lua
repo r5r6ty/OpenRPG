@@ -31,14 +31,22 @@ function start()
 	data:readDB()
 	for i, v in ipairs(data:getLines("data")) do
 		local p = utils.split(v.file, "/")
-		local cdb = LCastleDBCharacter:new(CS.UnityEngine.Application.dataPath .. "/0/StreamingAssets/Resource/data/" .. p[1] .. "/", p[2])
-		cdb:readDBLite()
+		local cdb = LCastleDBMap:new(CS.UnityEngine.Application.dataPath .. "/0/StreamingAssets/Resource/data/" .. p[1] .. "/", p[2])
+		cdb:readDB()
 		cdb:readIMG()
 
 --~ 	createSpriteAtlas()
 
 		createSpriteAtlas2(cdb)
 	end
+
+	local cdb = LCastleDBMap:new(CS.UnityEngine.Application.dataPath .. "/0/StreamingAssets/Resource/", "data2.cdb")
+	cdb:readDB()
+	cdb:readIMG()
+
+--~ 	createSpriteAtlas()
+
+	createSpriteAtlas2(cdb)
 
 
 end

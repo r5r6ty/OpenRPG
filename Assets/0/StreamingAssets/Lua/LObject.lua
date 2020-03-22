@@ -66,9 +66,16 @@ LObject = {database = nil,
 			eventManager = nil,
 
 			parent = nil,
+			children = nil,
 			root = nil,
 			animation = nil,
-			speed = nil
+			speed = nil,
+			timeLine = nil,
+			state = nil,
+			target = nil,
+			controller = nil,
+
+			oriPos = nil
 			}
 LObject.__index = LObject
 function LObject:new(parent, db, id, a, f, go, vx, vy, k)
@@ -86,10 +93,15 @@ function LObject:new(parent, db, id, a, f, go, vx, vy, k)
 	self.delayCounter = 0
 	self.nextDelayCounter = self.delayCounter
 
-	self.parent = nil
-	self.root = nil
+	self.parent = self
+	self.children = {}
+	self.root = self
 	self.animation = nil
 	self.speed = 1
+	self.timeLine = 0
+	self.state = nil
+	self.target = nil
+	self.controller = nil
 
 	for _i, _v in ipairs(self.database:getLines("vars")) do
 		self[_v.name] = _v.default
@@ -254,9 +266,7 @@ LCharacterObject = {
 
 			AI = nil,
 			target = nil,
-			catchedObjects = nil,
-
-			children = nil
+			catchedObjects = nil
 			}
 setmetatable(LCharacterObject, LObject)
 LCharacterObject.__index = LCharacterObject
@@ -322,8 +332,6 @@ function LCharacterObject:new(parent, db, id, a, f, go, vx, vy, k)
 	self.target = nil
 
 	self.catchedObjects = {}
-
-	self.children = {}
 
 	-- if self.kind ~= 3 and self.kind ~= 5 then
 	-- 	self:addEvent("Flying", 0, 999999, nil)

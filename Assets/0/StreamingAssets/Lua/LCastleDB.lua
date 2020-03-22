@@ -85,35 +85,23 @@ function castleDB:getLines(name)
 	return self.DBSheets[name].lines
 end
 
-
-LCastleDBCharacter = {characters = nil, AI = nil, texture2D = nil, sprites = nil, audioClips = nil, palettes = nil, animations = nil, characters_state = nil, FBcontorller = nil, animationClips = nil}
-setmetatable(LCastleDBCharacter, castleDB)
-LCastleDBCharacter.__index = LCastleDBCharacter
-function LCastleDBCharacter:new(path, file)
+LCastleDBMap = {texture2D = nil, sprites = nil, audioClips = nil, palettes = nil}
+setmetatable(LCastleDBMap, castleDB)
+LCastleDBMap.__index = LCastleDBMap
+function LCastleDBMap:new(path, file)
 	local self = {}
 	self = castleDB:new(path, file)
-	setmetatable(self, LCastleDBCharacter)
+	setmetatable(self, LCastleDBMap)
 
-	self.characters = nil
-	self.AI = nil
 	self.texture2D = nil
 	self.sprites = nil
 	self.audioClips = nil
 	self.palettes = nil
-
-	self.animations = nil
-	self.characters_state = nil
-	self.FBcontorller = nil
-	self.animationClips = nil
 	return self
 end
 
-function LCastleDBCharacter:readDBLite()
-	local str = utils.openFileText(self.DBPath .. self.DBFile)
-    self.DBData = json.decode(str)
-end
+function LCastleDBMap:readDB()
 
-function LCastleDBCharacter:readDB()
 	local str = utils.openFileText(self.DBPath .. self.DBFile)
 
     self.DBData = json.decode(str)
@@ -126,117 +114,12 @@ function LCastleDBCharacter:readDB()
 	end
 	print(self.DBPath .. self.DBFile .. ": json read!")
 
-
-	self.characters = {}
-	for i, v in ipairs(self:getLines("actions")) do
-		self.characters[v.name] = v.frames
-	end
-
-	if self.DBSheets["animations"] ~= nil then
-		self.animations = {}
-
-		self.animationClips = {}
-		for i, v in ipairs(self:getLines("animations")) do
-			self.animations[v.name] = {}
-			self.animations[v.name].eventQueue = {}
-			
-			self.animations[v.name].keyframes = {}
-
-			local delayC = 0
-			for j = 0, #v.clips - 1, 1 do
-				local currentFrame = v.clips[j + 1]
-				if currentFrame.category == "Sprite" then
-					if self.animations[v.name].eventQueue[delayC] == nil then
-						self.animations[v.name].eventQueue[delayC] = {}
-					end
-
-					-- print(v.name, delayC)
-
-					table.insert(self.animations[v.name].eventQueue[delayC], 1, currentFrame)
-
-					table.insert(self.animations[v.name].keyframes, delayC)
-
-					delayC = delayC + currentFrame.wait
-				-- elseif currentFrame.category == "Object" then
-				-- 	if self.animations[v.name].eventQueue[delayC] == nil then
-				-- 		self.animations[v.name].eventQueue[delayC] = {}
-				-- 	end
-				-- 	table.insert(self.animations[v.name].eventQueue[delayC], 1, currentFrame)
-				elseif currentFrame.category == "Act" or currentFrame.category == "Object" or currentFrame.category == "Trigger" then
-					for j = 0, currentFrame.wait - 1, 1 do
-						if self.animations[v.name].eventQueue[delayC + j] == nil then
-							self.animations[v.name].eventQueue[delayC + j] = {}
-						end
-						table.insert(self.animations[v.name].eventQueue[delayC + j], 1, currentFrame)
-					end
-				end
-			end
-
-			self.animations[v.name].delay = delayC
-			table.insert(self.animations[v.name].keyframes, delayC)
-
-			-- self.animationClips[v.name] = {}
-
-			-- local clip = CS.UnityEngine.AnimationClip()
-			-- clip.legacy = true
-			-- clip.wrapMode = CS.UnityEngine.WrapMode.Loop
-			-- clip.name = v.name
-
-			-- local curve = CS.UnityEngine.AnimationCurve()
-			-- for j = 0, self.animations[v.name].delay - 1, 1 do
-
-			-- 	local ae = CS.UnityEngine.AnimationEvent()
-			-- 	-- ae.objectReferenceParameter = ooo
-			-- 	ae.functionName = "RunAnimationEvent"
-			-- 	ae.intParameter = j
-			-- 	ae.stringParameter = v.name
-			-- 	ae.time = j * (1 / 60)
-			-- 	-- ae.messageOptions = CS.UnityEngine.SendMessageOptions.DontRequireReceiver
-			-- 	clip:AddEvent(ae)
-
-			-- 	-- local kf = CS.UnityEngine.Keyframe(j * (1 / 60), 0)
-			-- 	-- curve:AddKey(kf)
-			-- end
-			-- -- clip:SetCurve("", typeof(CS.UnityEngine.Transform), "localPosition.x", curve)
-			-- -- clip:SetCurve("", typeof(CS.GameAnimation), "enabled", curve)
-
-			-- self.animationClips[v.name] = clip
-		end
-
-	end
-
-	self.FBcontorller = {}
-
-	self.characters_state = {}
-	for i, v in ipairs(self:getLines("states")) do
-		self.characters_state[v.name] = v.animations
-
-		local p = utils.split(v.name, "_")
-
-		if self.FBcontorller[p[1]] == nil then
-			self.FBcontorller[p[1]] = {}
-		end
-
-		if p[2] == "front" and self.FBcontorller[p[1]].front == nil then
-			self.FBcontorller[p[1]].front = v.name
-
-			print("front", v.name)
-		elseif  p[2] == "back" and self.FBcontorller[p[1]].back == nil  then
-			self.FBcontorller[p[1]].back = v.name
-
-			print("back", v.name)
-		end
-
-	end
-
-	-- self.AI = LAI:new(self)
-
 	self.audioClips = self:createAudioClips()
 	self.texture2Ds, self.sprites = self:createSprites()
 	self.palettes = self:createPalettes()
 end
 
-function LCastleDBCharacter:createAudioClips()
+function LCastleDBMap:createAudioClips()
 	local audioClips = {}
     for i, v in ipairs(self:getLines("sounds")) do
 		local data = utils.openFileBytes(self.DBPath .. v.file)
@@ -322,7 +205,7 @@ end
 
 
 -- ????????????????sprite
-function LCastleDBCharacter:createSprites()
+function LCastleDBMap:createSprites()
 	--~     for i, v in pairs(texture2D) do
 	--~         if pics[i] == nil then
 	--~             pics[i] = CS.UnityEngine.Sprite.Create(v, CS.UnityEngine.Rect(0, 0, v.width, v.height), CS.UnityEngine.Vector2(0, 1))
@@ -334,7 +217,11 @@ function LCastleDBCharacter:createSprites()
 
 		if data ~= nil then
 		
-			local texture2D = CS.UnityEngine.Texture2D(0, 0, CS.UnityEngine.TextureFormat.RGBA32, false, false)
+			-- ???????????gamma?????linear????
+			-- local texture2D = CS.UnityEngine.Texture2D(0, 0, CS.UnityEngine.TextureFormat.RGBA32, false, false)
+			-- local texture2D = CS.UnityEngine.Texture2D(0, 0, CS.UnityEngine.Experimental.Rendering.DefaultFormat.HDR, CS.UnityEngine.Experimental.Rendering.TextureCreationFlags.None)
+			local texture2D = CS.UnityEngine.Texture2D(0, 0, CS.UnityEngine.Experimental.Rendering.GraphicsFormat.R8_UNorm, CS.UnityEngine.Experimental.Rendering.TextureCreationFlags.None)
+
 			texture2D.wrapMode = CS.UnityEngine.TextureWrapMode.Clamp
 			texture2D.filterMode = CS.UnityEngine.FilterMode.Point
 		
@@ -344,6 +231,8 @@ function LCastleDBCharacter:createSprites()
 			local str = utils.openFileText(self.DBPath .. p[1] .. ".json")
 		
 			local spriteData = json.decode(str)
+
+			print(p[1] .. ".png", texture2D.format)
 		
 			local pics = {}
 			for i, v in ipairs(spriteData) do
@@ -360,11 +249,15 @@ function LCastleDBCharacter:createSprites()
 
 	
 -- ?????
-function LCastleDBCharacter:createPalettes()
+function LCastleDBMap:createPalettes()
 	local palettes = {}
 	for i, v in ipairs(self:getLines("palettes")) do
 
 		local texture = CS.UnityEngine.Texture2D(256, 1, CS.UnityEngine.TextureFormat.RGBA32, false, false)
+		-- local texture = CS.UnityEngine.Texture2D(256, 1, CS.UnityEngine.Experimental.Rendering.DefaultFormat.LDR, CS.UnityEngine.Experimental.Rendering.TextureCreationFlags.None)
+		-- local texture = CS.UnityEngine.Texture2D(256, 1, CS.UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, CS.UnityEngine.Experimental.Rendering.TextureCreationFlags.None)
+
+
 		texture.wrapMode = CS.UnityEngine.TextureWrapMode.Clamp
 		texture.filterMode = CS.UnityEngine.FilterMode.Point
 
@@ -390,8 +283,8 @@ function LCastleDBCharacter:createPalettes()
 		local p = utils.split(str, "\n")
 		for i2, v2 in ipairs(p) do
 			local r, g, b = string.match(v2, "(%d+) (%d+) (%d+)")
-			if r ~= nil and g ~= nil and b ~=nil then
-				if count == 0 then
+			if r ~= nil and g ~= nil and b ~= nil then
+				if count == 0 or count == 255 then
 					texture:SetPixel(count, 0, CS.UnityEngine.Color(r / 255, g / 255, b / 255, 0))
 				else
 					texture:SetPixel(count, 0, CS.UnityEngine.Color(r / 255, g / 255, b / 255, 1))
@@ -420,6 +313,154 @@ function LCastleDBCharacter:createPalettes()
 	return palettes
 end
 
+
+--------------------------------------------------------------------------------------------------
+
+LCastleDBCharacter = {characters = nil, AI = nil, animations = nil, characters_state = nil, FBcontorller = nil, animationClips = nil, }
+setmetatable(LCastleDBCharacter, LCastleDBMap)
+LCastleDBCharacter.__index = LCastleDBCharacter
+function LCastleDBCharacter:new(path, file)
+	local self = {}
+	self = LCastleDBMap:new(path, file)
+	setmetatable(self, LCastleDBCharacter)
+
+	self.characters = nil
+	self.AI = nil
+
+	self.animations = nil
+	self.characters_state = nil
+	self.FBcontorller = nil
+	self.animationClips = nil
+	return self
+end
+
+function LCastleDBCharacter:readDB()
+	local str = utils.openFileText(self.DBPath .. self.DBFile)
+
+    self.DBData = json.decode(str)
+
+	self.DBSheets = {}
+    for i, v in ipairs(self.DBData["sheets"]) do
+        if self.DBSheets[v.name] == nil then
+            self.DBSheets[v.name] = v
+        end
+	end
+	print(self.DBPath .. self.DBFile .. ": json read!")
+
+
+	self.characters = {}
+	for i, v in ipairs(self:getLines("actions")) do
+		self.characters[v.name] = v.frames
+	end
+
+	if self.DBSheets["animations"] ~= nil then
+		self.animations = {}
+
+		self.animationClips = {}
+		for i, v in ipairs(self:getLines("animations")) do
+			self.animations[v.name] = {}
+			self.animations[v.name].eventQueue = {}
+			
+			self.animations[v.name].keyframes = {}
+
+			local delayC = 0
+			for j = 0, #v.clips - 1, 1 do
+				local currentFrame = v.clips[j + 1]
+				if currentFrame.category == "Sprite" then
+					if self.animations[v.name].eventQueue[delayC] == nil then
+						self.animations[v.name].eventQueue[delayC] = {}
+					end
+
+					-- print(v.name, delayC)
+
+					table.insert(self.animations[v.name].eventQueue[delayC], 1, currentFrame)
+
+					table.insert(self.animations[v.name].keyframes, delayC)
+
+					delayC = delayC + currentFrame.wait
+				elseif currentFrame.category == "Sound" then
+					if self.animations[v.name].eventQueue[delayC] == nil then
+						self.animations[v.name].eventQueue[delayC] = {}
+					end
+					table.insert(self.animations[v.name].eventQueue[delayC], 1, currentFrame)
+				elseif currentFrame.category == "Trigger" or currentFrame.category == "Body" then -- currentFrame.category == "Act" or currentFrame.category == "Object" or 
+					for j = 0, currentFrame.wait - 1, 1 do
+						if self.animations[v.name].eventQueue[delayC + j] == nil then
+							self.animations[v.name].eventQueue[delayC + j] = {}
+						end
+						table.insert(self.animations[v.name].eventQueue[delayC + j], 1, currentFrame)
+					end
+				end
+			end
+
+			self.animations[v.name].delay = delayC
+			table.insert(self.animations[v.name].keyframes, delayC)
+
+			-- self.animationClips[v.name] = {}
+
+			-- local clip = CS.UnityEngine.AnimationClip()
+			-- clip.legacy = true
+			-- clip.wrapMode = CS.UnityEngine.WrapMode.Loop
+			-- clip.name = v.name
+
+			-- local curve = CS.UnityEngine.AnimationCurve()
+			-- for j = 0, self.animations[v.name].delay - 1, 1 do
+
+			-- 	local ae = CS.UnityEngine.AnimationEvent()
+			-- 	-- ae.objectReferenceParameter = ooo
+			-- 	ae.functionName = "RunAnimationEvent"
+			-- 	ae.intParameter = j
+			-- 	ae.stringParameter = v.name
+			-- 	ae.time = j * (1 / 60)
+			-- 	-- ae.messageOptions = CS.UnityEngine.SendMessageOptions.DontRequireReceiver
+			-- 	clip:AddEvent(ae)
+
+			-- 	-- local kf = CS.UnityEngine.Keyframe(j * (1 / 60), 0)
+			-- 	-- curve:AddKey(kf)
+			-- end
+			-- -- clip:SetCurve("", typeof(CS.UnityEngine.Transform), "localPosition.x", curve)
+			-- -- clip:SetCurve("", typeof(CS.GameAnimation), "enabled", curve)
+
+			-- self.animationClips[v.name] = clip
+		end
+
+	end
+
+	self.FBcontorller = {}
+
+	self.characters_state = {}
+	for i, v in ipairs(self:getLines("states")) do
+		self.characters_state[v.name] = {}
+		self.characters_state[v.name].state = v.state
+		self.characters_state[v.name].animation = v.animation
+		self.characters_state[v.name].x = v.x
+		self.characters_state[v.name].y = v.y
+
+		local p = utils.split(v.name, "_")
+
+		if self.FBcontorller[p[1]] == nil then
+			self.FBcontorller[p[1]] = {}
+		end
+
+		if p[2] == "front" and self.FBcontorller[p[1]].front == nil then
+			self.FBcontorller[p[1]].front = v.name
+
+			print("front", v.name)
+		elseif  p[2] == "back" and self.FBcontorller[p[1]].back == nil  then
+			self.FBcontorller[p[1]].back = v.name
+
+			print("back", v.name)
+		end
+	end
+
+	-- self.AI = LAI:new(self)
+
+	self.audioClips = self:createAudioClips()
+	self.texture2Ds, self.sprites = self:createSprites()
+	self.palettes = self:createPalettes()
+end
+
+---------------------------------------------------------------------------------------
 
 
 LCastleDBCharacter_new = {characters2 = nil, animations = nil}

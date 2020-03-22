@@ -474,7 +474,7 @@ end
 function LPlayer:followCharacter()
 	if self.object.kind == 0 then
 		local charPos = self.object.gameObject.transform.position
-		self.camera.transform.position = CS.UnityEngine.Vector3(charPos.x, charPos.y + 1.0, self.camera.transform.position.z)
+		self.camera.transform.position = CS.UnityEngine.Vector3(charPos.x, charPos.y, self.camera.transform.position.z)
 	end
 end
 

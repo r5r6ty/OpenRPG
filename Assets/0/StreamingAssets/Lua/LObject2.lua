@@ -44,10 +44,15 @@ function LObject:new(parent, db, id, a, f, go, vx, vy, k)
 	self.delayCounter = 0
 	self.nextDelayCounter = self.delayCounter
 
-	self.parent = nil
-	self.root = nil
+	self.parent = self
+	self.children = {}
+	self.root = self
 	self.animation = nil
 	self.speed = 1
+	self.timeLine = 0
+	self.state = nil
+	self.target = nil
+	self.controller = nil
 
 	for _i, _v in ipairs(self.database:getLines("vars")) do
 		self[_v.name] = _v.default
@@ -104,7 +109,8 @@ function LObject:new(parent, db, id, a, f, go, vx, vy, k)
 
 	-- self.animation:Play(self.action)
 	-- self.functions = CS.Tools.Instance:GetAnimationState(self.animation, self.action)
-	self.frame = 0
+
+	self.oriPos = self.gameObject.transform.position
 	return self
 end
 
@@ -208,35 +214,312 @@ function LObject:runEvent2()
 	-- 	end
 	-- end
 
-	local c = self.database.animations[self.action].keyframes[self.delayCounter + 1]
+	if self.action ~= nil then
+		local c = self.database.animations[self.action].keyframes[self.delayCounter + 1]
 
 
-	if c == nil then
-		self.delayCounter = 0
-		self.frame = 0
-		c = self.database.animations[self.action].keyframes[self.delayCounter + 1]
-	end
-
-	if self.frame >= c * (1 / 60) then
-
-		local f = self.database.animations[self.action].eventQueue[c]
-		self.delayCounter = self.delayCounter + 1
-		if f ~= nil then
-			for i, v in ipairs(f) do
-				self:invokeEvent("on" .. v.category, v)
-			end
+		if c == nil then
+			self.delayCounter = 0
+			self.timeLine = 0
+			c = self.database.animations[self.action].keyframes[self.delayCounter + 1]
 		end
 
+		if self.timeLine >= c * (1 / 60) then
+
+			local f = self.database.animations[self.action].eventQueue[c]
+			self.delayCounter = self.delayCounter + 1
+			if f ~= nil then
+				for i, v in ipairs(f) do
+					self:invokeEvent("on" .. v.category, v)
+				end
+			end
+
+		end
 	end
 
 	-- if c < self.database.animations[self.action].delay then
-		self.frame = self.frame + CS.UnityEngine.Time.deltaTime * self.speed
+	self.timeLine = self.timeLine + CS.UnityEngine.Time.deltaTime * self.speed
 	-- else
 	-- 	self.delayCounter = 0
-	-- 	self.frame = 0
+	-- 	self.timeLine = 0
 	-- end
 
+    -- local x = "timeLine + 5"
+	-- local func = assert(load("return " .. x, "trigger", "t", self))
 
+	-- local y = func()
+
+	local gl = self.database.characters_state["global"]
+	for i, v in ipairs(gl.state) do
+		if v.trigger == nil or assert(load("return " .. v.trigger, "trigger", "t", self))() then
+			if v.kind == "Command" then
+				local cmd = utils.PLAYER.commands[v.command]
+				if cmd.UIActive ~= nil then
+					-- if self["HP"] > 0 and self["MP"] >= v.mp then
+						self:changeState(v.stateChange)
+
+						if cmd.UIActive == 1 then
+							if self.direction.x == -1 then
+								self.direction.x = 1
+							end
+						elseif cmd.UIActive == -1 then
+							if self.direction.x == 1 then
+								self.direction.x = -1
+							end
+						end
+
+						-- self["MP"] = self["MP"] - v.mp
+					-- end
+				end
+			end
+		end
+	end
+	
+	if self.state ~= nil then
+		local st = self.database.characters_state[self.state]
+		-- if st.animation ~= nil then
+		-- 	self.action = st.animation
+		-- 	self.delayCounter = 0
+		-- 	self.timeLine = 0
+		-- end
+		for i, v in ipairs(st.state) do
+			if v.trigger == nil or assert(load("return " .. v.trigger, "trigger", "t", self))() then
+				if v.kind == "ChangeState" then
+					self:changeState(v.stateChange)
+				elseif v.kind == "ChangeAnimation" then
+					self:changeAnimation(v.animationChange)
+				elseif v.kind == "TurnRight" then
+					self.direction.x = 1
+
+					local ea = self.gameObject.transform.eulerAngles
+					if self.direction.x == -1 then
+						self.gameObject.transform.eulerAngles = CS.UnityEngine.Vector3(0, 180, ea.z)
+					else
+						self.gameObject.transform.eulerAngles = CS.UnityEngine.Vector3(0, 0, ea.z)
+					end
+				elseif v.kind == "TurnLeft" then
+					self.direction.x = -1
+
+					local ea = self.gameObject.transform.eulerAngles
+					if self.direction.x == -1 then
+						self.gameObject.transform.eulerAngles = CS.UnityEngine.Vector3(0, 180, ea.z)
+					else
+						self.gameObject.transform.eulerAngles = CS.UnityEngine.Vector3(0, 0, ea.z)
+					end
+				elseif v.kind == "Child" then
+					local object = self.children[v.id]
+					if object ~= nil then
+						local z = v.layer / 100
+						if self.root.direction.x == -1 then
+							z = -z
+						end
+						object.gameObject.transform.localPosition = CS.UnityEngine.Vector3(v.x / 100, v.y / 100, z)
+					end
+				elseif v.kind == "TurnToTarget" then
+					local pos = self.root.target.gameObject.transform.position
+					local rad = CS.UnityEngine.Mathf.Atan2(self.gameObject.transform.position.y - pos.y, self.gameObject.transform.position.x - pos.x)
+		
+					local deg = rad * CS.UnityEngine.Mathf.Rad2Deg + 180
+		
+					local root = self.root
+					if root ~= nil then
+		
+						if root.direction.x == -1 then
+							deg = 360 - rad * CS.UnityEngine.Mathf.Rad2Deg
+						end
+						self.gameObject.transform.localEulerAngles = CS.UnityEngine.Vector3(0, 0, deg)
+					end
+				elseif v.kind == "Move" then
+					if v.x2 ~= nil then
+						self.velocity.x = v.x2
+					end
+					if v.y2 ~= nil then
+						self.velocity.y = v.y2
+					end
+					-- self.rigidbody.position = self.rigidbody.position + CS.UnityEngine.Vector2(v.x, v.y) * CS.UnityEngine.Time.deltaTime
+					-- self.gameObject.transform.position = self.gameObject.transform.position + CS.UnityEngine.Vector3(v.x, v.y, 0) * CS.UnityEngine.Time.deltaTime
+				elseif v.kind == "Object" then
+					local d = self.root.direction.x
+					
+					for i = 1, 10, 1 do
+
+						local r = CS.Tools.Instance:RandomRangeInt(0, 31) - 30 / 2
+
+						local rot = nil
+						local velocity = nil
+						if d == -1 then
+							rot = CS.UnityEngine.Vector3(0, 180, self.gameObject.transform.eulerAngles.z + r)
+
+							velocity = CS.UnityEngine.Quaternion.Euler(rot) * CS.UnityEngine.Vector3(v.x2 -  CS.Tools.Instance:RandomRangeInt(0, 16), v.y2, 0)
+						elseif d == 1 then
+							rot = CS.UnityEngine.Vector3(0, 0, self.gameObject.transform.eulerAngles.z + r)
+
+							velocity = CS.UnityEngine.Quaternion.Euler(rot) * CS.UnityEngine.Vector3(v.x2 -  CS.Tools.Instance:RandomRangeInt(0, 16), v.y2, 0)
+						end
+
+						
+						-- local velocity = CS.UnityEngine.Vector2(0, 0)
+
+						local pos = self.gameObject.transform.rotation * CS.UnityEngine.Vector3(v.x / 100 * 2, -v.y / 100 * 2, 0)
+
+						local object = utils.createObject(nil, tonumber(v.id), v.animationChange, 0, self.rigidbody.position.x + pos.x, self.rigidbody.position.y + pos.y, velocity.x, velocity.y, 0)
+						local lr = object.gameObject:AddComponent(typeof(CS.UnityEngine.LineRenderer))
+						lr.enabled = false
+						lr.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
+						lr.startWidth = 0.02
+						lr.endWidth = 0.01
+
+						local rc = CS.Tools.Instance:RandomRangeInt(0, #v.colors) + 1
+						local color = CS.Tools.Instance:ColorTryParseHtmlString("#" .. string.format("%X", v.colors[rc].color))
+
+						lr.startColor = color
+						lr.endColor = color
+						lr.numCapVertices = 90
+						lr.material = utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY
+
+						object:changeState(v.stateChange)
+						object.direction.x = d
+						-- object.velocity.x = v.x2 * self.root.direction.x
+						-- object.velocity.y = v.y2
+
+						-- local ea = object.gameObject.transform.eulerAngles
+						object.gameObject.transform.eulerAngles = rot
+						-- local tr = object.gameObject:AddComponent(typeof(CS.UnityEngine.TrailRenderer))
+						-- tr.startWidth = 0.04
+						-- tr.endWidth = 0.01
+						-- tr.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
+						-- tr.numCapVertices = 90
+						-- tr.startColor = CS.UnityEngine.Color.yellow
+						-- tr.endColor = CS.UnityEngine.Color(1, 0.92, 0.016, 0)
+
+						-- tr.material =  CS.UnityEngine.Material(utils.getShader())
+					end
+				elseif v.kind == "Collison" then
+					if self.frame == 1 then
+						utils.destroyObject(self.gameObject:GetInstanceID())
+					else
+						-- local lr = self.gameObject:GetComponent(typeof(CS.UnityEngine.LineRenderer))
+						local lr = self.gameObject:GetComponent(typeof(CS.UnityEngine.LineRenderer))
+						
+
+						local length = (self.gameObject.transform.position - self.oriPos).magnitude -- 射线的长度
+						local direction = self.gameObject.transform.position - self.oriPos -- 方向
+						-- RaycastHit2D[] hitinfo;
+						local hitinfo = CS.UnityEngine.Physics2D.RaycastAll(CS.UnityEngine.Vector2(self.oriPos.x, self.oriPos.y), CS.UnityEngine.Vector2(direction.x, direction.y), length) -- 在两个位置之间发起一条射线，然后通过这条射线去检测有没有发生碰撞
+						-- print(hitinfo.Length)
+						for i = 0, hitinfo.Length - 1, 1 do
+
+							lr:SetPosition(1, self.oriPos)
+							lr:SetPosition(0, CS.UnityEngine.Vector3(hitinfo[i].point.x, hitinfo[i].point.y, 0))
+							self.frame = 1
+
+							-- print("destory! " .. i, hitinfo.Length, hitinfo[i].collider.name)
+							-- utils.destroyObject(self.gameObject:GetInstanceID())
+
+							-- CS.UnityEngine.GL.PushMatrix() -- 保存当前Matirx
+							-- -- CS.UnityEngine.Material(utils.getShader()):SetPass(0) -- 刷新当前材质
+							-- CS.UnityEngine.GL.LoadPixelMatrix() -- 设置pixelMatrix
+							-- CS.UnityEngine.GL.Color(CS.UnityEngine.Color.yellow)
+							-- CS.UnityEngine.GL.Begin(CS.UnityEngine.GL.LINES)
+							-- CS.UnityEngine.GL.Vertex3(0, 0, 0)
+							-- CS.UnityEngine.GL.Vertex3(CS.UnityEngine.Screen.width, CS.UnityEngine.Screen.height, 0)
+							-- CS.UnityEngine.GL.End()
+							-- CS.UnityEngine.GL.PopMatrix()
+
+							break
+						end
+						if hitinfo.Length == 0 and self.oriPos.x ~= self.gameObject.transform.position.x and self.oriPos.y ~= self.gameObject.transform.position.y then
+							lr.enabled = true
+							lr:SetPosition(1, self.oriPos)
+							lr:SetPosition(0, self.gameObject.transform.position)
+						end
+					end
+				elseif v.kind == "Command" then
+					local cmd = utils.PLAYER.commands[v.command]
+					if cmd.UIActive ~= nil then
+						-- if self["HP"] > 0 and self["MP"] >= v.mp then
+							self:changeState(v.stateChange)
+	
+							if cmd.UIActive == 1 then
+								if self.direction.x == -1 then
+									self.direction.x = 1
+								end
+							elseif cmd.UIActive == -1 then
+								if self.direction.x == 1 then
+									self.direction.x = -1
+								end
+							end
+	
+							-- self["MP"] = self["MP"] - v.mp
+						-- end
+					end
+				end
+			end
+		end
+
+		-- if st.x ~= nil and st.y ~= nil then
+		-- 	self.rigidbody.position = self.rigidbody.position + CS.UnityEngine.Vector2(st.x, st.y) * CS.UnityEngine.Time.deltaTime
+		-- end
+	end
+
+	-- if self.state == "run" or self.state == "run2" then
+	-- 	if self:targetDeg(0) >= 0 and self:targetDeg(0) <= 180 then
+	-- 		self:changeState("run")
+	-- 	elseif self:targetDeg(0) < 0 and self:targetDeg(0)  >= -180 then
+	-- 		self:changeState("run2")
+	-- 	end
+	-- end
+
+	-- if self.state == "run" or self.state == "run2" then
+	-- 	self.rigidbody.position = self.rigidbody.position + CS.UnityEngine.Vector2(0.5, 0) * CS.UnityEngine.Time.deltaTime
+	-- end
+	self.oriPos = self.gameObject.transform.position
+end
+
+function LObject:changeState(state)
+	if state ~= nil then
+		self.state = state
+	end
+	local animation = self.database.characters_state[self.state].animation
+	if animation ~= nil then
+		self.action = animation
+		self.delayCounter = 0
+		self.timeLine = 0
+	end
+end
+
+function LObject:changeAnimation(animation)
+	if animation ~= nil then
+		self.action = animation
+		self.delayCounter = 0
+		self.timeLine = 0
+	end
+end
+
+function LObject:targetDeg(id)
+	print(self.children, self.action, self.state, id)
+	local object = self.children[tostring(id)]
+	local pos = self.target.gameObject.transform.position
+	-- object.gameObject.transform:LookAt(CS.UnityEngine.Vector3(pos.x, pos.y, object.gameObject.transform.position.z), CS.UnityEngine.Vector3(0, 0, 1))
+
+	local rad = CS.UnityEngine.Mathf.Atan2(object.gameObject.transform.position.y - pos.y, object.gameObject.transform.position.x - pos.x)
+	local deg = rad * CS.UnityEngine.Mathf.Rad2Deg
+
+	return deg
+end
+
+function LObject:SetParentAndRoot(object)
+	if self.gameObject.transform.parent == nil or self.gameObject.transform.parent ~= self.gameObject.transform then
+
+		self.gameObject.transform:SetParent(object.gameObject.transform)
+		self.parent = object
+		if object.parent ~= nil then
+			self.root = object.parent
+		else
+			self.root = object
+		end
+		self.gameObject.transform.localEulerAngles = CS.UnityEngine.Vector3(0, 0, 0)
+	end
 end
 ------------------------------------------------------------------------------
 
@@ -330,10 +613,55 @@ function LCharacterObject:new(parent, db, id, a, f, go, vx, vy, k)
 		self.pic_object.transform.localPosition = CS.UnityEngine.Vector3(value.x / 100, -value.y / 100, 0)
 	end)
 
+	self:addEvent("onSound", function(value)
+		self.audioSource.clip = self.database.audioClips[value.sfx]
+		-- local r = math.random() / 2.5
+		-- self.audioSource.pitch = 1 + r - 0.2
+		self.audioSource:Play()
+	end)
+
+	self:addEvent("onBody", function(value)
+		if self.bodyArray[value.id] == nil and not (value.x == 0 or value.y == 0 or value.width == 0 or value.height == 0) then
+			self.bodyArray[value.id] = LColliderBDY:new(self.bdy_object, value.id)
+			self.bodyArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.bodyFlags, value.layers)
+			self.bodyArray_InstanceID[self.bodyArray[value.id].collider:GetInstanceID()] = self.bodyArray[value.id]
+		else
+			if self.bodyArray[value.id] ~= nil then
+				if value.x == 0 or value.y == 0 or value.width == 0 or value.height == 0 then
+					local IID = self.bodyArray[value.id].collider:GetInstanceID()
+					self.bodyArray[value.id]:deleteCollider()
+					self.bodyArray[value.id] = nil
+					self.bodyArray_InstanceID[IID] = nil
+				else
+					self.bodyArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.bodyFlags, value.layers)
+				end
+			end
+		end
+	end)
+	self:addEvent("onAttack", function(value)
+		if self.attckArray[value.id] == nil and not (value.x == 0 or value.y == 0 or value.width == 0 or value.height == 0) then
+			self.attckArray[value.id] = LColliderATK:new(self.atk_object, value.id)
+			self.attckArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.attackFlags,
+														value.damage, value.fall, value.defence, value.frequency, value.directionX, value.directionY, false, value.var,
+														value.action, value.frame)
+		else
+			if self.attckArray[value.id] ~= nil then
+				if value.x == 0 or value.y == 0 or value.width == 0 or value.height == 0 then
+					self.attckArray[value.id]:deleteCollider()
+					self.attckArray[value.id] = nil
+				else
+					self.attckArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.attackFlags,
+															value.damage, value.fall, value.defence, value.frequency, value.directionX, value.directionY, value.ignoreFlag, value.var,
+															value.action, value.frame)
+				end
+			end
+		end
+	end)
+
 	self:addEvent("onTrigger", function(value)
 		local mousePos = CS.UnityEngine.Input.mousePosition
 		-- mousePos.z = v3.z
-		local worldPos = CS.UnityEngine.Camera.main:ScreenToWorldPoint(mousePos)
+		local worldPos = utils.CAMERA:ScreenToWorldPoint(mousePos)
         self.gameObject.transform.position = CS.UnityEngine.Vector3(worldPos.x, worldPos.y, 0)
 	end)
 
@@ -372,7 +700,7 @@ function LCharacterObject:new(parent, db, id, a, f, go, vx, vy, k)
 
 				-- object.gameObject.transform.localPosition = CS.UnityEngine.Vector3(value.x / 100, value.y / 100, 0)
 
-				object.spriteRenderer.sortingOrder = -value.layer
+				-- object.spriteRenderer.sortingOrder = -value.layer
 			end
 		end
 	end)
@@ -408,9 +736,17 @@ function LCharacterObject:new(parent, db, id, a, f, go, vx, vy, k)
 				-- end
 
 				if self.gameObject.transform.position.x - pos.x < 0 then
-					self.direction.x = 1
+					if self.direction.x ~= 1 then
+						self.delayCounter = 0
+						self.timeLine = 0
+						self.direction.x = 1
+					end
 				else
-					self.direction.x = -1
+					if self.direction.x ~= -1 then
+						self.delayCounter = 0
+						self.timeLine = 0
+						self.direction.x = -1
+					end
 				end
 
 				local ea = self.gameObject.transform.eulerAngles
@@ -452,14 +788,14 @@ function LCharacterObject:runFrame()
 	
 	-- 	self:frameLoop()
 
-	if self.directionBuff.x ~= self.direction.x then
-		if self.direction.x == -1 then
-			self.gameObject.transform.eulerAngles = CS.UnityEngine.Vector3(0, 180, 0)
-		else
-			self.gameObject.transform.eulerAngles = CS.UnityEngine.Vector3(0, 0, 0)
-		end
-		self.directionBuff.x = self.direction.x
-	end
+	-- if self.directionBuff.x ~= self.direction.x then
+	-- 	if self.direction.x == -1 then
+	-- 		self.gameObject.transform.eulerAngles = CS.UnityEngine.Vector3(0, 180, 0)
+	-- 	else
+	-- 		self.gameObject.transform.eulerAngles = CS.UnityEngine.Vector3(0, 0, 0)
+	-- 	end
+	-- 	self.directionBuff.x = self.direction.x
+	-- end
 	
 	if self.vvvX ~= nil then
 		self.velocity.x = self.vvvX * self.direction.x
@@ -479,8 +815,8 @@ function LCharacterObject:runFrame()
 
 
 
-	self["velocityX"] = self.velocity.x
-	self["velocityY"] = self.velocity.y
+	-- self["velocityX"] = self.velocity.x
+	-- self["velocityY"] = self.velocity.y
 
 	self.rigidbody.position = self.rigidbody.position + self.velocity * CS.UnityEngine.Time.deltaTime
 

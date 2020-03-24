@@ -702,7 +702,12 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 
 				local unityobject_child = CS.UnityEngine.GameObject("background" .. p .. "," .. k .. "[" .. gameMap[p][k] .. "]" .. n)
 				unityobject_child.transform.parent = sortArray[10].transform
-				unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, -k * ts.size / 100, 0)
+
+				local posX = p * ts.size / 100
+				local posY = -k * ts.size / 100
+				local posZ = 0
+
+				unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(posX, posY, posZ)
 				local sr = unityobject_child:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
 				sr.sprite = ts.spriteArray[CS.Tools.Instance:RandomRangeInt(1, #ts.spriteArray + 1)]
 				sr.material = castleDBInstance.palettes[1]
@@ -773,20 +778,42 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 
 					local unityobject_child2 = CS.UnityEngine.GameObject("wall" .. p .. "," .. k .. "[" .. gameMap[p][k] .. "]" .. n)
 					unityobject_child2.transform.parent = sortArray[10].transform
-					unityobject_child2.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, -k * ts.size / 100, 0)
+					-- unityobject_child2.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, -k * ts.size / 100, 0)
 					local sr2 = unityobject_child2:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
 					sr2.sprite = ts.walls
 					sr2.material = castleDBInstance.palettes[1]
 					sr2.sortingOrder = -10
+
+					
+					local spriteLowerBound = sr2.bounds.size.y * 0.5
+					local floorHeight = -0.16
+					local posX = p * ts.size / 100
+					local posY = -k * ts.size / 100
+					local posZ = (posY + floorHeight) * utils.Tan30
+					unityobject_child2.transform.localPosition = CS.UnityEngine.Vector3(posX, posY, posZ * 2)
 				end
 
 				local unityobject_child = CS.UnityEngine.GameObject("block" .. p .. "," .. k .. "[" .. gameMap[p][k] .. "]" .. n .. ",")
 				unityobject_child.transform.parent = sortArray[s].transform
-				unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, -(k - 1) * ts.size / 100, 0)
+				-- unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, -(k - 1) * ts.size / 100, 0)
 				local sr = unityobject_child:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
 				sr.sprite = ts.sprite
 				sr.material = castleDBInstance.palettes[1]
 				sr.sortingOrder = -s
+
+				local spriteLowerBound = sr.bounds.size.y * 0.5
+				local floorHeight = -0.16 - 0.08
+				
+				local g = k + 1
+				while gameMap[p][g] ~= nil and gameMap[p][g] ~= 0 do
+					floorHeight = floorHeight - 0.16
+					g = g + 1
+				end
+
+				local posX = p * ts.size / 100
+				local posY = -(k - 1) * ts.size / 100
+				local posZ = (posY + floorHeight) * utils.Tan30
+				unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(posX, posY, posZ * 2)
 
 				unityobject_child.layer = gameMap[p][k]
 				if gameMap[p][k] ~= 4 then -- 梯子加碰撞，但不碰

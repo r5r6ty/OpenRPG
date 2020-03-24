@@ -80,9 +80,6 @@
 					"default": 0
 				},
 				{
-					"name": "parent"
-				},
-				{
 					"name": "interact"
 				},
 				{
@@ -3703,7 +3700,7 @@
 				},
 				{
 					"name": "punch_l",
-					"command": "a",
+					"command": "/a",
 					"mp": 25,
 					"frame": 0,
 					"time": 1,
@@ -5189,8 +5186,15 @@
 							"sprite": "c17edd9a009e17594a7934bf316b8510",
 							"x": -18,
 							"y": -5,
-							"wait": 60,
+							"wait": 1,
 							"category": "Sprite"
+						},
+						{
+							"category": "Sprite",
+							"sprite": "c17edd9a009e17594a7934bf316b8510",
+							"wait": 59,
+							"x": -18,
+							"y": -5
 						}
 					]
 				},
@@ -5293,6 +5297,39 @@
 							"x": 2,
 							"wait": 60,
 							"y": -1
+						}
+					]
+				},
+				{
+					"name": "fire_effect",
+					"clips": [
+						{
+							"category": "Sprite",
+							"sprite": "5c6d7a131406a28e3617d89f74f01abd",
+							"x": 0,
+							"y": -6,
+							"wait": 3
+						},
+						{
+							"category": "Sprite",
+							"sprite": "178bb64bfeafd6cf74bc8153ea926838",
+							"wait": 3,
+							"x": 0,
+							"y": -7
+						},
+						{
+							"category": "Sprite",
+							"sprite": "e2d64c9b65fb56bdba688e2a73382a2d",
+							"wait": 3,
+							"x": 1,
+							"y": -9
+						},
+						{
+							"category": "Sprite",
+							"sprite": "c2678c95386d250a94c5dd62fbdc2ac8",
+							"wait": 3,
+							"x": 4,
+							"y": -10
 						}
 					]
 				}
@@ -5594,6 +5631,12 @@
 					"name": "weapon_idle",
 					"state": [
 						{
+							"comment": "",
+							"kind": "Ray",
+							"x": 24,
+							"y": -2
+						},
+						{
 							"stateChange": "weapon_shoot",
 							"command": "punch_l",
 							"trigger": "root.controller ~= nil and root.controller.commands[\"punch_l\"].UIActive ~= nil",
@@ -5629,12 +5672,41 @@
 								{
 									"color": 16731904
 								}
-							]
+							],
+							"amount": 10,
+							"trigger": "delayCounter == 1"
+						},
+						{
+							"comment": "",
+							"x": 24,
+							"y": -2,
+							"animationChange": "fire_effect",
+							"kind": "Object",
+							"id": "9",
+							"colors": [
+								{
+									"color": 16768346
+								},
+								{
+									"color": 16758797
+								},
+								{
+									"color": 16749056
+								},
+								{
+									"color": 16731904
+								}
+							],
+							"amount": 1,
+							"stateChange": "fire_effect",
+							"x2": 0,
+							"y2": 0,
+							"trigger": "delayCounter == 1"
 						},
 						{
 							"kind": "ChangeState",
 							"stateChange": "weapon_idle",
-							"trigger": "timeLine >= 0.017",
+							"trigger": "timeLine >= 5 / 60",
 							"comment": "",
 							"colors": []
 						}
@@ -5647,6 +5719,18 @@
 						{
 							"kind": "Collison",
 							"comment": "drawline"
+						}
+					]
+				},
+				{
+					"name": "fire_effect",
+					"state": [
+						{
+							"comment": "",
+							"stateChange": "weapon_idle",
+							"trigger": "timeLine >=  4 * 3 / 60",
+							"kind": "Destory",
+							"colors": []
 						}
 					]
 				}
@@ -5725,6 +5809,11 @@
 					"name": "id",
 					"opt": true,
 					"display": null
+				},
+				{
+					"typeStr": "3",
+					"name": "amount",
+					"opt": true
 				},
 				{
 					"typeStr": "8",

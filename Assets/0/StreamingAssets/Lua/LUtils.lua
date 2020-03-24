@@ -45,6 +45,7 @@ utils.CURSOR = nil
 utils.LUABEHAVIOUR = nil
 utils.SPRITESDEFAULT = CS.UnityEngine.Material(CS.UnityEngine.Shader.Find("Sprites/Default"))
 utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY = CS.UnityEngine.Material(CS.UnityEngine.Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"))
+utils.Tan30 = CS.UnityEngine.Mathf.Tan(CS.UnityEngine.Mathf.PI / 5)
 local LSystem = nil
 
 local hp = nil

@@ -64,7 +64,7 @@ function LObject:new(parent, db, id, a, f, go, vx, vy, k)
 	-- 	self.functions[_v.name] = _v.value
 	-- end
 
-	self["parent"] = parent
+	-- self["parent"] = parent
 
 	if k ~= 5 then
 		self["story"] = self.database:getLines("story")
@@ -314,6 +314,10 @@ function LObject:runEvent2()
 							z = -z
 						end
 						object.gameObject.transform.localPosition = CS.UnityEngine.Vector3(v.x / 100, v.y / 100, z)
+
+						-- object.gameObject.transform.localPosition = CS.UnityEngine.Vector3(v.x / 100, v.y / 100, 0)
+
+						-- object.spriteRenderer.sortingOrder = -v.layer
 					end
 				elseif v.kind == "TurnToTarget" then
 					local pos = self.root.target.gameObject.transform.position
@@ -341,28 +345,37 @@ function LObject:runEvent2()
 				elseif v.kind == "Object" then
 					local d = self.root.direction.x
 					
-					for i = 1, 10, 1 do
+					for i = 1, v.amount, 1 do
 
-						local r = CS.Tools.Instance:RandomRangeInt(0, 31) - 30 / 2
-
-						local rot = nil
-						local velocity = nil
-						if d == -1 then
-							rot = CS.UnityEngine.Vector3(0, 180, self.gameObject.transform.eulerAngles.z + r)
-
-							velocity = CS.UnityEngine.Quaternion.Euler(rot) * CS.UnityEngine.Vector3(v.x2 -  CS.Tools.Instance:RandomRangeInt(0, 16), v.y2, 0)
-						elseif d == 1 then
-							rot = CS.UnityEngine.Vector3(0, 0, self.gameObject.transform.eulerAngles.z + r)
-
-							velocity = CS.UnityEngine.Quaternion.Euler(rot) * CS.UnityEngine.Vector3(v.x2 -  CS.Tools.Instance:RandomRangeInt(0, 16), v.y2, 0)
+						local r = nil
+						if v.amount > 1 then
+							r = CS.Tools.Instance:RandomRangeInt(0, 31) - 30 / 2
+						else
+							r = 0
 						end
 
+						local rot = nil
+						local velocityyy = nil
+						local offset = nil
+						if v.x2 > 1 then
+							offset = CS.Tools.Instance:RandomRangeInt(0, 16)
+						else
+							offset = 0
+						end
+						if d == -1 then
+							rot = CS.UnityEngine.Vector3(0, 180, self.gameObject.transform.eulerAngles.z + r)
+						elseif d == 1 then
+							rot = CS.UnityEngine.Vector3(0, 0, self.gameObject.transform.eulerAngles.z + r)
+						end
+						velocityyy = CS.UnityEngine.Quaternion.Euler(rot) * CS.UnityEngine.Vector3(v.x2 - offset, v.y2, 0)
+						velocityyy.x = velocityyy.x + self.root.velocity.x
+						velocityyy.y = velocityyy.y + self.root.velocity.y
 						
 						-- local velocity = CS.UnityEngine.Vector2(0, 0)
 
 						local pos = self.gameObject.transform.rotation * CS.UnityEngine.Vector3(v.x / 100 * 2, -v.y / 100 * 2, 0)
 
-						local object = utils.createObject(nil, tonumber(v.id), v.animationChange, 0, self.rigidbody.position.x + pos.x, self.rigidbody.position.y + pos.y, velocity.x, velocity.y, 0)
+						local object = utils.createObject(nil, tonumber(v.id), v.animationChange, 0, self.rigidbody.position.x + pos.x, self.rigidbody.position.y + pos.y, velocityyy.x, velocityyy.y, 0)
 						local lr = object.gameObject:AddComponent(typeof(CS.UnityEngine.LineRenderer))
 						lr.enabled = false
 						lr.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
@@ -394,6 +407,8 @@ function LObject:runEvent2()
 
 						-- tr.material =  CS.UnityEngine.Material(utils.getShader())
 					end
+				elseif v.kind == "Destory" then
+					utils.destroyObject(self.gameObject:GetInstanceID())
 				elseif v.kind == "Collison" then
 					if self.frame == 1 then
 						utils.destroyObject(self.gameObject:GetInstanceID())
@@ -434,6 +449,55 @@ function LObject:runEvent2()
 							lr:SetPosition(0, self.gameObject.transform.position)
 						end
 					end
+				elseif v.kind == "Ray" then
+					local lr = nil
+					if not self.gameObject:TryGetComponent(typeof(CS.UnityEngine.LineRenderer), lr) then
+						lr = self.gameObject:AddComponent(typeof(CS.UnityEngine.LineRenderer))
+
+						lr.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
+						lr.startWidth = 0.02
+						lr.endWidth = 0.02
+
+						local rc = CS.UnityEngine.Color.red
+						local color = CS.UnityEngine.Color.red
+
+						lr.endColor = color
+						color.a = 0
+						lr.startColor = color
+						lr.numCapVertices = 90
+						lr.material = utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY
+					else
+						lr = self.gameObject:GetComponent(typeof(CS.UnityEngine.LineRenderer))
+					end
+					if lr ~= nil then
+
+						local d = self.root.direction.x
+
+						local rot = nil
+						local velocityyy = nil
+						if d == -1 then
+							rot = CS.UnityEngine.Vector3(0, 180, self.gameObject.transform.eulerAngles.z)
+						elseif d == 1 then
+							rot = CS.UnityEngine.Vector3(0, 0, self.gameObject.transform.eulerAngles.z)
+						end
+						velocityyy = CS.UnityEngine.Quaternion.Euler(rot) * CS.UnityEngine.Vector3(1, 0, 0)
+
+						local pos = self.gameObject.transform.rotation * CS.UnityEngine.Vector3(v.x / 100 * 2, -v.y / 100 * 2, 0)
+						local xxx = self.rigidbody.position.x + pos.x
+						local yyy = self.rigidbody.position.y + pos.y
+
+						local hitinfo = CS.UnityEngine.Physics2D.RaycastAll(CS.UnityEngine.Vector2(xxx, yyy), CS.UnityEngine.Vector2(velocityyy.x, velocityyy.y))
+						for i = 0, hitinfo.Length - 1, 1 do
+							lr:SetPosition(1, CS.UnityEngine.Vector3(xxx, yyy, 0))
+							lr:SetPosition(0, CS.UnityEngine.Vector3(hitinfo[i].point.x, hitinfo[i].point.y, 0))
+							break
+						end
+						if hitinfo.Length == 0 then
+							lr:SetPosition(1, CS.UnityEngine.Vector3(xxx, yyy, 0))
+							lr:SetPosition(0, CS.UnityEngine.Vector3(self.rigidbody.position.x + velocityyy.x * 25, self.rigidbody.position.y + velocityyy.y * 25, 0))
+						end
+					end
+
 				elseif v.kind == "Command" then
 					local cmd = utils.PLAYER.commands[v.command]
 					if cmd.UIActive ~= nil then
@@ -474,13 +538,23 @@ function LObject:runEvent2()
 	-- 	self.rigidbody.position = self.rigidbody.position + CS.UnityEngine.Vector2(0.5, 0) * CS.UnityEngine.Time.deltaTime
 	-- end
 	self.oriPos = self.gameObject.transform.position
+
+	if self.parent == self then
+		-- local spriteLowerBound = self.spriteRenderer.bounds.size.y * 0.5
+		local floorHeight = 0
+		local posX = self.gameObject.transform.position.x
+		local posY = self.gameObject.transform.position.y
+		local posZ = (posY + floorHeight) * utils.Tan30
+		self.gameObject.transform.position = CS.UnityEngine.Vector3(posX, posY, posZ)
+	end
 end
 
 function LObject:changeState(state)
+	local animation = nil
 	if state ~= nil then
 		self.state = state
+		animation = self.database.characters_state[self.state].animation
 	end
-	local animation = self.database.characters_state[self.state].animation
 	if animation ~= nil then
 		self.action = animation
 		self.delayCounter = 0

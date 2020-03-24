@@ -44,7 +44,8 @@ function start()
     LMap.new(CS.UnityEngine.Application.dataPath .. "/0/StreamingAssets/Resource/", "data2.cdb")
     -- LMap.show(1, 0, 0)
 
-	local ds = LMap.gen3(-40 * 0.2, 20 * 0.2, 2)
+    -- local ds = LMap.gen3(-40 * 0.2, 20 * 0.2, 2)
+    local ds = LMap.gen3(0, 0, 2)
 
     -- LMap.gen()
 

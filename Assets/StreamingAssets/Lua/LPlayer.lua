@@ -1,4 +1,4 @@
-local utils = require "LUtils"
+utils = require "LUtils"
 -- local cs_coroutine = (require 'cs_coroutine')
 
 
@@ -18,38 +18,39 @@ function LSystem:new(o)
 	self.keysDownCount = 0
 
 
-	-- ´´½¨°´¼üÓ³Éä
-	self:createKey("U", {CS.UnityEngine.KeyCode.W}) -- ÉÏ
-	self:createKey("D", {CS.UnityEngine.KeyCode.S}) -- ÏÂ
-	self:createKey("B", {CS.UnityEngine.KeyCode.A}) -- ×ó
-	self:createKey("F", {CS.UnityEngine.KeyCode.D}) -- ÓÒ
+	-- åˆ›å»ºæŒ‰é”®æ˜ å°„
+	self:createKey("U", {CS.UnityEngine.KeyCode.W}) -- ä¸Š
+	self:createKey("D", {CS.UnityEngine.KeyCode.S}) -- ä¸‹
+	self:createKey("B", {CS.UnityEngine.KeyCode.A}) -- å·¦
+	self:createKey("F", {CS.UnityEngine.KeyCode.D}) -- å³
 
-	self:createKey("UB", {CS.UnityEngine.KeyCode.W, CS.UnityEngine.KeyCode.A}) -- ×óÉÏ
-	self:createKey("UF", {CS.UnityEngine.KeyCode.W, CS.UnityEngine.KeyCode.D}) -- ÓÒÉÏ
-	self:createKey("DB", {CS.UnityEngine.KeyCode.S, CS.UnityEngine.KeyCode.A}) -- ×óÏÂ
-	self:createKey("DF", {CS.UnityEngine.KeyCode.S, CS.UnityEngine.KeyCode.D}) -- ÓÒÏÂ
+	self:createKey("UB", {CS.UnityEngine.KeyCode.W, CS.UnityEngine.KeyCode.A}) -- å·¦ä¸Š
+	self:createKey("UF", {CS.UnityEngine.KeyCode.W, CS.UnityEngine.KeyCode.D}) -- å³ä¸Š
+	self:createKey("DB", {CS.UnityEngine.KeyCode.S, CS.UnityEngine.KeyCode.A}) -- å·¦ä¸‹
+	self:createKey("DF", {CS.UnityEngine.KeyCode.S, CS.UnityEngine.KeyCode.D}) -- å³ä¸‹
 
- 	self:createKey("e", {CS.UnityEngine.KeyCode.E}) -- »¥¶¯¼ü
+	self:createKey("e", {CS.UnityEngine.KeyCode.E}) -- äº’åŠ¨é”®
+	self:createKey("q", {CS.UnityEngine.KeyCode.Q}) -- test
 
-	-- ¶¨Òå³åÍ»¼ü
-	self.keys["U"].antiKey = self.keys["D"] -- ÉÏÏÂ¶Ô³å
-	self.keys["D"].antiKey = self.keys["U"] -- ÉÏÏÂ¶Ô³å
-	self.keys["B"].antiKey = self.keys["F"] -- ×óÓÒ¶Ô³å
-	self.keys["F"].antiKey = self.keys["B"] -- ×óÓÒ¶Ô³å
+	-- å®šä¹‰å†²çªé”®
+	self.keys["U"].antiKey = self.keys["D"] -- ä¸Šä¸‹å¯¹å†²
+	self.keys["D"].antiKey = self.keys["U"] -- ä¸Šä¸‹å¯¹å†²
+	self.keys["B"].antiKey = self.keys["F"] -- å·¦å³å¯¹å†²
+	self.keys["F"].antiKey = self.keys["B"] -- å·¦å³å¯¹å†²
 
-	self.keys["UB"].antiKey = self.keys["DF"] -- ×óÉÏÓÒÏÂ¶Ô³å
-	self.keys["UF"].antiKey = self.keys["DB"] -- ÓÒÉÏ×óÏÂ¶Ô³å
-	self.keys["DB"].antiKey = self.keys["UF"] -- ×óÉÏÓÒÏÂ¶Ô³å
-	self.keys["DF"].antiKey = self.keys["UB"] -- ÓÒÉÏ×óÏÂ¶Ô³å
+	self.keys["UB"].antiKey = self.keys["DF"] -- å·¦ä¸Šå³ä¸‹å¯¹å†²
+	self.keys["UF"].antiKey = self.keys["DB"] -- å³ä¸Šå·¦ä¸‹å¯¹å†²
+	self.keys["DB"].antiKey = self.keys["UF"] -- å·¦ä¸Šå³ä¸‹å¯¹å†²
+	self.keys["DF"].antiKey = self.keys["UB"] -- å³ä¸Šå·¦ä¸‹å¯¹å†²
 
-	-- ¶¨Òå·´Ïò¼ü
-	self.keys["B"].reverseKey = self.keys["F"] -- ×óÓÒ»¥·´
-	self.keys["F"].reverseKey = self.keys["B"] -- ×óÓÒ»¥·´
+	-- å®šä¹‰åå‘é”®
+	self.keys["B"].reverseKey = self.keys["F"] -- å·¦å³äº’å
+	self.keys["F"].reverseKey = self.keys["B"] -- å·¦å³äº’å
 
-	self.keys["UB"].reverseKey = self.keys["UF"] -- ×óÉÏÓÒÉÏ»¥·´
-	self.keys["UF"].reverseKey = self.keys["UB"] -- ×óÉÏÓÒÉÏ»¥·´
-	self.keys["DB"].reverseKey = self.keys["DF"] -- ×óÏÂÓÒÏÂ»¥·´
-	self.keys["DF"].reverseKey = self.keys["DB"] -- ×óÏÂÓÒÏÂ»¥·´
+	self.keys["UB"].reverseKey = self.keys["UF"] -- å·¦ä¸Šå³ä¸Šäº’å
+	self.keys["UF"].reverseKey = self.keys["UB"] -- å·¦ä¸Šå³ä¸Šäº’å
+	self.keys["DB"].reverseKey = self.keys["DF"] -- å·¦ä¸‹å³ä¸‹äº’å
+	self.keys["DF"].reverseKey = self.keys["DB"] -- å·¦ä¸‹å³ä¸‹äº’å
 	
 	self.commands = {}
 	self.commands_sort = {}
@@ -62,7 +63,7 @@ function LSystem:new(o)
 	return self
 end
 
--- ÇĞ»»½ÇÉ«
+-- åˆ‡æ¢è§’è‰²
 function LSystem:ChangeCharacter(obj)
 	self.preObject = self.object
 	self.object = obj
@@ -74,14 +75,14 @@ function LSystem:ChangeCharacter(obj)
 	-- end
 	end
 
-	table.sort(self.commands_sort, function(a, b) -- levelµÍµÄÕĞÊ½·ÅºóÃæ
+	table.sort(self.commands_sort, function(a, b) -- levelä½çš„æ‹›å¼æ”¾åé¢
 		if a.key ~= nil and b.key ~= nil then
 			return a.key > b.key
 		end
 	end)
 end
 
--- ´´½¨°´¼üÓ³Éä
+-- åˆ›å»ºæŒ‰é”®æ˜ å°„
 function LSystem:createKey(id, k)
 	local key = {}
 	key.id = id
@@ -97,18 +98,18 @@ function LSystem:createKey(id, k)
 	self.keys[id] = key
 end
 
--- ¼ì²â°´¼ü×´Ì¬
+-- æ£€æµ‹æŒ‰é”®çŠ¶æ€
 function LSystem:input()
 	for i, v in pairs(self.keys) do
 		if self:isKeyDown(v.keys) then
 			if v.id ~= "a" and v.id ~= "b" and v.id ~= "c" and v.id ~= "j" and v.id ~= "e" then
-				for i2, v2 in pairs(self.keys) do -- Èç¹ûÓĞÒ»¸ö¼ü°´ÏÂ£¬ÆäËû¼ü¶¼Ëã·Å¿ª
+				for i2, v2 in pairs(self.keys) do -- å¦‚æœæœ‰ä¸€ä¸ªé”®æŒ‰ä¸‹ï¼Œå…¶ä»–é”®éƒ½ç®—æ”¾å¼€
 					if v2.id ~= v.id and v2.id ~= "a" and v2.id ~= "b" and v2.id ~= "c" and v2.id ~= "j" and v2.id ~= "e" then
-						if v2.count == 0 then -- Èç¹ûÖ®Ç°Ã»°´£¬ÏÖÔÚ¾ÍÊÇÃ»°´
+						if v2.count == 0 then -- å¦‚æœä¹‹å‰æ²¡æŒ‰ï¼Œç°åœ¨å°±æ˜¯æ²¡æŒ‰
 							v2.state = 0
-						elseif v2.count == 1 then -- Èç¹ûÖ®Ç°¸Õ°´ÏÂ£¬ÏÖÔÚ¾ÍÊÇ¸Õ·Å¿ª
+						elseif v2.count == 1 then -- å¦‚æœä¹‹å‰åˆšæŒ‰ä¸‹ï¼Œç°åœ¨å°±æ˜¯åˆšæ”¾å¼€
 							v2.state = 3
-						elseif v.count > 1 then -- Èç¹ûÖ®Ç°ÊÇ°´×¡£¬ÏÖÔÚ¾ÍÊÇ¸Õ·Å¿ª
+						elseif v.count > 1 then -- å¦‚æœä¹‹å‰æ˜¯æŒ‰ä½ï¼Œç°åœ¨å°±æ˜¯åˆšæ”¾å¼€
 							v2.state = 3
 						end
 
@@ -117,11 +118,11 @@ function LSystem:input()
 				end
 			end
 
-			if v.count == 0 then -- Èç¹ûÖ®Ç°Ã»°´£¬ÏÖÔÚ¾ÍÊÇ¸Õ°´ÏÂ
+			if v.count == 0 then -- å¦‚æœä¹‹å‰æ²¡æŒ‰ï¼Œç°åœ¨å°±æ˜¯åˆšæŒ‰ä¸‹
 				v.state = 1
-			elseif v.count == 1 then -- Èç¹ûÖ®Ç°¸Õ°´ÏÂ£¬ÏÖÔÚ¾ÍÊÇ°´×¡
+			elseif v.count == 1 then -- å¦‚æœä¹‹å‰åˆšæŒ‰ä¸‹ï¼Œç°åœ¨å°±æ˜¯æŒ‰ä½
 				v.state = 2
-			elseif v.count > 1 then -- Èç¹ûÖ®Ç°ÊÇ°´×¡£¬ÏÖÔÚ¾ÍÊÇ°´×¡
+			elseif v.count > 1 then -- å¦‚æœä¹‹å‰æ˜¯æŒ‰ä½ï¼Œç°åœ¨å°±æ˜¯æŒ‰ä½
 				v.state = 2
 			end
 
@@ -131,29 +132,29 @@ function LSystem:input()
 					v.count = 0
 					v.antiKey.count = 0
 
-					if v.count == 0 then -- Èç¹ûÖ®Ç°Ã»°´£¬ÏÖÔÚ¾ÍÊÇÃ»°´
+					if v.count == 0 then -- å¦‚æœä¹‹å‰æ²¡æŒ‰ï¼Œç°åœ¨å°±æ˜¯æ²¡æŒ‰
 						v.state = 0
-					elseif v.count == 1 then -- Èç¹ûÖ®Ç°¸Õ°´ÏÂ£¬ÏÖÔÚ¾ÍÊÇ¸Õ·Å¿ª
+					elseif v.count == 1 then -- å¦‚æœä¹‹å‰åˆšæŒ‰ä¸‹ï¼Œç°åœ¨å°±æ˜¯åˆšæ”¾å¼€
 						v.state = 3
-					elseif v.count > 1 then -- Èç¹ûÖ®Ç°ÊÇ°´×¡£¬ÏÖÔÚ¾ÍÊÇ¸Õ·Å¿ª
+					elseif v.count > 1 then -- å¦‚æœä¹‹å‰æ˜¯æŒ‰ä½ï¼Œç°åœ¨å°±æ˜¯åˆšæ”¾å¼€
 						v.state = 3
 					end
-					if v.antiKey.count == 0 then -- Èç¹ûÖ®Ç°Ã»°´£¬ÏÖÔÚ¾ÍÊÇÃ»°´
+					if v.antiKey.count == 0 then -- å¦‚æœä¹‹å‰æ²¡æŒ‰ï¼Œç°åœ¨å°±æ˜¯æ²¡æŒ‰
 						v.antiKey.state = 0
-					elseif v.antiKey.count == 1 then -- Èç¹ûÖ®Ç°¸Õ°´ÏÂ£¬ÏÖÔÚ¾ÍÊÇ¸Õ·Å¿ª
+					elseif v.antiKey.count == 1 then -- å¦‚æœä¹‹å‰åˆšæŒ‰ä¸‹ï¼Œç°åœ¨å°±æ˜¯åˆšæ”¾å¼€
 						v.antiKey.state = 3
-					elseif vantiKey..count > 1 then -- Èç¹ûÖ®Ç°ÊÇ°´×¡£¬ÏÖÔÚ¾ÍÊÇ¸Õ·Å¿ª
+					elseif vantiKey..count > 1 then -- å¦‚æœä¹‹å‰æ˜¯æŒ‰ä½ï¼Œç°åœ¨å°±æ˜¯åˆšæ”¾å¼€
 						v.antiKey.state = 3
 					end
 				end
 			end
 			
 		elseif self:isKey(v.keys) then
-			if v.count == 0 then -- Èç¹ûÖ®Ç°Ã»°´£¬ÏÖÔÚ¾ÍÊÇ¸Õ°´ÏÂ
+			if v.count == 0 then -- å¦‚æœä¹‹å‰æ²¡æŒ‰ï¼Œç°åœ¨å°±æ˜¯åˆšæŒ‰ä¸‹
 				v.state = 1
-			elseif v.count == 1 then -- Èç¹ûÖ®Ç°¸Õ°´ÏÂ£¬ÏÖÔÚ¾ÍÊÇ°´×¡
+			elseif v.count == 1 then -- å¦‚æœä¹‹å‰åˆšæŒ‰ä¸‹ï¼Œç°åœ¨å°±æ˜¯æŒ‰ä½
 				v.state = 2
-			elseif v.count > 1 then -- Èç¹ûÖ®Ç°ÊÇ°´×¡£¬ÏÖÔÚ¾ÍÊÇ°´×¡
+			elseif v.count > 1 then -- å¦‚æœä¹‹å‰æ˜¯æŒ‰ä½ï¼Œç°åœ¨å°±æ˜¯æŒ‰ä½
 				v.state = 2
 			end
 
@@ -163,31 +164,31 @@ function LSystem:input()
 					v.count = 0
 					v.antiKey.count = 0
 
-					if v.count == 0 then -- Èç¹ûÖ®Ç°Ã»°´£¬ÏÖÔÚ¾ÍÊÇÃ»°´
+					if v.count == 0 then -- å¦‚æœä¹‹å‰æ²¡æŒ‰ï¼Œç°åœ¨å°±æ˜¯æ²¡æŒ‰
 						v.state = 0
-					elseif v.count == 1 then -- Èç¹ûÖ®Ç°¸Õ°´ÏÂ£¬ÏÖÔÚ¾ÍÊÇ¸Õ·Å¿ª
+					elseif v.count == 1 then -- å¦‚æœä¹‹å‰åˆšæŒ‰ä¸‹ï¼Œç°åœ¨å°±æ˜¯åˆšæ”¾å¼€
 						v.state = 3
-					elseif v.count > 1 then -- Èç¹ûÖ®Ç°ÊÇ°´×¡£¬ÏÖÔÚ¾ÍÊÇ¸Õ·Å¿ª
+					elseif v.count > 1 then -- å¦‚æœä¹‹å‰æ˜¯æŒ‰ä½ï¼Œç°åœ¨å°±æ˜¯åˆšæ”¾å¼€
 						v.state = 3
 					end
-					if v.antiKey.count == 0 then -- Èç¹ûÖ®Ç°Ã»°´£¬ÏÖÔÚ¾ÍÊÇÃ»°´
+					if v.antiKey.count == 0 then -- å¦‚æœä¹‹å‰æ²¡æŒ‰ï¼Œç°åœ¨å°±æ˜¯æ²¡æŒ‰
 						v.antiKey.state = 0
-					elseif v.antiKey.count == 1 then -- Èç¹ûÖ®Ç°¸Õ°´ÏÂ£¬ÏÖÔÚ¾ÍÊÇ¸Õ·Å¿ª
+					elseif v.antiKey.count == 1 then -- å¦‚æœä¹‹å‰åˆšæŒ‰ä¸‹ï¼Œç°åœ¨å°±æ˜¯åˆšæ”¾å¼€
 						v.antiKey.state = 3
-					elseif v.antiKey.count > 1 then -- Èç¹ûÖ®Ç°ÊÇ°´×¡£¬ÏÖÔÚ¾ÍÊÇ¸Õ·Å¿ª
+					elseif v.antiKey.count > 1 then -- å¦‚æœä¹‹å‰æ˜¯æŒ‰ä½ï¼Œç°åœ¨å°±æ˜¯åˆšæ”¾å¼€
 						v.antiKey.state = 3
 					end
 				end
 			end
 		elseif self:isKeyUp(v.keys) then
 			if v.id ~= "a" and v.id ~= "b" and v.id ~= "c" and v.id ~= "j" and v.id ~= "e" then
-				for i2, v2 in pairs(self.keys) do -- Èç¹ûÓĞÒ»¸ö¼ü·Å¿ª£¬ÆäËû¼ü¶¼Ëã·Å¿ª
+				for i2, v2 in pairs(self.keys) do -- å¦‚æœæœ‰ä¸€ä¸ªé”®æ”¾å¼€ï¼Œå…¶ä»–é”®éƒ½ç®—æ”¾å¼€
 					if v2.id ~= v.id and v2.id ~= "a" and v2.id ~= "b" and v2.id ~= "c" and v2.id ~= "j" and v2.id ~= "e" then
-						if v2.count == 0 then -- Èç¹ûÖ®Ç°Ã»°´£¬ÏÖÔÚ¾ÍÊÇÃ»°´
+						if v2.count == 0 then -- å¦‚æœä¹‹å‰æ²¡æŒ‰ï¼Œç°åœ¨å°±æ˜¯æ²¡æŒ‰
 							v2.state = 0
-						elseif v2.count == 1 then -- Èç¹ûÖ®Ç°¸Õ°´ÏÂ£¬ÏÖÔÚ¾ÍÊÇ¸Õ·Å¿ª
+						elseif v2.count == 1 then -- å¦‚æœä¹‹å‰åˆšæŒ‰ä¸‹ï¼Œç°åœ¨å°±æ˜¯åˆšæ”¾å¼€
 							v2.state = 3
-						elseif v.count > 1 then -- Èç¹ûÖ®Ç°ÊÇ°´×¡£¬ÏÖÔÚ¾ÍÊÇ¸Õ·Å¿ª
+						elseif v.count > 1 then -- å¦‚æœä¹‹å‰æ˜¯æŒ‰ä½ï¼Œç°åœ¨å°±æ˜¯åˆšæ”¾å¼€
 							v2.state = 3
 						end
 
@@ -196,11 +197,11 @@ function LSystem:input()
 				end
 			end
 
-			if v.count == 0 then -- Èç¹ûÖ®Ç°Ã»°´£¬ÏÖÔÚ¾ÍÊÇÃ»°´
+			if v.count == 0 then -- å¦‚æœä¹‹å‰æ²¡æŒ‰ï¼Œç°åœ¨å°±æ˜¯æ²¡æŒ‰
 				v.state = 0
-			elseif v.count == 1 then -- Èç¹ûÖ®Ç°¸Õ°´ÏÂ£¬ÏÖÔÚ¾ÍÊÇ¸Õ·Å¿ª
+			elseif v.count == 1 then -- å¦‚æœä¹‹å‰åˆšæŒ‰ä¸‹ï¼Œç°åœ¨å°±æ˜¯åˆšæ”¾å¼€
 				v.state = 3
-			elseif v.count > 1 then -- Èç¹ûÖ®Ç°ÊÇ°´×¡£¬ÏÖÔÚ¾ÍÊÇ¸Õ·Å¿ª
+			elseif v.count > 1 then -- å¦‚æœä¹‹å‰æ˜¯æŒ‰ä½ï¼Œç°åœ¨å°±æ˜¯åˆšæ”¾å¼€
 				v.state = 3
 			end
 
@@ -212,7 +213,7 @@ function LSystem:input()
 	end
 end
 
--- µ±°´¼ü¸Õ°´ÏÂ
+-- å½“æŒ‰é”®åˆšæŒ‰ä¸‹
 function LSystem:isKeyDown(keys)
 	local c = 0
 	for i = 1, #keys, 1 do
@@ -226,7 +227,7 @@ function LSystem:isKeyDown(keys)
 	return false
 end
 
--- µ±°´¼ü°´×¡
+-- å½“æŒ‰é”®æŒ‰ä½
 function LSystem:isKey(keys)
 	local c = 0
 	for i = 1, #keys, 1 do
@@ -241,7 +242,7 @@ function LSystem:isKey(keys)
 	return false
 end
 
--- µ±°´¼üµ¯Æğ
+-- å½“æŒ‰é”®å¼¹èµ·
 function LSystem:isKeyUp(keys)
 	local c = 0
 	for i = 1, #keys, 1 do
@@ -256,7 +257,7 @@ function LSystem:isKeyUp(keys)
 	return false
 end
 
--- ÓĞÈÎºÎ¼ü°´ÏÂ£¿
+-- æœ‰ä»»ä½•é”®æŒ‰ä¸‹ï¼Ÿ
 function LSystem:isAnyKeyDown(key)
 	for i, v in pairs(self.keys) do
 		if v ~= key then
@@ -270,7 +271,7 @@ function LSystem:isAnyKeyDown(key)
 	return false
 end
 
--- debugÏÔÊ¾°´¼ü×´Ì¬
+-- debugæ˜¾ç¤ºæŒ‰é”®çŠ¶æ€
 function LSystem:displayKeys()
 	for i, v in pairs(self.keys) do
 		CS.UnityEngine.GUILayout.Label(v.id .. ": " .. v.count .. "," .. v.state)
@@ -278,7 +279,7 @@ function LSystem:displayKeys()
 end
 
 
--- »¥¶¯ÏµÍ³²âÊÔÖĞ
+-- äº’åŠ¨ç³»ç»Ÿæµ‹è¯•ä¸­
 function LSystem:systemInput(obj)
 
 	-- if dialogueBox == nil then
@@ -286,7 +287,7 @@ function LSystem:systemInput(obj)
 			if kaiwaButton == nil then
 				kaiwaButton = utils.createObject(nil, 999, "Interact_display", 0, 0, 0, 0, 0, 5)
 			end
-			-- if self.keys["e"].state == 1 then -- ¸Õ°´ÏÂ
+			-- if self.keys["e"].state == 1 then -- åˆšæŒ‰ä¸‹
 
 				local b = false
 				for i, v in pairs(obj.elseArray) do
@@ -317,7 +318,7 @@ function LSystem:systemInput(obj)
 								-- 	-- end
 								-- end
 							
-								-- table.sort(self.commands_sort, function(a, b) -- levelµÍµÄÕĞÊ½·ÅºóÃæ
+								-- table.sort(self.commands_sort, function(a, b) -- levelä½çš„æ‹›å¼æ”¾åé¢
 								-- 	if a.key ~= nil and b.key ~= nil then
 								-- 		return a.key > b.key
 								-- 	end
@@ -349,7 +350,7 @@ function LSystem:systemInput(obj)
 		end
 	-- else
 		-- if obj.isElse & (1 << 16) == 1 << 16 then
-			-- if self.keys["D"].state == 1 then -- ¸Õ°´ÏÂ
+			-- if self.keys["D"].state == 1 then -- åˆšæŒ‰ä¸‹
 			-- 	dialogueBox.vars["choose_test2"] = dialogueBox.vars["choose_test2"] + 1
 			-- 	if dialogueBox.vars["choose_test2"] > 3 then
 			-- 		dialogueBox.vars["choose_test2"] = 1
@@ -364,7 +365,7 @@ function LSystem:systemInput(obj)
 			-- end
 
 
-			-- if self.keys["e"].state == 1 then -- ¸Õ°´ÏÂ
+			-- if self.keys["e"].state == 1 then -- åˆšæŒ‰ä¸‹
 				-- utils.destroyObject(dialogueBox.gameObject:GetInstanceID())
 				-- dialogueBox = nil
 				-- self.object.vars["interact"] = false
@@ -394,7 +395,7 @@ function LUITest:new(x, y, w, h, b)
     return self
 end
 
--- Ìí¼ÓÊÂ¼ş
+-- æ·»åŠ äº‹ä»¶
 function LUITest:addEvent(eventName, action)
 	if not self.eventManager[eventName] then
 		self.eventManager[eventName] = Delegate()
@@ -402,17 +403,17 @@ function LUITest:addEvent(eventName, action)
 	self.eventManager[eventName].add(action)
 end
 
--- ÒÆ³ıÊÂ¼ş
+-- ç§»é™¤äº‹ä»¶
 function LUITest:removeEvent(eventName, action)
 	self.eventManager[eventName].delete(action)
 end
 
--- ÒÆ³ıËùÓĞÊÂ¼ş
+-- ç§»é™¤æ‰€æœ‰äº‹ä»¶
 function LUITest:removeAllEvent()
 	self.eventManager = {}
 end
 
--- ´¥·¢ÊÂ¼ş
+-- è§¦å‘äº‹ä»¶
 function LUITest:InvokeEvent(eventName, ...)
 	if self.eventManager[eventName] then
 		self.eventManager[eventName].invoke(...)
@@ -430,11 +431,11 @@ function LPlayer:new(o, c)
 	self.camera = c
 
 
-	self:createKey("a", {CS.UnityEngine.KeyCode.Mouse0}) -- ¹¥»÷¼ü
-	self:createKey("b", {CS.UnityEngine.KeyCode.Mouse1}) -- ¹¥»÷¼ü
-	self:createKey("c", {CS.UnityEngine.KeyCode.Mouse2}) -- ¹¥»÷¼ü
+	self:createKey("a", {CS.UnityEngine.KeyCode.Mouse0}) -- æ”»å‡»é”®
+	self:createKey("b", {CS.UnityEngine.KeyCode.Mouse1}) -- æ”»å‡»é”®
+	self:createKey("c", {CS.UnityEngine.KeyCode.Mouse2}) -- æ”»å‡»é”®
 
-	self:createKey("j", {CS.UnityEngine.KeyCode.Space}) -- ÌøÔ¾¼ü
+	self:createKey("j", {CS.UnityEngine.KeyCode.Space}) -- è·³è·ƒé”®
 
 	self:createCommand(self.object.database:getLines("commands"))
 
@@ -444,7 +445,7 @@ function LPlayer:new(o, c)
 		-- end
 	end
 
-	table.sort(self.commands_sort, function(a, b) -- levelµÍµÄÕĞÊ½·ÅºóÃæ
+	table.sort(self.commands_sort, function(a, b) -- levelä½çš„æ‹›å¼æ”¾åé¢
 		if a.key ~= nil and b.key ~= nil then
 			return a.key > b.key
 		end
@@ -470,7 +471,7 @@ function LPlayer:new(o, c)
     return self
 end
 
--- ÉãÏñ»ú¸úËæÖ÷½Ç£¬±È½Ï¼òÂª
+-- æ‘„åƒæœºè·Ÿéšä¸»è§’ï¼Œæ¯”è¾ƒç®€é™‹
 function LPlayer:followCharacter()
 	if self.object.kind == 0 then
 		local charPos = self.object.physics_object.transform.position
@@ -478,7 +479,7 @@ function LPlayer:followCharacter()
 	end
 end
 
--- ´´½¨ÕĞÊ½
+-- åˆ›å»ºæ‹›å¼
 function LSystem:createCommand(c)
 	for i, v in ipairs(c) do
 		if v.active then
@@ -507,7 +508,7 @@ function LSystem:resetCommands()
 	end
 end
 
--- ´´½¨ÕĞÊ½³öÕĞ·½·¨
+-- åˆ›å»ºæ‹›å¼å‡ºæ‹›æ–¹æ³•
 function LSystem:createCMD(c_str)
 	local cmds = {}
 	local c = utils.split(c_str, ",")
@@ -516,7 +517,7 @@ function LSystem:createCMD(c_str)
 		cmd.kind = 0
 		cmd.keys = {}
 		local found = false
-		-- ¿´¿´ÊÇÊ²Ã´°´¼ü
+		-- çœ‹çœ‹æ˜¯ä»€ä¹ˆæŒ‰é”®
 		local k = string.match(v, "(%a+)")
 		for i2, v2 in pairs(self.keys) do
 			if utils.isStringAContainB(k, v2.id) then
@@ -525,7 +526,7 @@ function LSystem:createCMD(c_str)
 				break
 			end
 		end
-		-- Èç¹ûÃ»ÕÒµ½£¬ÓÃ+ºÅ·Ö¿ª¿´¿´
+		-- å¦‚æœæ²¡æ‰¾åˆ°ï¼Œç”¨+å·åˆ†å¼€çœ‹çœ‹
 		if found == false then
 			local str = utils.split(k, "+")
 			for i = 1, #str, 1 do
@@ -534,12 +535,12 @@ function LSystem:createCMD(c_str)
 				end
 			end
 		end
-		-- ÌØÊâ¹¦ÄÜ¼ÓÉÏ
-		if string.find(v, "/") then -- °´×¡
+		-- ç‰¹æ®ŠåŠŸèƒ½åŠ ä¸Š
+		if string.find(v, "/") then -- æŒ‰ä½
 			cmd.kind = 1
-		elseif string.find(v, "~") then -- ·Å¿ª
+		elseif string.find(v, "~") then -- æ”¾å¼€
 			cmd.kind = 2
-		elseif string.find(v, ">") then -- ÉÏÒ»´Î°´¼üºÍÕâÒ»´Î°´¼üÖ®ÖĞ²»ÄÜ²ôÔÓÆäËûµÄ°´¼ü
+		elseif string.find(v, ">") then -- ä¸Šä¸€æ¬¡æŒ‰é”®å’Œè¿™ä¸€æ¬¡æŒ‰é”®ä¹‹ä¸­ä¸èƒ½æºæ‚å…¶ä»–çš„æŒ‰é”®
 			cmd.kind = 3
 		end
 		table.insert(cmds, cmd)
@@ -547,7 +548,7 @@ function LSystem:createCMD(c_str)
 	return cmds
 end
 
--- debugÏÔÊ¾command×´Ì¬
+-- debugæ˜¾ç¤ºcommandçŠ¶æ€
 function LSystem:displayCommands()
 	for i, vvv in pairs(self.commands_sort) do
 		local v = vvv.value
@@ -555,7 +556,7 @@ function LSystem:displayCommands()
 	end
 end
 
--- ÅĞ¶ÏÕâ¸ö½×¶ÎµÄÕĞÊ½ÖĞµÄ°´¼üÊÇ·ñÔÚÉÏ¸ö½×¶ÎÒÑ¾­°üº¬
+-- åˆ¤æ–­è¿™ä¸ªé˜¶æ®µçš„æ‹›å¼ä¸­çš„æŒ‰é”®æ˜¯å¦åœ¨ä¸Šä¸ªé˜¶æ®µå·²ç»åŒ…å«
 function LSystem:getIterateKeys(keysA, keysB)
 	local iterate = {}
 	for i, v in ipairs(keysA) do -- .keys
@@ -570,7 +571,7 @@ function LSystem:getIterateKeys(keysA, keysB)
 	return iterate
 end
 
--- ÅĞ¶Ï³öÕĞ
+-- åˆ¤æ–­å‡ºæ‹›
 function LSystem:judgeCommand()
 	for i, vvv in pairs(self.commands_sort) do -- command
 		local v = vvv.value
@@ -599,22 +600,22 @@ function LSystem:judgeCommand()
 				end
 				if v2.kind == 0 then
 					-- print(myKey.state)
-					if myKey.state == 1 then -- ¸Õ°´ÏÂ
+					if myKey.state == 1 then -- åˆšæŒ‰ä¸‹
 						ok = ok + 1
 					else
 						if myReverseKey ~= nil and v.direction == 0 then
-							if myReverseKey.state == 1 then -- ·´Ïò¸Õ°´ÏÂ
+							if myReverseKey.state == 1 then -- åå‘åˆšæŒ‰ä¸‹
 								ok = ok + 1
 								rok = rok - 1
 							end
 						end
 					end
 				elseif v2.kind == 1 then
-					if myKey.state == 2 then -- °´×¡
+					if myKey.state == 2 then -- æŒ‰ä½
 						ok = ok + 1
 					else
 						if myReverseKey ~= nil and v.direction == 0 then
-							if myReverseKey.state == 2 then -- ·´Ïò°´×¡
+							if myReverseKey.state == 2 then -- åå‘æŒ‰ä½
 								ok = ok + 1
 								rok = rok - 1
 							end
@@ -628,7 +629,7 @@ function LSystem:judgeCommand()
 					-- 	rev = true
 					-- 	v.direction = -1
 					-- end
-					if myKey.state == 3 then -- ¸Õ·Å¿ª -- myKey.state == 0 or 
+					if myKey.state == 3 then -- åˆšæ”¾å¼€ -- myKey.state == 0 or 
 						-- print(myKey.id)
 						ok = ok + 1
 						-- if rev then
@@ -636,13 +637,13 @@ function LSystem:judgeCommand()
 						-- end
 					else
 						if myReverseKey ~= nil and v.direction == 0 then
-							if myReverseKey.state == 3 then -- ·´Ïò¸Õ·Å¿ª
+							if myReverseKey.state == 3 then -- åå‘åˆšæ”¾å¼€
 								ok = ok + 1
 								rok = rok - 1
 							end
 						end
 					end
-				elseif v2.kind == 3 then -- ÉÏÒ»´Î°´¼üºÍÕâÒ»´Î°´¼üÖ®ÖĞ²»ÄÜ²ôÔÓÆäËûµÄ°´¼ü
+				elseif v2.kind == 3 then -- ä¸Šä¸€æ¬¡æŒ‰é”®å’Œè¿™ä¸€æ¬¡æŒ‰é”®ä¹‹ä¸­ä¸èƒ½æºæ‚å…¶ä»–çš„æŒ‰é”®
 					if myKey.state == 1 then
 						ok = ok + 1
 					else

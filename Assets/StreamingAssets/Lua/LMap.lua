@@ -37,7 +37,7 @@ local dataBase = {data = nil,
 
 local gameMap = {}
 
--- Êı¾İ¿ânew
+-- æ•°æ®åº“new
 function tool2_castleDB.new(path, file)
     castleDBInstance = LCastleDBMap:new(path, file)
     castleDBInstance:readDB()
@@ -62,8 +62,8 @@ function tool2_castleDB.new(path, file)
 --~ 	tiletiletile()
 end
 
--- ¶ÁÈ¡tool2_castleDBµÄtile(Êı¾İ£¬sprite´æÈëµÄtable)
--- ¸ñÊ½£º
+-- è¯»å–tool2_castleDBçš„tile(æ•°æ®ï¼Œspriteå­˜å…¥çš„table)
+-- æ ¼å¼ï¼š
 function loadTile(data, tiles, flag)
     flag = flag or false
     for i, v in ipairs(data) do
@@ -71,18 +71,18 @@ function loadTile(data, tiles, flag)
         if dataBase.textures[ff] == nil then
             dataBase.textures[ff] = utils.LoadImageToTexture2DByPath(castleDBInstance.DBPath .. ff)
         end
-        -- ÓÃtextureÉú³Ésprite
+        -- ç”¨textureç”Ÿæˆsprite
         local s = utils.CreateSprite(dataBase.textures[ff], v["icon"]["x"], v["icon"]["y"], v["icon"]["size"])
         if flag then
-            tiles[v["id"]] = {tileSort = v["sort"], sprite = s} -- ²åÈësortÈ¨ÖØºÍsprite£¬ÓÃÃû×Ö²éÕÒ
+            tiles[v["id"]] = {tileSort = v["sort"], sprite = s} -- æ’å…¥sortæƒé‡å’Œspriteï¼Œç”¨åå­—æŸ¥æ‰¾
         else
-            table.insert(tiles, {tileSort = v["sort"], sprite = s}) -- ²åÈësortÈ¨ÖØºÍsprite£¬ÓÃÏÂ±êµ÷ÓÃ
-			tiles[v["id"]] = #tiles - 1 -- ÉèÖÃÒÔÃû×Ö²éÕÒĞòºÅ·½·¨£¬·½±ãÊµÓÃ
+            table.insert(tiles, {tileSort = v["sort"], sprite = s}) -- æ’å…¥sortæƒé‡å’Œspriteï¼Œç”¨ä¸‹æ ‡è°ƒç”¨
+			tiles[v["id"]] = #tiles - 1 -- è®¾ç½®ä»¥åå­—æŸ¥æ‰¾åºå·æ–¹æ³•ï¼Œæ–¹ä¾¿å®ç”¨
         end
     end
 end
 
--- ¶ÁÈ¡level
+-- è¯»å–level
 function loadLevel()
     for index, value in ipairs(castleDBInstance:getLines("levelData")) do
 		local tab = value
@@ -100,7 +100,7 @@ function loadLevel()
 		end
 
 		local temp = {}
-		-- ÁÙÊ±×öÒ»¸ö´¦ÀílinkerµÄ´¦Àíconnectors
+		-- ä¸´æ—¶åšä¸€ä¸ªå¤„ç†linkerçš„å¤„ç†connectors
 		for i_y = 0, hhh - 1 do
 			for i_x = 0, www - 1 do
 				if tt2[i_x + i_y * www + 1] ~= 0 then
@@ -112,7 +112,7 @@ function loadLevel()
 			end
 		end
 
-		-- ÉîËÑÒ»ÏÂ°ÑÏàÁÚµÄÍ¬ÀàĞÍµÄlinker¹éÀàµ½Ò»¸öÀàĞÍÁ¬½ÓÆ÷Àï·Åµ½Êı×éconnectorsÀï
+		-- æ·±æœä¸€ä¸‹æŠŠç›¸é‚»çš„åŒç±»å‹çš„linkerå½’ç±»åˆ°ä¸€ä¸ªç±»å‹è¿æ¥å™¨é‡Œæ”¾åˆ°æ•°ç»„connectorsé‡Œ
 		local id = 1
 		local conn = {}
 		for p, a in pairs(temp) do
@@ -186,7 +186,7 @@ function dpdp(t1, x, y, value, t2, t3)
     return value
 end
 
--- È¡×î´óxy
+-- å–æœ€å¤§xy
 function table_maxn(t)
     local mn_x = nil
     local mn_y = nil
@@ -207,7 +207,7 @@ function table_maxn(t)
     return mn_x, mn_y
 end
 
--- È¡×îĞ¡xy
+-- å–æœ€å°xy
 function table_minn(t)
     local mn_x = nil
     local mn_y = nil
@@ -228,14 +228,14 @@ function table_minn(t)
     return mn_x, mn_y
 end
 
--- ¶ÁÈ¡tile¹æÔò
+-- è¯»å–tileè§„åˆ™
 function loadTileSet(index)
     for index, value in ipairs(castleDBInstance:getLines("tileSet")) do
 		local da = value
 		local data = value["layers"]
 		for i, v in ipairs(data) do
 			if v["active"] == true then
-				-- ¶ÁÈ¡textureºÍsprite
+				-- è¯»å–textureå’Œsprite
 				-- local ff = v["tile"]["file"]
 				-- if dataBase.textures[ff] == nil then
 				-- 	dataBase.textures[ff] = utils.LoadImageToTexture2DByPath(castleDBInstance.DBPath .. ff)
@@ -269,7 +269,7 @@ function loadTileSet(index)
 					wall_s = castleDBInstance.sprites[v["walls2"]]
 				end
 
-				-- ¶ÁÈ¡tile¹æÔò
+				-- è¯»å–tileè§„åˆ™
 				local tt = utils.Base64DecodeToArray_Ground(v["data"]["data"])
 	--~ 			for g = 1, #tt, 1 do
 	--~ 				print(tt[g])
@@ -304,7 +304,7 @@ function loadTileSet(index)
 
 
 				local g = {}
-				-- Éú³É¹æÔògrid
+				-- ç”Ÿæˆè§„åˆ™grid
 				for i = -1, 1, 1 do
 					g[i] = {}
 					for j = -1, 1, 1 do
@@ -491,7 +491,7 @@ function tool2_castleDB.linkRoom(room, index)
     return true, room2
 end
 
--- Éú³É¹Ø¿¨£¨²âÊÔÖĞ£©
+-- ç”Ÿæˆå…³å¡ï¼ˆæµ‹è¯•ä¸­ï¼‰
 function tool2_castleDB.gen()
 	local test = dataBase.levels[CS.Tools.Instance:RandomRangeInt(1, #dataBase.levels + 1)]
     local room = tileRoom:new(0, 0, test, gameMap, test.name .. "mainhouse")
@@ -526,7 +526,7 @@ function tool2_castleDB.gen()
 --~ 	outlineMap(gameMap)
 	fillMap(gameMap)
 
---~ 	-- ¿ÉÊÓ»¯gameMap
+--~ 	-- å¯è§†åŒ–gameMap
 --~     local p = CS.UnityEngine.GameObject("test")
 --~     local unityobject = CS.UnityEngine.GameObject("blocks")
 --~     unityobject.transform.parent = p.transform
@@ -600,7 +600,7 @@ function tool2_castleDB.drawBackGround(map, x, y, scale, n, w, h)
 	local decorations = {}
     for p, a in pairs(map) do
         for k, b in pairs(map[p]) do
-			if (map[p][k] == 1 or map[p][k] == 2) and (map[p][k - 1] ~= nil and (map[p][k - 1] == 0 or map[p][k - 1] == 4)) then -- ÏÈÅĞ¶ÏµØÃæÉÏµÄ¶«Î÷
+			if (map[p][k] == 1 or map[p][k] == 2) and (map[p][k - 1] ~= nil and (map[p][k - 1] == 0 or map[p][k - 1] == 4)) then -- å…ˆåˆ¤æ–­åœ°é¢ä¸Šçš„ä¸œè¥¿
 				local decoration = tool2_castleDB.judgeBackGround(map, p, k - 1, w, h)
 --~ 				print(decoration)
 				if decoration ~= nil then
@@ -679,9 +679,9 @@ function tool2_castleDB.judgeBackGround(map, p, k, width, height)
 	end
 end
 
--- äÖÈ¾gameMap2D
+-- æ¸²æŸ“gameMap2D
 function tool2_castleDB.drawMap(gameMap, x, y, scale)
-	-- äÖÈ¾gameMap
+	-- æ¸²æŸ“gameMap
     local p = CS.UnityEngine.GameObject("test")
     local unityobject = CS.UnityEngine.GameObject("blocks")
 	unityobject.transform.parent = p.transform
@@ -691,7 +691,7 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 	local sortArray = {}
     for p, a in pairs(gameMap) do
         for k, b in pairs(gameMap[p]) do
-			if gameMap[p][k] == 0 or gameMap[p][k] == 2 or gameMap[p][k] == 4 then -- Éú³É±³¾°
+			if gameMap[p][k] == 0 or gameMap[p][k] == 2 or gameMap[p][k] == 4 then -- ç”ŸæˆèƒŒæ™¯
 				if sortArray[10] == nil then
 					local sortObject = CS.UnityEngine.GameObject("Sort " .. 10)
 					sortObject.transform.parent = unityobject.transform
@@ -739,7 +739,7 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 					-- CS.UnityEngine.GameObject.Destroy(deubg_object:GetComponent(typeof(CS.UnityEngine.BoxCollider)))
 				end
 			end
-			if gameMap[p][k] ~= 0 then -- Éú³ÉÅö×²³¡¾°
+			if gameMap[p][k] ~= 0 then -- ç”Ÿæˆç¢°æ’åœºæ™¯
 				local ts = nil
 				for i = 1, #dataBase.tileSets, 1 do
 					if ruileJudge(p, k, gameMap, dataBase.tileSets[i].gird, dataBase.blocksTiles[dataBase.tileSets[i].tileType]) == true then
@@ -763,7 +763,7 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 					sortArray[s] = sortObject
 				end
 
-				if gameMap[p][k] == 4 and gameMap[p][k - 1] == 2 then -- Èç¹ûÌİ×ÓÉÏÃæÒ»¸ö¸ñ×ÓÊÇÆ½Ì¨,ÔÚÌİ×ÓÉÏÃæÑÓÉìÒ»¸öÌİ×Ó
+				if gameMap[p][k] == 4 and gameMap[p][k - 1] == 2 then -- å¦‚æœæ¢¯å­ä¸Šé¢ä¸€ä¸ªæ ¼å­æ˜¯å¹³å°,åœ¨æ¢¯å­ä¸Šé¢å»¶ä¼¸ä¸€ä¸ªæ¢¯å­
 					local unityobject_child = CS.UnityEngine.GameObject("block" .. p .. "," .. k - 1 .. "[" .. gameMap[p][k] .. "]" .. n)
 					unityobject_child.transform.parent = sortArray[s].transform
 					unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, -(k - 1) * ts.size / 100, 0)
@@ -850,12 +850,12 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 				local unityobject_child = tool2_castleDB.createMapObject(sortArray[s].transform, "block", p, k, gameMap, n, ts, ts.sprite, -s, "block")
 
 				unityobject_child.layer = gameMap[p][k]
-				if gameMap[p][k] ~= 4 then -- Ìİ×Ó¼ÓÅö×²£¬µ«²»Åö
+				if gameMap[p][k] ~= 4 then -- æ¢¯å­åŠ ç¢°æ’ï¼Œä½†ä¸ç¢°
 					local bit = nil
 					if gameMap[p][k] == 2 then
 						bit = 1
 					else
-						-- ÕâÀïÒª¸ø²»Í¬³¯ÏòµÄµØ°å·ÅÉÏ²»Í¬µÄcollider£¬0000ËÄ¸öbitÎ»×éºÏÀ´±íÊ¾³¯Ïò£¬·ÅÔÚÃû×Ö×îºó
+						-- è¿™é‡Œè¦ç»™ä¸åŒæœå‘çš„åœ°æ¿æ”¾ä¸Šä¸åŒçš„colliderï¼Œ0000å››ä¸ªbitä½ç»„åˆæ¥è¡¨ç¤ºæœå‘ï¼Œæ”¾åœ¨åå­—æœ€å
 						bit = tool2_castleDB.judgeColliderType(gameMap, p, k)
 					end
 					unityobject_child.name = unityobject_child.name .. "," .. bit
@@ -976,7 +976,7 @@ function tool2_castleDB.createMapObject(parent, name, p, k, gameMap, n, ts, spri
 		-- pic_BoxCollider.isTrigger = true
 	-- end
 
-	-- Õâ¸öÊÇÔÚÍ¼µÄµØ·½»­¸öÅö×²ºĞ
+	-- è¿™ä¸ªæ˜¯åœ¨å›¾çš„åœ°æ–¹ç”»ä¸ªç¢°æ’ç›’
 	-- if flag == "block" then
 	-- 	local boxCollider3D = CS.UnityEngine.GameObject("boxCollider3D")
 	-- 	boxCollider3D.transform:SetParent(unityobject_child.transform)
@@ -1013,7 +1013,7 @@ function tool2_castleDB.createMapObject(parent, name, p, k, gameMap, n, ts, spri
 	return unityobject_child
 end
 
--- 0Ã»ÓĞcollider£¬0001=1ÉÏ£¬0011=3ÉÏÏÂ£¬0111=7ÉÏÏÂ×ó£¬1111=ÉÏÏÂ×óÓÒ£¬0101=5ÉÏÏÂ£¬1010=10×óÓÒ, 010000=16Ç°£¬100000=32ºó
+-- 0æ²¡æœ‰colliderï¼Œ0001=1ä¸Šï¼Œ0011=3ä¸Šä¸‹ï¼Œ0111=7ä¸Šä¸‹å·¦ï¼Œ1111=ä¸Šä¸‹å·¦å³ï¼Œ0101=5ä¸Šä¸‹ï¼Œ1010=10å·¦å³, 010000=16å‰ï¼Œ100000=32å
 function tool2_castleDB.judgeColliderType(map, p, k)
 	local b = 0
 
@@ -1033,7 +1033,7 @@ function tool2_castleDB.judgeColliderType(map, p, k)
 	b = b | 16
 	b = b | 32
 
-	-- b = b ~ 15 -- È¡·´
+	-- b = b ~ 15 -- å–å
 	b = b ~ 63
 	return b
 end
@@ -1075,9 +1075,9 @@ function tool2_castleDB.getColliderTypeWithString(str)
 	return r
 end
 
--- äÖÈ¾gameMap3D
+-- æ¸²æŸ“gameMap3D
 function tool2_castleDB.drawMap__(gameMap, x, y, scale)
-	-- äÖÈ¾gameMap
+	-- æ¸²æŸ“gameMap
     local p = CS.UnityEngine.GameObject("test")
     local unityobject = CS.UnityEngine.GameObject("blocks")
     unityobject.transform.parent = p.transform
@@ -1139,7 +1139,7 @@ function comp(a, bArray)
 	return false
 end
 
--- tileÂß¼­ÅĞ¶Ï£¬Ğ´µÄºÜÀÃ£¬ÒÔºó»òĞí»áÓÅ»¯
+-- tileé€»è¾‘åˆ¤æ–­ï¼Œå†™çš„å¾ˆçƒ‚ï¼Œä»¥åæˆ–è®¸ä¼šä¼˜åŒ–
 function ruileJudge(p, k, map, gird, t)
 	if map[p][k] ~= t then
 		return false
@@ -1176,7 +1176,7 @@ function ruileJudge(p, k, map, gird, t)
 	return true
 end
 
--- Éú³É·¿¼ä
+-- ç”Ÿæˆæˆ¿é—´
 function crateRoom(firstroom, num)
 	local rooms = {}
 	table.insert(rooms, firstroom)
@@ -1191,7 +1191,7 @@ function crateRoom(firstroom, num)
 		local l2 = CS.Tools.Instance:RandomRangeInt(1, #dataBase.levels + 1)
 		-- x, y, r2 = r:link(l, dataBase.levels[l2], gameMap, "test")
 		x, y, r2 = rooms[p]:link(l, dataBase.levels[l2], gameMap, dataBase.levels[l2].name)
-		while (x == nil or y == nil or r2 == nil) and c <= 100 do -- ³¢ÊÔ100´Î
+		while (x == nil or y == nil or r2 == nil) and c <= 100 do -- å°è¯•100æ¬¡
 			p = CS.Tools.Instance:RandomRangeInt(1, #rooms + 1)
 			l = CS.Tools.Instance:RandomRangeInt(1, #rooms[p].linkers + 1)
 			l2 = CS.Tools.Instance:RandomRangeInt(1, #dataBase.levels + 1)
@@ -1212,7 +1212,7 @@ function crateRoom(firstroom, num)
 	return rooms
 end
 
--- Ãè±ßµØÍ¼
+-- æè¾¹åœ°å›¾
 function outlineMap(map)
 	local outline = {}
 
@@ -1236,7 +1236,7 @@ function outlineMap(map)
 	end
 end
 
--- Ìî³äµØÍ¼
+-- å¡«å……åœ°å›¾
 function fillMap(map)
 	local cArray = {}
 	for p, a in pairs(map) do

@@ -15,7 +15,7 @@ function LCollider:new(l, go, id)
 	self.id = id
 	self.filter = nil
 
-	self.collider = self.gameObject:AddComponent(typeof(CS.UnityEngine.BoxCollider))
+	-- self.collider = self.gameObject:AddComponent(typeof(CS.UnityEngine.BoxCollider))
 
 	self.offset = nil
 	self.size = nil
@@ -27,10 +27,14 @@ function LCollider:new(l, go, id)
     return self
 end
 
--- ÉèÖÃcollider
-function LCollider:setCollider(dir, x, y, width, height, flag, layers)
+-- è®¾ç½®collider
+function LCollider:setCollider(dir, x, y, width, height, depth, flag, layers)
 	self.offset = CS.UnityEngine.Vector3((x + width / 2) / 100, -(y + height / 2) / 100, 0)
-	self.size = CS.UnityEngine.Vector3(width / 100, height / 100, width / 100)
+	if depth ~= nil then
+		self.size = CS.UnityEngine.Vector3(depth / 100, height / 100, width / 100)
+	else
+		self.size = CS.UnityEngine.Vector3(width / 100, height / 100, width / 100)
+	end
 	self.collider.center = self.offset-- * dir
 	self.collider.size = self.size
 
@@ -74,10 +78,12 @@ end
 LColliderBDY = { bounciness = nil}
 setmetatable(LColliderBDY, LCollider)
 LColliderBDY.__index = LColliderBDY
-function LColliderBDY:new(l, go)
+function LColliderBDY:new(l, go, id)
 	local self = {}
-	self = LCollider:new(l, go)
+	self = LCollider:new(l, go, id)
 	setmetatable(self, LColliderBDY)
+
+	self.collider = self.gameObject:AddComponent(typeof(CS.UnityEngine.BoxCollider))
 
 	if self.LObject.kind == 99 then
 		self.bounciness = 0.5
@@ -89,7 +95,7 @@ function LColliderBDY:new(l, go)
 	return self
 end
 
--- ¼ì²âÅö×²Îï£¬Èç¹û·¢ÉúÅö×²Ôò½øĞĞÎ»ÒÆ
+-- æ£€æµ‹ç¢°æ’ç‰©ï¼Œå¦‚æœå‘ç”Ÿç¢°æ’åˆ™è¿›è¡Œä½ç§»
 function LColliderBDY:BDYFixedUpdate2D(velocity, weight)
 	local isGround = 1
 	local isCeiling = false
@@ -97,12 +103,12 @@ function LColliderBDY:BDYFixedUpdate2D(velocity, weight)
 	local isElse = 1
 	local elseArray = {}
 
-	-- ¼ì²âºÍÊ²Ã´Åö£¬2dÅö×²·¶Î§Ò»°ã±ÈÊµ¼ÊÒª´ó£¬ÒòÎªAABBÒª´óÒ»µã£¬ÎªÁË¾«È·Åö×²£¬ĞèÒª×Ô¼ºÊµÏÖ
-	local contactColliders = CS.Tools.Instance:Collider2DOverlapCollider(self.collider, self.filter) -- Õâ¸öº¯ÊıÆäÊµCollider2D.OverlapCollider£¬ÓÃÀ´ÊÖ¶¯¼ì²âÅö×²£¬Õâ±ßÒòÎªluaµÄÔµ¹Ê·â×°ÁËÒ»ÏÂ
+	-- æ£€æµ‹å’Œä»€ä¹ˆç¢°ï¼Œ2dç¢°æ’èŒƒå›´ä¸€èˆ¬æ¯”å®é™…è¦å¤§ï¼Œå› ä¸ºAABBè¦å¤§ä¸€ç‚¹ï¼Œä¸ºäº†ç²¾ç¡®ç¢°æ’ï¼Œéœ€è¦è‡ªå·±å®ç°
+	local contactColliders = CS.Tools.Instance:Collider2DOverlapCollider(self.collider, self.filter) -- è¿™ä¸ªå‡½æ•°å…¶å®Collider2D.OverlapColliderï¼Œç”¨æ¥æ‰‹åŠ¨æ£€æµ‹ç¢°æ’ï¼Œè¿™è¾¹å› ä¸ºluaçš„ç¼˜æ•…å°è£…äº†ä¸€ä¸‹
 
 	local objectTable = {}
 
-	-- ×îÖÕÎ»ÒÆ×ø±ê
+	-- æœ€ç»ˆä½ç§»åæ ‡
 	local finalOffset_x = 0
 	local finalOffset_y = 0
 	for p, k in pairs(contactColliders) do
@@ -112,23 +118,23 @@ function LColliderBDY:BDYFixedUpdate2D(velocity, weight)
 
 			local go = k.attachedRigidbody.gameObject
 			local object2 = utils.getObject(go:GetInstanceID())
-			if go.name == "test" then -- Èç¹ûÊÇµØÍ¼¿é
+			if go.name == "test" then -- å¦‚æœæ˜¯åœ°å›¾å—
 				local name = utils.split(k.name, ",")
-				local num = tonumber(name[#name]) -- µØÍ¼¿é×îºóÒ»¸öÊı×Ö×÷Îªbit
+				local num = tonumber(name[#name]) -- åœ°å›¾å—æœ€åä¸€ä¸ªæ•°å­—ä½œä¸ºbit
 
-				if num & 1 == 1 then --Î»²Ù×÷£¬Ëã³öÕâ¸ö·½¿é³¯ÄÄ¸ö·½Ïò½øĞĞÅö×²£¬Ò»¸ö·½¿é¿ÉÒÔÓĞ¶à¸öÅö×²·½Ïò£¬Õâ²¿·ÖËæÒâÉè¼Æ£¬Ö»ĞèÒªÄÜÖªµÀÕâ¸öcolliderµÄÅĞ¶¨·½Ïò£¬ÓÃlayermaskÊ²Ã´¶¼ĞĞ
+				if num & 1 == 1 then --ä½æ“ä½œï¼Œç®—å‡ºè¿™ä¸ªæ–¹å—æœå“ªä¸ªæ–¹å‘è¿›è¡Œç¢°æ’ï¼Œä¸€ä¸ªæ–¹å—å¯ä»¥æœ‰å¤šä¸ªç¢°æ’æ–¹å‘ï¼Œè¿™éƒ¨åˆ†éšæ„è®¾è®¡ï¼Œåªéœ€è¦èƒ½çŸ¥é“è¿™ä¸ªcolliderçš„åˆ¤å®šæ–¹å‘ï¼Œç”¨layermaskä»€ä¹ˆéƒ½è¡Œ
 					up = true
 				end
-				if num & 2 == 2 then --Î»²Ù×÷
+				if num & 2 == 2 then --ä½æ“ä½œ
 					down = true
 				end
-				if num & 4 == 4 then --Î»²Ù×÷
+				if num & 4 == 4 then --ä½æ“ä½œ
 					left = true
 				end
-				if num & 8 == 8 then --Î»²Ù×÷
+				if num & 8 == 8 then --ä½æ“ä½œ
 					right = true
 				end
-			elseif go.name ~= "test" and object2 ~= nil and not object2["isCatched"] and self.collider.attachedRigidbody.gameObject ~= go then -- ÊÇÓÎÏ·object£¬ÔòÖ»ÔÊĞí×óÓÒ½øĞĞÅö×²
+			elseif go.name ~= "test" and object2 ~= nil and not object2["isCatched"] and self.collider.attachedRigidbody.gameObject ~= go then -- æ˜¯æ¸¸æˆobjectï¼Œåˆ™åªå…è®¸å·¦å³è¿›è¡Œç¢°æ’
 
 				local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
 
@@ -143,9 +149,9 @@ function LColliderBDY:BDYFixedUpdate2D(velocity, weight)
 			if up or down or left or right then
 
 				local menseki = utils.getBoundsIntersectsArea(self.collider.bounds, k.bounds)
-				if menseki.magnitude > 0 then -- ÎŞÊÓ¶àÉÙÃæ»ıÉèÖÃ
+				if menseki.magnitude > 0 then -- æ— è§†å¤šå°‘é¢ç§¯è®¾ç½®
 
-					-- Ëã2¸öcolliderÖ®¼ä¾àÀë£¬Ö÷ÒªÊÇÎªÁË·¨Ïß
+					-- ç®—2ä¸ªcolliderä¹‹é—´è·ç¦»ï¼Œä¸»è¦æ˜¯ä¸ºäº†æ³•çº¿
 					local cd2d = self.collider:Distance(k)
 
 	--~ 				local a =  CS.UnityEngine.Vector3(cd2d.pointA.x, cd2d.pointA.y, 0)
@@ -154,15 +160,15 @@ function LColliderBDY:BDYFixedUpdate2D(velocity, weight)
 	--~ 				CS.UnityEngine.Debug.DrawLine(a, a + normal, CS.UnityEngine.Color.red)
 	--~ 				CS.UnityEngine.Debug.DrawLine(b, b + normal, CS.UnityEngine.Color.yellow)
 
-					-- ×öÅö×²·¨ÏßÓëĞĞ½ø·½ÏòµÄµã»ı
-					-- local projection = CS.UnityEngine.Vector2.Dot(velocity.normalized, normal) -- Ã»ÓÃµ½£¬ÓĞĞèÒª¿ÉÒÔ×Ô¼º¿´Çé¿ö¼Ó
+					-- åšç¢°æ’æ³•çº¿ä¸è¡Œè¿›æ–¹å‘çš„ç‚¹ç§¯
+					-- local projection = CS.UnityEngine.Vector2.Dot(velocity.normalized, normal) -- æ²¡ç”¨åˆ°ï¼Œæœ‰éœ€è¦å¯ä»¥è‡ªå·±çœ‹æƒ…å†µåŠ 
 
 					local offset_x = 0
 					local offset_y = 0
 
-					-- ×óÒÆ£¬ÓÒÒÆ
+					-- å·¦ç§»ï¼Œå³ç§»
 					if self.collider.bounds.center.x < k.bounds.center.x then
-						if left and CS.UnityEngine.Vector2.Dot(velocity.normalized, CS.UnityEngine.Vector2(-1, 0)) <= 0 then -- Èç¹ûÅö×²³¯ÏòÓëĞĞ½ø·½ÏòÏà·´£¬ÔòÇó³öÎ»ÒÆ×ø±ê
+						if left and CS.UnityEngine.Vector2.Dot(velocity.normalized, CS.UnityEngine.Vector2(-1, 0)) <= 0 then -- å¦‚æœç¢°æ’æœå‘ä¸è¡Œè¿›æ–¹å‘ç›¸åï¼Œåˆ™æ±‚å‡ºä½ç§»åæ ‡
 							offset_x = -menseki.x
 						end
 					else
@@ -170,7 +176,7 @@ function LColliderBDY:BDYFixedUpdate2D(velocity, weight)
 							offset_x = menseki.x
 						end
 					end
-					-- ÉÏÒÆ£¬ÏÂÒÆ
+					-- ä¸Šç§»ï¼Œä¸‹ç§»
 					if self.collider.bounds.center.y > k.bounds.center.y then
 						if up and CS.UnityEngine.Vector2.Dot(velocity.normalized, CS.UnityEngine.Vector2(0, 1)) <= 0 then
 							offset_y = menseki.y
@@ -181,12 +187,12 @@ function LColliderBDY:BDYFixedUpdate2D(velocity, weight)
 						end
 					end
 
-					if (up or down) and (left or right) then -- Èç¹ûÍ¬Ê±Âú×ãÉÏÏÂºÍ×óÓÒ·½ÏòÍ¬Ê±´æÔÚµÄÇé¿ö£¬Ôò¸ù¾İÅö×²·½ÏòÀ´É¸Ñ¡µôÁíÒ»¸öÖáµÄÎ»ÒÆ
+					if (up or down) and (left or right) then -- å¦‚æœåŒæ—¶æ»¡è¶³ä¸Šä¸‹å’Œå·¦å³æ–¹å‘åŒæ—¶å­˜åœ¨çš„æƒ…å†µï¼Œåˆ™æ ¹æ®ç¢°æ’æ–¹å‘æ¥ç­›é€‰æ‰å¦ä¸€ä¸ªè½´çš„ä½ç§»
 						offset_x = offset_x * math.abs(normal.x)
 						offset_y = offset_y * math.abs(normal.y)
 					end
 
-					-- ÁôÏÂ×îĞ¡Î»ÒÆ×ø±ê
+					-- ç•™ä¸‹æœ€å°ä½ç§»åæ ‡
 					if velocity.x > 0 then
 						if offset_x < finalOffset_x then
 							finalOffset_x = offset_x
@@ -218,7 +224,7 @@ function LColliderBDY:BDYFixedUpdate2D(velocity, weight)
 						object2:invokeEvent("onForce", {velocity = CS.UnityEngine.Vector2(-vOffset, 0), compute = 1})
 					end
 
-					if go.name == "test" then -- ÅĞ¶ÏÊÇ²»ÊÇ×²µ½µØÃæ£¬ÕâÑùĞ´²»ºÃ£¬ÒÔºóÔÙÓÅ»¯
+					if go.name == "test" then -- åˆ¤æ–­æ˜¯ä¸æ˜¯æ’åˆ°åœ°é¢ï¼Œè¿™æ ·å†™ä¸å¥½ï¼Œä»¥åå†ä¼˜åŒ–
 						if finalOffset_x ~= 0 and (normal.x == -1 or normal.x == 1) then
 							isWall = true
 						end
@@ -247,7 +253,7 @@ function LColliderBDY:BDYFixedUpdate2D(velocity, weight)
 		end
 	end
 
-	-- ¸üĞÂ×ÔÉíÎ»ÖÃ
+	-- æ›´æ–°è‡ªèº«ä½ç½®
 	self.collider.attachedRigidbody.position = self.collider.attachedRigidbody.position + CS.UnityEngine.Vector2(finalOffset_x, finalOffset_y)
 
 	return isGround, isCeiling, isWall, isElse, elseArray
@@ -261,13 +267,13 @@ function LColliderBDY:BDYFixedUpdate()
 	local velocity = self.LObject.velocity * CS.UnityEngine.Time.deltaTime
 	
 
-	local contactColliders = CS.UnityEngine.Physics.OverlapBox(self.collider.bounds.center + velocity, self.collider.bounds.extents, self.gameObject.transform.rotation, self.filter.layerMask.value)
+	local contactColliders = CS.UnityEngine.Physics.OverlapBox(self.collider.bounds.center + velocity, self.collider.bounds.extents, self.LObject.physics_object.transform.rotation, self.filter.layerMask.value)
 
 	-- local contactColliders = CS.Tools.Instance:PhysicsOverlapBoxNonAlloc(self.collider.bounds.center + velocity, self.collider.bounds.extents, self.gameObject.transform.rotation, self.filter.layerMask.value)
 
 	-- local contactColliders = CS.LuaUtil.PhysicsBoxCastNonAlloc(self.collider.bounds.center, self.collider.bounds.extents, velocity.normalized, self.gameObject.transform.rotation, velocity.magnitude, self.filter.layerMask.value)
 
-	-- ×îÖÕÎ»ÒÆ×ø±ê
+	-- æœ€ç»ˆä½ç§»åæ ‡
 	local finalOffset_x = velocity.x
 	local finalOffset_z = velocity.z
 	local finalOffset_y = velocity.y
@@ -278,42 +284,44 @@ function LColliderBDY:BDYFixedUpdate()
 			local up, down, left, right, above, under = false, false, false, false, false, false
 
 			local go = k.attachedRigidbody.gameObject
-			-- local object2 = utils.getObject(go:GetInstanceID())
-			if go.name == "test" then -- Èç¹ûÊÇµØÍ¼¿é
+
+			if go.name == "test" then -- å¦‚æœæ˜¯åœ°å›¾å—
 				local name = utils.split(k.name, ",")
-				local num = tonumber(name[#name]) -- µØÍ¼¿é×îºóÒ»¸öÊı×Ö×÷Îªbit
+				local num = tonumber(name[#name]) -- åœ°å›¾å—æœ€åä¸€ä¸ªæ•°å­—ä½œä¸ºbit
 
 
-				if num & 1 == 1 then --Î»²Ù×÷£¬Ëã³öÕâ¸ö·½¿é³¯ÄÄ¸ö·½Ïò½øĞĞÅö×²£¬Ò»¸ö·½¿é¿ÉÒÔÓĞ¶à¸öÅö×²·½Ïò£¬Õâ²¿·ÖËæÒâÉè¼Æ£¬Ö»ĞèÒªÄÜÖªµÀÕâ¸öcolliderµÄÅĞ¶¨·½Ïò£¬ÓÃlayermaskÊ²Ã´¶¼ĞĞ
+				if num & 1 == 1 then --ä½æ“ä½œï¼Œç®—å‡ºè¿™ä¸ªæ–¹å—æœå“ªä¸ªæ–¹å‘è¿›è¡Œç¢°æ’ï¼Œä¸€ä¸ªæ–¹å—å¯ä»¥æœ‰å¤šä¸ªç¢°æ’æ–¹å‘ï¼Œè¿™éƒ¨åˆ†éšæ„è®¾è®¡ï¼Œåªéœ€è¦èƒ½çŸ¥é“è¿™ä¸ªcolliderçš„åˆ¤å®šæ–¹å‘ï¼Œç”¨layermaskä»€ä¹ˆéƒ½è¡Œ
 					up = true
 				end
-				if num & 2 == 2 then --Î»²Ù×÷
+				if num & 2 == 2 then --ä½æ“ä½œ
 					down = true
 				end
-				if num & 4 == 4 then --Î»²Ù×÷
+				if num & 4 == 4 then --ä½æ“ä½œ
 					left = true
 				end
-				if num & 8 == 8 then --Î»²Ù×÷
+				if num & 8 == 8 then --ä½æ“ä½œ
 					right = true
 				end
-				if num & 16 == 16 then --Î»²Ù×÷
+				if num & 16 == 16 then --ä½æ“ä½œ
 					above = true
 				end
-				if num & 32 == 32 then --Î»²Ù×÷
+				if num & 32 == 32 then --ä½æ“ä½œ
 					under = true
 				end
-			-- elseif go.name ~= "test" and object2 ~= nil and not object2["isCatched"] and self.collider.attachedRigidbody.gameObject ~= go then -- ÊÇÓÎÏ·object£¬ÔòÖ»ÔÊĞí×óÓÒ½øĞĞÅö×²
+			elseif go.name ~= "test" then -- and object2 ~= nil and not object2["isCatched"] and self.collider.attachedRigidbody.gameObject ~= go -- æ˜¯æ¸¸æˆobjectï¼Œåˆ™åªå…è®¸å·¦å³è¿›è¡Œç¢°æ’
+				local object2 = utils.getObject(go:GetInstanceID())
+				if self.LObject.team ~= object2.team then
+				-- local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
 
-			-- 	local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
-
-			-- 	if not string.find(LC.layers, string.match(self.collider.name, "%[(%d+)%]")) then
-			-- 		up = true
-			-- 		down = true
-			-- 		left = true
-			-- 		right = true
-			-- 	end
+				-- if not string.find(LC.layers, string.match(self.collider.name, "%[(%d+)%]")) then
+					up = true
+					down = true
+					left = true
+					right = true
+				-- end
 				-- above = true
 				-- under = true
+				end
 			else
 				-- return 1, false, false, 1, elseArray
 			end
@@ -353,7 +361,7 @@ function LColliderBDY:BDYFixedUpdate()
 					end
 
 
-					-- ÁôÏÂ×îĞ¡Î»ÒÆ×ø±ê
+					-- ç•™ä¸‹æœ€å°ä½ç§»åæ ‡
 					if left or right then
 						if velocity.x > 0 then
 							if offset_x < finalOffset_x then
@@ -404,19 +412,27 @@ function LColliderBDY:BDYFixedUpdate()
 			end
 		end
 	end
-	-- ¸üĞÂ×ÔÉíÎ»ÖÃ
+	-- æ›´æ–°è‡ªèº«ä½ç½®
 	-- self.collider.attachedRigidbody.position = self.collider.attachedRigidbody.position + CS.UnityEngine.Vector3(finalOffset_x, finalOffset_y, finalOffset_z)
 
 	CS.LuaUtil.SetPos2(self.LObject.rigidbody_id, self.collider.attachedRigidbody.position.x + finalOffset_x, self.collider.attachedRigidbody.position.y + finalOffset_y, self.collider.attachedRigidbody.position.z + finalOffset_z)
 
-	if isWall_leftright == 1 then
-		self.LObject.velocity.x = -self.LObject.velocity.x * self.bounciness
-	end
-	if isWall_updown == 1 then
-		self.LObject.velocity.z = -self.LObject.velocity.z * self.bounciness
-	end
-	if isGround == 1 then
-		self.LObject.velocity.y = -self.LObject.velocity.y * self.bounciness
+	if self.bounciness > 0 then
+		if isWall_leftright == 1 then
+			self.LObject.velocity.x = -self.LObject.velocity.x * self.bounciness
+			self.LObject.rotation = -self.LObject.rotation
+			self.LObject.rotation_velocity = -self.LObject.rotation_velocity
+		end
+		if isWall_updown == 1 then
+			self.LObject.velocity.z = -self.LObject.velocity.z * self.bounciness
+			self.LObject.rotation = -self.LObject.rotation
+			self.LObject.rotation_velocity = -self.LObject.rotation_velocity
+		end
+		if isGround == 1 then
+			self.LObject.velocity.y = -self.LObject.velocity.y * self.bounciness
+			self.LObject.rotation = -self.LObject.rotation
+			self.LObject.rotation_velocity = -self.LObject.rotation_velocity
+		end
 	end
 	return isGround
 end
@@ -430,7 +446,7 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 
 	-- local contactColliders = CS.UnityEngine.Physics.OverlapBox(self.collider.bounds.center, self.collider.bounds.extents, self.gameObject.transform.rotation, self.filter.layerMask.value)
 
-	-- -- ×îÖÕÎ»ÒÆ×ø±ê
+	-- -- æœ€ç»ˆä½ç§»åæ ‡
 	-- local finalOffset_y = 0
 	-- for i = 0, contactColliders.Length - 1, 1 do
 	-- 	local k = contactColliders[i]
@@ -439,14 +455,14 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 	-- 		local above, under = false, false
 
 	-- 		local go = k.attachedRigidbody.gameObject
-	-- 		if go.name == "test" then -- Èç¹ûÊÇµØÍ¼¿é
+	-- 		if go.name == "test" then -- å¦‚æœæ˜¯åœ°å›¾å—
 	-- 			local name = utils.split(k.name, ",")
-	-- 			local num = tonumber(name[#name]) -- µØÍ¼¿é×îºóÒ»¸öÊı×Ö×÷Îªbit
+	-- 			local num = tonumber(name[#name]) -- åœ°å›¾å—æœ€åä¸€ä¸ªæ•°å­—ä½œä¸ºbit
 
-	-- 			if num & 16 == 16 then --Î»²Ù×÷
+	-- 			if num & 16 == 16 then --ä½æ“ä½œ
 	-- 				above = true
 	-- 			end
-	-- 			if num & 32 == 32 then --Î»²Ù×÷
+	-- 			if num & 32 == 32 then --ä½æ“ä½œ
 	-- 				under = true
 	-- 			end
 	-- 		else
@@ -456,9 +472,9 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 	-- 		if above or under then
 
 	-- 			local menseki, normal = utils.getBoundsIntersectsArea3D(self.collider.bounds, k.bounds)
-	-- 			if menseki.magnitude > 0 then -- ÎŞÊÓ¶àÉÙÃæ»ıÉèÖÃ
+	-- 			if menseki.magnitude > 0 then -- æ— è§†å¤šå°‘é¢ç§¯è®¾ç½®
 
-	-- 				-- Ëã2¸öcolliderÖ®¼ä¾àÀë£¬Ö÷ÒªÊÇÎªÁË·¨Ïß
+	-- 				-- ç®—2ä¸ªcolliderä¹‹é—´è·ç¦»ï¼Œä¸»è¦æ˜¯ä¸ºäº†æ³•çº¿
 	-- 				-- local cd2d = self.collider:Distance(k)
 
 	-- -- ~ 				local a =  CS.UnityEngine.Vector3(cd2d.pointA.x, cd2d.pointA.y, 0)
@@ -473,8 +489,8 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 	-- 				-- CS.UnityEngine.Debug.DrawLine(b, d, CS.UnityEngine.Color.yellow)
 	-- 				-- print(normal)
 
-	-- 				-- ×öÅö×²·¨ÏßÓëĞĞ½ø·½ÏòµÄµã»ı
-	-- 				-- local projection = CS.UnityEngine.Vector2.Dot(velocity.normalized, normal) -- Ã»ÓÃµ½£¬ÓĞĞèÒª¿ÉÒÔ×Ô¼º¿´Çé¿ö¼Ó
+	-- 				-- åšç¢°æ’æ³•çº¿ä¸è¡Œè¿›æ–¹å‘çš„ç‚¹ç§¯
+	-- 				-- local projection = CS.UnityEngine.Vector2.Dot(velocity.normalized, normal) -- æ²¡ç”¨åˆ°ï¼Œæœ‰éœ€è¦å¯ä»¥è‡ªå·±çœ‹æƒ…å†µåŠ 
 
 	-- 				local offset_y = 0
 
@@ -490,7 +506,7 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 	-- 					end
 	-- 				end
 
-	-- 				-- ÁôÏÂ×îĞ¡Î»ÒÆ×ø±ê
+	-- 				-- ç•™ä¸‹æœ€å°ä½ç§»åæ ‡
 
 	-- 				if velocity.y > 0 then
 	-- 					if offset_y < finalOffset_y then
@@ -514,7 +530,7 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 	-- -- 					object2:invokeEvent("onForce", {velocity = CS.UnityEngine.Vector2(-vOffset, 0), compute = 1})
 	-- -- 				end
 
-	-- 				if go.name == "test" then -- ÅĞ¶ÏÊÇ²»ÊÇ×²µ½µØÃæ£¬ÕâÑùĞ´²»ºÃ£¬ÒÔºóÔÙÓÅ»¯
+	-- 				if go.name == "test" then -- åˆ¤æ–­æ˜¯ä¸æ˜¯æ’åˆ°åœ°é¢ï¼Œè¿™æ ·å†™ä¸å¥½ï¼Œä»¥åå†ä¼˜åŒ–
 	-- 					-- if finalOffset_x ~= 0 and (normal.x == -1 or normal.x == 1) then
 	-- 					-- 	isWall = true
 	-- 					-- end
@@ -547,12 +563,12 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 	-- 	end
 	-- end
 
-	-- -- ¸üĞÂ×ÔÉíÎ»ÖÃ
+	-- -- æ›´æ–°è‡ªèº«ä½ç½®
 	-- -- self.collider.attachedRigidbody.position = self.collider.attachedRigidbody.position + CS.UnityEngine.Vector3(0, finalOffset_y, 0)
 
 	local contactColliders = CS.UnityEngine.Physics.OverlapBox(self.collider2.bounds.center, self.collider2.bounds.extents, self.gameObject.transform.rotation, self.filter.layerMask.value)
 
-	-- ×îÖÕÎ»ÒÆ×ø±ê
+	-- æœ€ç»ˆä½ç§»åæ ‡
 	local finalOffset_x = 0
 	local finalOffset_z = 0
 	for i = 0, contactColliders.Length - 1, 1 do
@@ -563,24 +579,24 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 
 			local go = k.attachedRigidbody.gameObject
 			local object2 = utils.getObject(go:GetInstanceID())
-			if go.name == "test" then -- Èç¹ûÊÇµØÍ¼¿é
+			if go.name == "test" then -- å¦‚æœæ˜¯åœ°å›¾å—
 				local name = utils.split(k.transform.parent.name, ",")
-				local num = tonumber(name[#name]) -- µØÍ¼¿é×îºóÒ»¸öÊı×Ö×÷Îªbit
+				local num = tonumber(name[#name]) -- åœ°å›¾å—æœ€åä¸€ä¸ªæ•°å­—ä½œä¸ºbit
 				if num ~= nil then
-					if num & 1 == 1 then --Î»²Ù×÷£¬Ëã³öÕâ¸ö·½¿é³¯ÄÄ¸ö·½Ïò½øĞĞÅö×²£¬Ò»¸ö·½¿é¿ÉÒÔÓĞ¶à¸öÅö×²·½Ïò£¬Õâ²¿·ÖËæÒâÉè¼Æ£¬Ö»ĞèÒªÄÜÖªµÀÕâ¸öcolliderµÄÅĞ¶¨·½Ïò£¬ÓÃlayermaskÊ²Ã´¶¼ĞĞ
+					if num & 1 == 1 then --ä½æ“ä½œï¼Œç®—å‡ºè¿™ä¸ªæ–¹å—æœå“ªä¸ªæ–¹å‘è¿›è¡Œç¢°æ’ï¼Œä¸€ä¸ªæ–¹å—å¯ä»¥æœ‰å¤šä¸ªç¢°æ’æ–¹å‘ï¼Œè¿™éƒ¨åˆ†éšæ„è®¾è®¡ï¼Œåªéœ€è¦èƒ½çŸ¥é“è¿™ä¸ªcolliderçš„åˆ¤å®šæ–¹å‘ï¼Œç”¨layermaskä»€ä¹ˆéƒ½è¡Œ
 						up = true
 					end
-					if num & 2 == 2 then --Î»²Ù×÷
+					if num & 2 == 2 then --ä½æ“ä½œ
 						down = true
 					end
-					if num & 4 == 4 then --Î»²Ù×÷
+					if num & 4 == 4 then --ä½æ“ä½œ
 						left = true
 					end
-					if num & 8 == 8 then --Î»²Ù×÷
+					if num & 8 == 8 then --ä½æ“ä½œ
 						right = true
 					end
 				end
-			-- elseif go.name ~= "test" and object2 ~= nil and not object2["isCatched"] and self.collider2.attachedRigidbody.gameObject ~= go then -- ÊÇÓÎÏ·object£¬ÔòÖ»ÔÊĞí×óÓÒ½øĞĞÅö×²
+			-- elseif go.name ~= "test" and object2 ~= nil and not object2["isCatched"] and self.collider2.attachedRigidbody.gameObject ~= go then -- æ˜¯æ¸¸æˆobjectï¼Œåˆ™åªå…è®¸å·¦å³è¿›è¡Œç¢°æ’
 
 			-- 	local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
 
@@ -597,9 +613,9 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 			if up or down or left or right then
 
 				local menseki, normal = utils.getBoundsIntersectsArea3D(self.collider2.bounds, k.bounds)
-				if menseki.magnitude > 0 then -- ÎŞÊÓ¶àÉÙÃæ»ıÉèÖÃ
+				if menseki.magnitude > 0 then -- æ— è§†å¤šå°‘é¢ç§¯è®¾ç½®
 
-					-- Ëã2¸öcolliderÖ®¼ä¾àÀë£¬Ö÷ÒªÊÇÎªÁË·¨Ïß
+					-- ç®—2ä¸ªcolliderä¹‹é—´è·ç¦»ï¼Œä¸»è¦æ˜¯ä¸ºäº†æ³•çº¿
 					-- local cd2d = self.collider:Distance(k)
 
 	-- ~ 				local a =  CS.UnityEngine.Vector3(cd2d.pointA.x, cd2d.pointA.y, 0)
@@ -614,17 +630,17 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 					-- CS.UnityEngine.Debug.DrawLine(b, d, CS.UnityEngine.Color.yellow)
 					-- print(normal)
 
-					-- ×öÅö×²·¨ÏßÓëĞĞ½ø·½ÏòµÄµã»ı
-					-- local projection = CS.UnityEngine.Vector2.Dot(velocity.normalized, normal) -- Ã»ÓÃµ½£¬ÓĞĞèÒª¿ÉÒÔ×Ô¼º¿´Çé¿ö¼Ó
+					-- åšç¢°æ’æ³•çº¿ä¸è¡Œè¿›æ–¹å‘çš„ç‚¹ç§¯
+					-- local projection = CS.UnityEngine.Vector2.Dot(velocity.normalized, normal) -- æ²¡ç”¨åˆ°ï¼Œæœ‰éœ€è¦å¯ä»¥è‡ªå·±çœ‹æƒ…å†µåŠ 
 
 					local offset_x = 0
 					local offset_z = 0
 
 					local velo_nor = CS.UnityEngine.Vector2(velocity.x, velocity.z).normalized
 
-					-- ×óÒÆ£¬ÓÒÒÆ
+					-- å·¦ç§»ï¼Œå³ç§»
 					if self.collider2.bounds.center.x < k.bounds.center.x then
-						if left and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(-1, 0)) <= 0 then -- Èç¹ûÅö×²³¯ÏòÓëĞĞ½ø·½ÏòÏà·´£¬ÔòÇó³öÎ»ÒÆ×ø±ê
+						if left and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(-1, 0)) <= 0 then -- å¦‚æœç¢°æ’æœå‘ä¸è¡Œè¿›æ–¹å‘ç›¸åï¼Œåˆ™æ±‚å‡ºä½ç§»åæ ‡
 							offset_x = -menseki.x
 						end
 					else
@@ -632,7 +648,7 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 							offset_x = menseki.x
 						end
 					end
-					-- ÉÏÒÆ£¬ÏÂÒÆ
+					-- ä¸Šç§»ï¼Œä¸‹ç§»
 					if self.collider2.bounds.center.y > k.bounds.center.y then
 						if up and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(0, 1)) <= 0 then
 							-- offset_z = menseki.y - (self.collider2.bounds.center.z - k.bounds.center.z)
@@ -664,7 +680,7 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 					end
 
 
-					-- ÁôÏÂ×îĞ¡Î»ÒÆ×ø±ê
+					-- ç•™ä¸‹æœ€å°ä½ç§»åæ ‡
 					if velocity.x > 0 then
 						if offset_x < finalOffset_x then
 							finalOffset_x = offset_x
@@ -696,7 +712,7 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 	-- 					object2:invokeEvent("onForce", {velocity = CS.UnityEngine.Vector2(-vOffset, 0), compute = 1})
 	-- 				end
 
-					-- if go.name == "test" then -- ÅĞ¶ÏÊÇ²»ÊÇ×²µ½µØÃæ£¬ÕâÑùĞ´²»ºÃ£¬ÒÔºóÔÙÓÅ»¯
+					-- if go.name == "test" then -- åˆ¤æ–­æ˜¯ä¸æ˜¯æ’åˆ°åœ°é¢ï¼Œè¿™æ ·å†™ä¸å¥½ï¼Œä»¥åå†ä¼˜åŒ–
 					-- 	-- if finalOffset_x ~= 0 and (normal.x == -1 or normal.x == 1) then
 					-- 	-- 	isWall = true
 					-- 	-- end
@@ -730,10 +746,10 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 	end
 
 	
-	-- -- ¼ì²âºÍÊ²Ã´Åö£¬2dÅö×²·¶Î§Ò»°ã±ÈÊµ¼ÊÒª´ó£¬ÒòÎªAABBÒª´óÒ»µã£¬ÎªÁË¾«È·Åö×²£¬ĞèÒª×Ô¼ºÊµÏÖ
-	-- local contactColliders = CS.Tools.Instance:Collider2DOverlapCollider(self.collider2, self.filter) -- Õâ¸öº¯ÊıÆäÊµCollider2D.OverlapCollider£¬ÓÃÀ´ÊÖ¶¯¼ì²âÅö×²£¬Õâ±ßÒòÎªluaµÄÔµ¹Ê·â×°ÁËÒ»ÏÂ
+	-- -- æ£€æµ‹å’Œä»€ä¹ˆç¢°ï¼Œ2dç¢°æ’èŒƒå›´ä¸€èˆ¬æ¯”å®é™…è¦å¤§ï¼Œå› ä¸ºAABBè¦å¤§ä¸€ç‚¹ï¼Œä¸ºäº†ç²¾ç¡®ç¢°æ’ï¼Œéœ€è¦è‡ªå·±å®ç°
+	-- local contactColliders = CS.Tools.Instance:Collider2DOverlapCollider(self.collider2, self.filter) -- è¿™ä¸ªå‡½æ•°å…¶å®Collider2D.OverlapColliderï¼Œç”¨æ¥æ‰‹åŠ¨æ£€æµ‹ç¢°æ’ï¼Œè¿™è¾¹å› ä¸ºluaçš„ç¼˜æ•…å°è£…äº†ä¸€ä¸‹
 
-	-- -- ×îÖÕÎ»ÒÆ×ø±ê
+	-- -- æœ€ç»ˆä½ç§»åæ ‡
 	-- local finalOffset_x = 0
 	-- local finalOffset_z = 0
 	-- for p, k in pairs(contactColliders) do
@@ -745,27 +761,27 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 	-- 		-- local go = k.attachedRigidbody.gameObject
 	-- 		local go = k.gameObject.transform.parent.gameObject
 	-- 		local object2 = utils.getObject(go:GetInstanceID())
-	-- 		-- if go.name == "test" then -- Èç¹ûÊÇµØÍ¼¿é
+	-- 		-- if go.name == "test" then -- å¦‚æœæ˜¯åœ°å›¾å—
 	-- 		if string.find(go.name, "block") ~= nil then
 	-- 			-- print(go.name)
 	-- 			local name = utils.split(go.name, ",")
-	-- 			local num = tonumber(name[#name]) -- µØÍ¼¿é×îºóÒ»¸öÊı×Ö×÷Îªbit
+	-- 			local num = tonumber(name[#name]) -- åœ°å›¾å—æœ€åä¸€ä¸ªæ•°å­—ä½œä¸ºbit
 
 
-	-- 			if num & 1 == 1 then --Î»²Ù×÷£¬Ëã³öÕâ¸ö·½¿é³¯ÄÄ¸ö·½Ïò½øĞĞÅö×²£¬Ò»¸ö·½¿é¿ÉÒÔÓĞ¶à¸öÅö×²·½Ïò£¬Õâ²¿·ÖËæÒâÉè¼Æ£¬Ö»ĞèÒªÄÜÖªµÀÕâ¸öcolliderµÄÅĞ¶¨·½Ïò£¬ÓÃlayermaskÊ²Ã´¶¼ĞĞ
+	-- 			if num & 1 == 1 then --ä½æ“ä½œï¼Œç®—å‡ºè¿™ä¸ªæ–¹å—æœå“ªä¸ªæ–¹å‘è¿›è¡Œç¢°æ’ï¼Œä¸€ä¸ªæ–¹å—å¯ä»¥æœ‰å¤šä¸ªç¢°æ’æ–¹å‘ï¼Œè¿™éƒ¨åˆ†éšæ„è®¾è®¡ï¼Œåªéœ€è¦èƒ½çŸ¥é“è¿™ä¸ªcolliderçš„åˆ¤å®šæ–¹å‘ï¼Œç”¨layermaskä»€ä¹ˆéƒ½è¡Œ
 	-- 				up = true
 	-- 			end
-	-- 			if num & 2 == 2 then --Î»²Ù×÷
+	-- 			if num & 2 == 2 then --ä½æ“ä½œ
 	-- 				down = true
 	-- 			end
-	-- 			if num & 4 == 4 then --Î»²Ù×÷
+	-- 			if num & 4 == 4 then --ä½æ“ä½œ
 	-- 				left = true
 	-- 			end
-	-- 			if num & 8 == 8 then --Î»²Ù×÷
+	-- 			if num & 8 == 8 then --ä½æ“ä½œ
 	-- 				right = true
 	-- 			end
 	-- 			-- print("aaa")
-	-- 		elseif not string.find(go.name, "block") ~= nil and object2 ~= nil and not object2["isCatched"] and self.collider.attachedRigidbody.gameObject ~= go then -- ÊÇÓÎÏ·object£¬ÔòÖ»ÔÊĞí×óÓÒ½øĞĞÅö×²
+	-- 		elseif not string.find(go.name, "block") ~= nil and object2 ~= nil and not object2["isCatched"] and self.collider.attachedRigidbody.gameObject ~= go then -- æ˜¯æ¸¸æˆobjectï¼Œåˆ™åªå…è®¸å·¦å³è¿›è¡Œç¢°æ’
 
 	-- 			-- local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
 
@@ -785,9 +801,9 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 
 
 	-- 			local menseki, normal = utils.getBoundsIntersectsArea3D(self.collider2.bounds, k.bounds)
-	-- 			if menseki.magnitude > 0 then -- ÎŞÊÓ¶àÉÙÃæ»ıÉèÖÃ
+	-- 			if menseki.magnitude > 0 then -- æ— è§†å¤šå°‘é¢ç§¯è®¾ç½®
 
-	-- 				-- Ëã2¸öcolliderÖ®¼ä¾àÀë£¬Ö÷ÒªÊÇÎªÁË·¨Ïß
+	-- 				-- ç®—2ä¸ªcolliderä¹‹é—´è·ç¦»ï¼Œä¸»è¦æ˜¯ä¸ºäº†æ³•çº¿
 	-- 				-- local cd2d = self.collider2:Distance(k)
 
 	-- --~ 				local a =  CS.UnityEngine.Vector3(cd2d.pointA.x, cd2d.pointA.y, 0)
@@ -796,17 +812,17 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 	-- --~ 				CS.UnityEngine.Debug.DrawLine(a, a + normal, CS.UnityEngine.Color.red)
 	-- --~ 				CS.UnityEngine.Debug.DrawLine(b, b + normal, CS.UnityEngine.Color.yellow)
 
-	-- 				-- ×öÅö×²·¨ÏßÓëĞĞ½ø·½ÏòµÄµã»ı
-	-- 				-- local projection = CS.UnityEngine.Vector2.Dot(velocity.normalized, normal) -- Ã»ÓÃµ½£¬ÓĞĞèÒª¿ÉÒÔ×Ô¼º¿´Çé¿ö¼Ó
+	-- 				-- åšç¢°æ’æ³•çº¿ä¸è¡Œè¿›æ–¹å‘çš„ç‚¹ç§¯
+	-- 				-- local projection = CS.UnityEngine.Vector2.Dot(velocity.normalized, normal) -- æ²¡ç”¨åˆ°ï¼Œæœ‰éœ€è¦å¯ä»¥è‡ªå·±çœ‹æƒ…å†µåŠ 
 
 	-- 				local offset_x = 0
 	-- 				local offset_z = 0
 
 	-- 				local velo_nor = CS.UnityEngine.Vector2(velocity.x, velocity.z).normalized
 
-	-- 				-- ×óÒÆ£¬ÓÒÒÆ
+	-- 				-- å·¦ç§»ï¼Œå³ç§»
 	-- 				if self.collider2.bounds.center.x < k.bounds.center.x then
-	-- 					if left and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(-1, 0)) <= 0 then -- Èç¹ûÅö×²³¯ÏòÓëĞĞ½ø·½ÏòÏà·´£¬ÔòÇó³öÎ»ÒÆ×ø±ê
+	-- 					if left and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(-1, 0)) <= 0 then -- å¦‚æœç¢°æ’æœå‘ä¸è¡Œè¿›æ–¹å‘ç›¸åï¼Œåˆ™æ±‚å‡ºä½ç§»åæ ‡
 	-- 						offset_x = -menseki.x
 	-- 					end
 	-- 				else
@@ -814,7 +830,7 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 	-- 						offset_x = menseki.x
 	-- 					end
 	-- 				end
-	-- 				-- ÉÏÒÆ£¬ÏÂÒÆ
+	-- 				-- ä¸Šç§»ï¼Œä¸‹ç§»
 	-- 				if self.collider2.bounds.center.y > k.bounds.center.y then
 	-- 					if up and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(0, 1)) <= 0 then
 	-- 						offset_z = menseki.y
@@ -827,7 +843,7 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 
 
 
-	-- 				-- if (up or down) and (left or right) then -- Èç¹ûÍ¬Ê±Âú×ãÉÏÏÂºÍ×óÓÒ·½ÏòÍ¬Ê±´æÔÚµÄÇé¿ö£¬Ôò¸ù¾İÅö×²·½ÏòÀ´É¸Ñ¡µôÁíÒ»¸öÖáµÄÎ»ÒÆ
+	-- 				-- if (up or down) and (left or right) then -- å¦‚æœåŒæ—¶æ»¡è¶³ä¸Šä¸‹å’Œå·¦å³æ–¹å‘åŒæ—¶å­˜åœ¨çš„æƒ…å†µï¼Œåˆ™æ ¹æ®ç¢°æ’æ–¹å‘æ¥ç­›é€‰æ‰å¦ä¸€ä¸ªè½´çš„ä½ç§»
 	-- 				-- 	offset_x = offset_x * math.abs(normal.x)
 	-- 				-- 	offset_z = offset_z * math.abs(normal.z)
 	-- 				-- end
@@ -844,7 +860,7 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 
 
 
-	-- 				-- ÁôÏÂ×îĞ¡Î»ÒÆ×ø±ê
+	-- 				-- ç•™ä¸‹æœ€å°ä½ç§»åæ ‡
 	-- 				if velocity.x > 0 then
 	-- 					if offset_x < finalOffset_x then
 	-- 						finalOffset_x = offset_x
@@ -891,21 +907,20 @@ function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 	-- 	end
 	-- end
 
-	-- ¸üĞÂ×ÔÉíÎ»ÖÃ
+	-- æ›´æ–°è‡ªèº«ä½ç½®
 	-- self.collider2.attachedRigidbody.position = self.collider2.attachedRigidbody.position + CS.UnityEngine.Vector3(finalOffset_x, 0, finalOffset_z)
 	-- self.collider2.attachedRigidbody.position = self.collider2.attachedRigidbody.position + CS.UnityEngine.Vector3(finalOffset_x, 0, finalOffset_z)
 
 	return isGround, isCeiling, isWall, isElse, elseArray, CS.UnityEngine.Vector3(finalOffset_x, 0, finalOffset_z)
 end
 
-LColliderATK = {damage = nil, frequency = nil, velocity = nil, fall = nil, defence = nil, ignoreObjects = nil, var = nil, isCatch = nil, action = nil, frame = nil}
+LColliderATK = {damage = nil, frequency = nil, velocity = nil, fall = nil, defence = nil, ignoreObjects = nil, var = nil, isCatch = nil, action = nil, frame = nil, isRayCast = nil, isHit = nil, hitObject = nil, length = nil, direction = nil}
 setmetatable(LColliderATK, LCollider)
 LColliderATK.__index = LColliderATK
-function LColliderATK:new(go, id)
+function LColliderATK:new(l, go, id)
 	local self = {}
-	self = LCollider:new(go, id)
+	self = LCollider:new(l, go, id)
 	setmetatable(self, LColliderATK)
-
 
 	self.frequency = nil
 	self.damage = nil
@@ -920,16 +935,25 @@ function LColliderATK:new(go, id)
 	self.isCatch = nil
 	self.action = nil
 	self.frame = nil
+	self.isRayCast = false
 
+	self.isHit = -1
+	self.hitObject = nil
+	self.length = 0
+	self.direction = nil
 	return self
 end
 
--- ÉèÖÃcollider
-function LColliderATK:setCollider(dir, x, y, width, height, flag, dmg, fal, def, f, dx, dy, ignoreFlag, v, action, frame)
-	self.offset = CS.UnityEngine.Vector3((x + width / 2) / 100, -(y + height / 2) / 100, 0)
-	self.size = CS.UnityEngine.Vector3(width / 100, height / 100, width / 100)
-	self.collider.center = self.offset-- * dir
-	self.collider.size = self.size
+-- è®¾ç½®collider
+function LColliderATK:setCollider(dir, x, y, width, height, depth, flag, dmg, fal, def, f, dx, dy, ignoreFlag, v, action, frame)
+	-- self.offset = CS.UnityEngine.Vector3((x + width / 2) / 100, -(y + height / 2) / 100, 0)
+	-- if depth ~= nil then
+	-- 	self.size = CS.UnityEngine.Vector3(depth / 100, height / 100, width / 100)
+	-- else
+	-- 	self.size = CS.UnityEngine.Vector3(width / 100, height / 100, width / 100)
+	-- end
+	-- self.collider.center = self.offset-- * dir
+	-- self.collider.size = self.size
 
 	self.filter = CS.UnityEngine.ContactFilter2D()
 	self.filter.useLayerMask = true
@@ -937,13 +961,13 @@ function LColliderATK:setCollider(dir, x, y, width, height, flag, dmg, fal, def,
 	local lll = CS.UnityEngine.LayerMask()
 	lll.value = lll.value | 1 << 16
 	self.filter.layerMask = lll
-	self.collider.isTrigger = true
+	-- self.collider.isTrigger = true
 
 	self.damage = dmg
 	self.fall = fal
 	self.defence = def
 	self.frequency = f
-	self.velocity = CS.UnityEngine.Vector2(dx, dy)
+	-- self.velocity = CS.UnityEngine.Vector2(dx, dy)
 
 	if ignoreFlag then
 		self.ignoreObjects = {}
@@ -961,13 +985,17 @@ function LColliderATK:setCollider(dir, x, y, width, height, flag, dmg, fal, def,
 	end
 	self.action = action
 	self.frame = frame
+
+	if width == 1 and height == 1 then
+		self.isRayCast = true
+	end
 end
 
--- ¼ì²â¹¥»÷
+-- æ£€æµ‹æ”»å‡»
 function LColliderATK:ATKFixedUpdate(dir, myObj)
 	local ishit = false
 
-	if self.frequency > 0 then -- ¹¥»÷¼ä¸ôÎª0µÄÊ±ºò£¬Ö»¶Ô¶ÔÏó¹¥»÷Ò»´Î
+	if self.frequency > 0 then -- æ”»å‡»é—´éš”ä¸º0çš„æ—¶å€™ï¼Œåªå¯¹å¯¹è±¡æ”»å‡»ä¸€æ¬¡
 		for i, v in pairs(self.ignoreObjects) do
 			v.count = v.count + 1
 		end
@@ -978,8 +1006,8 @@ function LColliderATK:ATKFixedUpdate(dir, myObj)
 	for p, k in pairs(contactColliders) do
 		local iId = k.attachedRigidbody.gameObject:GetInstanceID()
 		local object = utils.getObject(iId)
-		if k.isTrigger and self.collider.bounds:Intersects(k.bounds) and object ~= myObj then -- ÊÇtrigger£¬Ïà½»£¬²»ÊÇ×Ô¼º
-			if self.ignoreObjects[iId] == nil or self.ignoreObjects[iId].count >= self.frequency then -- Èç¹û²»ÔÚºöÊÓÁĞ±íÀï£¬»ò¼ÆÊıÒÑ¾­³¬¹ı¹¥»÷¼ä¸ô
+		if k.isTrigger and self.collider.bounds:Intersects(k.bounds) and object ~= myObj then -- æ˜¯triggerï¼Œç›¸äº¤ï¼Œä¸æ˜¯è‡ªå·±
+			if self.ignoreObjects[iId] == nil or self.ignoreObjects[iId].count >= self.frequency then -- å¦‚æœä¸åœ¨å¿½è§†åˆ—è¡¨é‡Œï¼Œæˆ–è®¡æ•°å·²ç»è¶…è¿‡æ”»å‡»é—´éš”
 				if object ~= nil then
 
 					local s = false
@@ -992,9 +1020,9 @@ function LColliderATK:ATKFixedUpdate(dir, myObj)
 
 					local LC = object.bodyArray_InstanceID[k:GetInstanceID()]
 
-					if LC.isDefence and object.direction.x ~= dir.x and not self.isDefence then -- ¶Ô·½·ÀÓù×´Ì¬ÇÒ²»ÊÇ´Ó±³ºó¹¥»÷ÇÒÕâÒ»»÷²»ÊÇ·ÀÓù²»¿ÉµÃµÄ
+					if LC.isDefence and object.direction.x ~= dir.x and not self.isDefence then -- å¯¹æ–¹é˜²å¾¡çŠ¶æ€ä¸”ä¸æ˜¯ä»èƒŒåæ”»å‡»ä¸”è¿™ä¸€å‡»ä¸æ˜¯é˜²å¾¡ä¸å¯å¾—çš„
 						
-						if object["defencing"] + self.defence >= 70 or object["HP"] - self.damage <= 0 then -- Èç¹ûÕâÒ»»÷ÆÆ·ÀÁË»òÕß¶Ô·½ËÀÁË
+						if object["defencing"] + self.defence >= 70 or object["HP"] - self.damage <= 0 then -- å¦‚æœè¿™ä¸€å‡»ç ´é˜²äº†æˆ–è€…å¯¹æ–¹æ­»äº†
 							if self.isCatch then
 								-- object.vars["isCatched"] = true
 
@@ -1082,3 +1110,90 @@ function LColliderATK:ATKFixedUpdate(dir, myObj)
 end
 
 
+function LColliderATK:ATKFixedUpdate()
+	-- self.isHit = -1
+	-- local ishit = false
+
+	-- if self.frequency > 0 then -- æ”»å‡»é—´éš”ä¸º0çš„æ—¶å€™ï¼Œåªå¯¹å¯¹è±¡æ”»å‡»ä¸€æ¬¡
+	-- 	for i, v in pairs(self.ignoreObjects) do
+	-- 		v.count = v.count + 1
+	-- 	end
+	-- end
+
+	self.length = (self.LObject.rigidbody.position - self.LObject.oriPos).magnitude -- å°„çº¿çš„é•¿åº¦
+	self.direction = (self.LObject.rigidbody.position - self.LObject.oriPos).normalized -- æ–¹å‘
+	-- RaycastHit2D[] hitinfo;
+	-- local hitinfo = CS.UnityEngine.Physics2D.RaycastAll(CS.UnityEngine.Vector2(self.oriPos.x, self.oriPos.y), CS.UnityEngine.Vector2(direction.x, direction.y), length) -- åœ¨ä¸¤ä¸ªä½ç½®ä¹‹é—´å‘èµ·ä¸€æ¡å°„çº¿ï¼Œç„¶åé€šè¿‡è¿™æ¡å°„çº¿å»æ£€æµ‹æœ‰æ²¡æœ‰å‘ç”Ÿç¢°æ’
+
+	-- local hitinfo = CS.Tools.Instance:PhysicsRaycastAll(self.oriPos, direction, self.length, 15)
+	-- -- print(hitinfo.Length)
+
+	local hitinfo = CS.Tools.Instance:PhysicsRaycast(self.LObject.oriPos, self.direction, self.length, 1048575)
+	-- if lr.positionCount > 2 then
+	-- 	lr.positionCount = 2
+	-- end
+	if hitinfo.collider ~= nil then
+		-- s = self.oriPos
+		-- e = hitinfo.point
+		-- lr:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
+		-- lr:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
+		if hitinfo.collider.attachedRigidbody.gameObject.name ~= "test" then
+
+			local iId = hitinfo.collider.attachedRigidbody.gameObject:GetInstanceID()
+			local object = utils.getObject(iId)
+
+			local LC = object.bodyArray_InstanceID[hitinfo.collider:GetInstanceID()]
+			if LC ~= nil and LC.isDefence then
+				-- local l2 = self.physics_object.transform.position - hitinfo.point
+				-- local l3 = CS.UnityEngine.Vector3.Reflect(l2, hitinfo.normal)
+
+				-- self.physics_object.transform.rotation = CS.UnityEngine.Quaternion.FromToRotation(l2, l3)
+				-- self.velocity = self.physics_object.transform.rotation * self.velocity
+				-- self.physics_object.transform.position = hitinfo.point
+
+				-- object:invokeEvent("Sound", {sfx = v.sfx})
+				-- self.frame = self.frame + 1
+				self.hitObject = object
+				self.isHit = 1
+			else
+
+
+				-- local comp = hitinfo.collider.attachedRigidbody.gameObject.transform.parent.gameObject:GetComponent(typeof(CS.XLuaTest.LuaComponent))
+				-- local object = comp.scriptEnv.MainObject
+
+				-- local spd = direction * 40 / 100
+
+				-- object:invokeEvent("Hurt", {damage = 1, fall = 0, defence = self.defence, attacker = self, var = self.var})
+				-- object:invokeEvent("Force", {velocity = spd, compute = 0})
+				-- local object = utils.createObject(nil, 9, "blood_effect", 0, hitinfo.point.x, hitinfo.point.y, hitinfo.point.z, 0, 0, 0, 5)
+				-- object:changeState("fire_effect")
+				-- self.frame = 3
+				self.hitObject = object
+				self.isHit = 16
+			end
+		else
+			-- local l2 = self.physics_object.transform.position - hitinfo.point
+			-- local l3 = CS.UnityEngine.Vector3.Reflect(l2, hitinfo.normal)
+			-- -- local e2 = l3 + hitinfo.point
+
+			-- -- lr.positionCount = 3
+			-- -- lr:SetPosition(2, CS.UnityEngine.Vector3(e2.x, e2.y + e2.z, e2.z))
+			-- self.physics_object.transform.rotation = CS.UnityEngine.Quaternion.FromToRotation(l2, l3)
+			-- self.velocity = self.physics_object.transform.rotation * self.velocity
+			-- self.physics_object.transform.position = hitinfo.point
+
+			-- self.frame = self.frame + 1
+			-- self.frame = 3
+			self.hitObject = nil
+			self.isHit = 0
+		end
+	else
+		-- s = self.oriPos
+		-- e = self.physics_object.transform.position
+		-- lr:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
+		-- lr:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
+
+		self.hitObject = nil
+		self.isHit = -1
+	end
+end

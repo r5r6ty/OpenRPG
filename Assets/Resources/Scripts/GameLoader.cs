@@ -358,6 +358,11 @@ public class LuaUtil
         mObjs[id].transform.localPosition = new Vector3(x, y, z);
     }
 
+    public static void SetRotationEuler(int id, float x, float y, float z)
+    {
+        mObjs[id].transform.rotation = Quaternion.Euler(x, y, z);
+    }
+
     public static RaycastHit[] PhysicsBoxCastNonAlloc(Vector3 center, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float maxDistance, int mask)
     {
         Physics.BoxCastNonAlloc(center, halfExtents, direction, m_RaycastHits, orientation, maxDistance, mask);

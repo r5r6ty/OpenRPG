@@ -32,10 +32,11 @@ local LFontTexture2D = nil
 local LFontMaterial = nil
 
 -- local LObjectShader = CS.UnityEngine.Shader.Find("Sprites/Beat/Diffuse-Shadow")
--- local LObjectShader = CS.UnityEngine.Shader.Find("Tutorial/007_Sprite")
+local LUIObjectShader = CS.UnityEngine.Shader.Find("Tutorial/007_Sprite")
 local LObjectShader = CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph")
 -- local LObjectShader = CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph 1")
 -- local LObjectShader = CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph 3D")
+-- local LObjectShader = CS.UnityEngine.Shader.Find("Tutorial/007_Sprite-Lit-Default")
 
 local LDatas = {}
 local objects = {}
@@ -59,7 +60,34 @@ local gray = nil
 
 local idLoop
 
--- ÏÈ²»¹ÜwebglÁË£¬¿É¶ñ£¬¸ã²»ºÃ£¡
+utils.eventManagerCenter = {}
+
+-- æ·»åŠ äº‹ä»¶
+function utils.addEvent(eventName, action)
+	if not utils.eventManagerCenter[eventName] then
+		utils.eventManagerCenter[eventName] = Delegate()
+	end
+	utils.eventManagerCenter[eventName].add(action)
+end
+
+-- ç§»é™¤äº‹ä»¶
+function utils.removeEvent(eventName, action)
+	utils.eventManagerCenter[eventName].delete(action)
+end
+
+-- ç§»é™¤æ‰€æœ‰äº‹ä»¶
+function utils.removeAllEvent()
+	utils.eventManagerCenter = {}
+end
+
+-- è§¦å‘äº‹ä»¶
+function utils.invokeEvent(eventName, ...)
+	if utils.eventManagerCenter[eventName] then
+		utils.eventManagerCenter[eventName].invoke(...)
+	end
+end
+
+-- å…ˆä¸ç®¡webgläº†ï¼Œå¯æ¶ï¼Œæä¸å¥½ï¼
 utils.download = coroutine.create(function(path)
 	local www = CS.UnityEngine.Networking.UnityWebRequest.Get(path)
 	print(www.isDone, www.downloadProgress)
@@ -69,7 +97,7 @@ utils.download = coroutine.create(function(path)
 	coroutine.yield(www)
 end)
 
--- ´ò¿ªÎÄ¼ş¶ÁÈ¡ÎÄ±¾
+-- æ‰“å¼€æ–‡ä»¶è¯»å–æ–‡æœ¬
 function utils.openFileText(path)
 	local str = nil
 	if utils.platform == "PC" then
@@ -104,7 +132,7 @@ function utils.openFileText(path)
 	return str
 end
 
--- ´ò¿ªÎÄ¼ş¶ÁÈ¡Êı¾İ
+-- æ‰“å¼€æ–‡ä»¶è¯»å–æ•°æ®
 function utils.openFileBytes(path)
 	local bytes = nil
 	if utils.platform == "PC" then
@@ -136,7 +164,7 @@ function utils.openFileBytes(path)
 	return bytes
 end
 
--- idÑ­»·
+-- idå¾ªç¯
 function idLoop(id, s)
 	for i, v in pairs(s) do
 		if id == v.id then
@@ -149,7 +177,7 @@ function idLoop(id, s)
 	return true
 end
 
--- ´°¿Úid·ÖÅä
+-- çª—å£idåˆ†é…
 function utils.createid(stack)
 	local id = 0
 	while id < 65535 do
@@ -164,7 +192,7 @@ function utils.createid(stack)
 	return nil
 end
 
--- »ñÈ¡´°¿Ú²¿·Ö
+-- è·å–çª—å£éƒ¨åˆ†
 function utils.getObject(id, s)
 	for i, v in pairs(s) do
 		if id == v.id then
@@ -179,7 +207,7 @@ function utils.getObject(id, s)
 	return nil
 end
 
--- ×Ö·û´®·Ö¸î
+-- å­—ç¬¦ä¸²åˆ†å‰²
 function utils.split(str, reps)
     local resultStrList = {}
     string.gsub(str, '[^'..reps..']+' ,function (w)
@@ -188,7 +216,7 @@ function utils.split(str, reps)
     return resultStrList
 end
 
--- ±È½Ï×Ö·û´®aÊÇ·ñ°üº¬ÔÚbÀïÃæ£¨³¤¶ÈÒªÏàµÈ£©
+-- æ¯”è¾ƒå­—ç¬¦ä¸²aæ˜¯å¦åŒ…å«åœ¨bé‡Œé¢ï¼ˆé•¿åº¦è¦ç›¸ç­‰ï¼‰
 function utils.isStringAContainB(a, b)
 	if #a ~= #b then
 		return false
@@ -206,7 +234,7 @@ function utils.isStringAContainB(a, b)
 	return false
 end
 
--- ¶ÁÈ¡×ÖÌå
+-- è¯»å–å­—ä½“
 function utils.loadfont()
     local str = utils.openFileText(utils.resourcePath .. "font/" .. myFont .. ".json")
 
@@ -264,7 +292,7 @@ function utils.loadfont()
     LFont.material = LFontMaterial
 end
 
--- ¶ÁÈ¡×ÖÌå2
+-- è¯»å–å­—ä½“2
 function utils.loadfont2()
 	LFont = CS.UnityEngine.Resources.Load("Fonts/" .. myFont, typeof(CS.UnityEngine.Font))
 	LFontMaterial = LFont.material
@@ -272,13 +300,17 @@ function utils.loadfont2()
 	LFontTexture2D.filterMode = CS.UnityEngine.FilterMode.Point
 end
 
--- »ñÈ¡×ÖÌå
+-- è·å–å­—ä½“
 function utils.getFont()
 	return LFont
 end
 
 function utils.getShader()
 	return LObjectShader
+end
+
+function utils.getUIShader()
+	return LUIObjectShader
 end
 
 function utils.setLCanvas(cvs)
@@ -341,39 +373,88 @@ end
 
 
 -- parent == LObject
-function utils.createObject(parent, id, a, f, x, y, z, dx, dy, dz, k)
-	local character = CS.UnityEngine.GameObject(id .. " kind " .. k)
-	character.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
-	if parent ~= nil then
-		-- character.transform:SetParent(parent.gameObject.transform)
-		-- character.transform.localPosition = CS.UnityEngine.Vector3(x, y, 0)
-	else
-		character.transform.position = CS.UnityEngine.Vector3(x, y, z)
+-- function utils.createObject(parent, id, a, f, x, y, z, dx, dy, dz, k)
+-- 	local character = CS.UnityEngine.GameObject(id .. " kind " .. k)
+-- 	character.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
+-- 	if parent ~= nil then
+-- 		-- character.transform:SetParent(parent.gameObject.transform)
+-- 		-- character.transform.localPosition = CS.UnityEngine.Vector3(x, y, 0)
+-- 	else
+-- 		character.transform.position = CS.UnityEngine.Vector3(x, y, z)
+-- 	end
+	
+-- 	-- local o = nil
+-- 	-- if k == 5 then
+-- 	-- 	o = LCharacterObject:new(parent, LDatas[id], id, a, f, character, dx, dy, dz, k)
+-- 	-- else
+-- 	-- 	o = LCharacterObject:new(parent, LDatas[id], id, a, f, character, dx, dy, dz, k)
+-- 	-- end
+-- 	-- local IID = character:GetInstanceID()
+-- 	-- utils.addObject(IID, o)
+	
+-- 	-- return o, IID
+-- 	return character
+-- end
+
+function utils.createObject(parent, id, a, f, s, x, y, z, dx, dy, dz, k)
+	-- local character = CS.UnityEngine.GameObject(id .. " kind " .. k)
+	-- character.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
+	-- character.transform.position = CS.UnityEngine.Vector3(x, y, z)
+
+	-- local script = CS.LuaUtil.AddLuaComponent(character, "LObject_apap")
+	local p = LObject:new(parent, LDatas[id], id, a, f, s, x, y, z, dx, dy, dz, k)
+	-- script.MainObject = p
+
+	if k == 5 then
+		p.physics_object.name = p.physics_object.name .. " " .. "Bullet"
+	elseif k == 99 then
+		p.physics_object.name = p.physics_object.name .. " " .. "Shell"
+	elseif k == 0 then
+		p.physics_object.name = p.physics_object.name .. " " .. "Human"
 	end
+
+	local IID = p.physics_object:GetInstanceID()
+	utils.addObject(IID, p)
 	
-	-- local o = nil
-	-- if k == 5 then
-	-- 	o = LCharacterObject:new(parent, LDatas[id], id, a, f, character, dx, dy, dz, k)
-	-- else
-	-- 	o = LCharacterObject:new(parent, LDatas[id], id, a, f, character, dx, dy, dz, k)
-	-- end
-	-- local IID = character:GetInstanceID()
-	-- utils.addObject(IID, o)
-	
-	-- return o, IID
-	return character
+	return p, IID
 end
 
-function utils.createObject(parent, id, a, f, x, y, z, dx, dy, dz, k)
-	local character = CS.UnityEngine.GameObject(id .. " kind " .. k)
-	character.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
-	character.transform.position = CS.UnityEngine.Vector3(x, y, z)
+function utils.createObject_Gun(parent, id, a, f, s, x, y, z, dx, dy, dz, k)
+	-- local character = CS.UnityEngine.GameObject(id .. " kind " .. k)
+	-- character.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
+	-- character.transform.position = CS.UnityEngine.Vector3(x, y, z)
 
-	local script = CS.LuaUtil.AddLuaComponent(character, "LObject_apap")
-	local p = LObject:new(parent, LDatas[id], id, a, f, character, dx, dy, dz, k)
-	script.MainObject = p
+	-- local script = CS.LuaUtil.AddLuaComponent(character, "LObject_apap")
+	local p = LObject_Gun:new(parent, LDatas[id], id, a, f, s, x, y, z, dx, dy, dz, k)
+	-- script.MainObject = p
 
-	return p
+	local IID = p.physics_object:GetInstanceID()
+	utils.addObject(IID, p)
+	
+	return p, IID
+end
+
+function utils.createUIObject(parent, id, a, f, s, x, y, z, dx, dy, dz, k)
+	-- local character = CS.UnityEngine.GameObject(id .. " kind " .. k)
+	-- character.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
+	-- character.transform.position = CS.UnityEngine.Vector3(x, y, z)
+
+	-- local script = CS.LuaUtil.AddLuaComponent(character, "LObject_apap")
+	local p = LUIObject:new(parent, LDatas[id], id, a, f, s, x, y, z, dx, dy, dz, k)
+	-- script.MainObject = p
+
+	-- if k == 5 then
+	-- 	p.physics_object.name = p.physics_object.name .. " " .. "Bullet"
+	-- elseif k == 99 then
+	-- 	p.physics_object.name = p.physics_object.name .. " " .. "Shell"
+	-- elseif k == 0 then
+	-- 	p.physics_object.name = p.physics_object.name .. " " .. "Human"
+	-- end
+
+	local IID = p.UI_object:GetInstanceID()
+	utils.addObject(IID, p)
+	
+	return p, IID
 end
 
 function utils.toMaxvalue(v, maxV, rate)
@@ -411,22 +492,22 @@ function utils.setPalette(o, n)
 	o.spriteRenderer.material = o.database.palettes[n]
 end
 
--- È¡µÃÎïÌåºÏ¼¯
+-- å–å¾—ç‰©ä½“åˆé›†
 function utils.getObjects()
 	return objects
 end
 
--- È¡µÃÎïÌå
+-- å–å¾—ç‰©ä½“
 function utils.getObject(id)
 	return objects[id]
 end
 
--- Ìí¼ÓÎïÌå
+-- æ·»åŠ ç‰©ä½“
 function utils.addObject(id, o)
 	objects[id] = o
 end
 
--- Ïú»ÙÎïÌå
+-- é”€æ¯ç‰©ä½“
 function utils.destroyObject(id)
 	local o = objects[id]
 	if o ~= nil then
@@ -444,17 +525,42 @@ function utils.destroyObject(id)
 	end
 end
 
-function utils.destroyObject(go)
-	-- local o = objects[id]
-	-- if o ~= nil then
-		CS.UnityEngine.GameObject.Destroy(go)
-		-- objects[id] = nil
-	-- else
-	-- 	print("utils.destroyObject(id) --- object is nil!")
-	-- end
+function utils.destroyObject(id)
+
+		-- CS.UnityEngine.GameObject.Destroy(go)
+
+		local o = objects[id]
+		if o ~= nil then
+			-- if o.kind == 5 then
+			-- 	for i, v in pairs(o.UIArray) do
+			-- 		if v.gameObject ~= nil then
+			-- 			CS.UnityEngine.GameObject.Destroy(v.gameObject)
+			-- 		end
+			-- 	end
+			-- end
+
+			utils.destroyObjectChildren(o)
+
+			CS.UnityEngine.GameObject.Destroy(o.physics_object)
+			CS.UnityEngine.GameObject.Destroy(o.pic_offset_object)
+			objects[id] = nil
+		else
+			print("utils.destroyObject(id) --- object is nil!")
+		end
 end
 
--- ²âÊÔÑªÌõ´´Ôì
+function utils.destroyObjectChildren(object)
+	for i, v in pairs(object.children) do
+		utils.destroyObjectChildren(v)
+		local id = v.physics_object:GetInstanceID()
+		CS.UnityEngine.GameObject.Destroy(v.physics_object)
+		CS.UnityEngine.GameObject.Destroy(v.pic_offset_object)
+
+		objects[id] = nil
+	end
+end
+
+-- æµ‹è¯•è¡€æ¡åˆ›é€ 
 function utils.createHPMP()
 
 	hp = CS.UnityEngine.Texture2D(1, 1, CS.UnityEngine.TextureFormat.RGBA32, false, false)
@@ -488,7 +594,7 @@ function utils.createHPMP()
 	gray:Apply()
 end
 
--- ²âÊÔÑªÌõ»æÖÆ
+-- æµ‹è¯•è¡€æ¡ç»˜åˆ¶
 function utils.drawHPMP(x, y, h, m, f, d)
 	local width = 50
 	local height = 3
@@ -534,7 +640,19 @@ function utils.drawHPMP(x, y, h, m, f, d)
 			end
 		end
 	end
+end
 
+function utils.drawHPMP(x, y, h)
+	local width = 50
+	local height = 3
+	-- local offset = 0
+	if h > 0 and h < 1 then
+		CS.UnityEngine.GUI.DrawTexture(CS.UnityEngine.Rect(x - width / 2 - 1, y - 1, width + 2, height + 2), white)
+		CS.UnityEngine.GUI.DrawTexture(CS.UnityEngine.Rect(x - width / 2, y, width, height), black)
+		CS.UnityEngine.GUI.DrawTexture(CS.UnityEngine.Rect(x - width / 2, y, width * h, height), hp)
+
+		-- offset = offset + 6
+	end
 end
 
 function utils.displayObjectsInfo()
@@ -543,23 +661,26 @@ function utils.displayObjectsInfo()
 	end
 end
 
-function utils.runObjectsFrame()
-	-- for i, v in pairs(objects) do
-	-- 	-- v:runEvent()
-	-- 	v:runFrame()
-	-- 	-- if v.AI then
-	-- 	-- 	v.database.AI:judgeAI(v)
-	-- 	-- end
-	-- end
+function utils.runObjectsFixedupdate()
+	for i, v in pairs(objects) do
+
+		v:fixedupdate()
+		if v.controller ~= nil and v.AI then
+			v.controller:resetCommands()
+		end
+	end
 end
 
-function utils.runObjectsFrame2()
+function utils.runObjectsUpdate()
 	for i, v in pairs(objects) do
-		v:runEvent2()
+		v:update()
 		-- v:runFrame()
 		-- if v.AI then
 		-- 	v.database.AI:judgeAI(v)
 		-- end
+		if v.controller ~= nil and v.AI then
+			v.controller:judgeAI(v)
+		end
 	end
 end
 
@@ -571,7 +692,25 @@ function utils.display()
 	CS.UnityEngine.GUI.Label(CS.UnityEngine.Rect(10, CS.UnityEngine.Screen.height - 56, 200, 20), "Objects: " .. num)
 end
 
--- ´Ó×Ö·û¶ÁÈ¡±í´ïÊ½µÄ²âÊÔ£¬²»ºÃÓÃ
+function utils.setfenv(fn, env)
+	local i = 1
+	while true do
+	  local name = debug.getupvalue(fn, i)
+	  if name == "_ENV" then
+		debug.upvaluejoin(fn, i, (function()
+		  return env
+		end), 1)
+		break
+	  elseif not name then
+		break
+	  end
+	  
+	  i = i + 1
+	end
+	return fn
+end
+
+-- ä»å­—ç¬¦è¯»å–è¡¨è¾¾å¼çš„æµ‹è¯•ï¼Œä¸å¥½ç”¨
 function utils.calcValue(o, v)
 	local vs, es = nil
 	if tonumber(v) == nil then
@@ -673,9 +812,9 @@ function utils.superSplit(str, reps)
 
 	return temp, temp2
 end
--- ´Ó×Ö·û¶ÁÈ¡±í´ïÊ½µÄ²âÊÔ£¬²»ºÃÓÃ£¨Íê£©
+-- ä»å­—ç¬¦è¯»å–è¡¨è¾¾å¼çš„æµ‹è¯•ï¼Œä¸å¥½ç”¨ï¼ˆå®Œï¼‰
 
--- byte×ªint
+-- byteè½¬int
 function utils.bytesToInt(bytes, offset)
 	local value = 0
 	for i = 0, 3, 1 do
@@ -684,7 +823,7 @@ function utils.bytesToInt(bytes, offset)
 	return value
 end
 
--- bytes×ªfloat
+-- bytesè½¬float
 function utils.bytesToFloat(firstByte, secondByte)
 	local s = ((secondByte << 8) | firstByte) / 32768
 	if s > 1 then
@@ -694,7 +833,7 @@ function utils.bytesToFloat(firstByte, secondByte)
 	end
 end
 
--- ´Ó.img¼ÓÔØÍ¼Æ¬×ö³Étexture2D
+-- ä».imgåŠ è½½å›¾ç‰‡åšæˆtexture2D
 function utils.loadImageToTexture2D(b64str)
 	local temp = string.match(b64str, "data:image/png;base64,(.+)")
 	local mod4 = #temp % 4
@@ -706,11 +845,11 @@ function utils.loadImageToTexture2D(b64str)
 
 	local bytes = CS.System.Convert.FromBase64String(temp)
 
-	-- ¼ÓÔØÍ¼Æ¬
+	-- åŠ è½½å›¾ç‰‡
 	local texture = CS.UnityEngine.Texture2D(0, 0, CS.UnityEngine.TextureFormat.RGBA32, false, false)
 	texture.filterMode = CS.UnityEngine.FilterMode.Point
-	-- CS.UnityEngine.ImageConversion.LoadImage(texture, bytes) -- Õâ¸öÔõÃ´²»ĞĞÁË£¿
-	texture:LoadImage(bytes) --- Texture2d  ³ÉÔ±·½·¨ÎŞ·¨Ê¹ÓÃ£¬ÎªÊ²Ã´£¿ÎªÊ²Ã´ÓÖÄÜÊ¹ÓÃÁË£¿
+	-- CS.UnityEngine.ImageConversion.LoadImage(texture, bytes) -- è¿™ä¸ªæ€ä¹ˆä¸è¡Œäº†ï¼Ÿ
+	texture:LoadImage(bytes) --- Texture2d  æˆå‘˜æ–¹æ³•æ— æ³•ä½¿ç”¨ï¼Œä¸ºä»€ä¹ˆï¼Ÿä¸ºä»€ä¹ˆåˆèƒ½ä½¿ç”¨äº†ï¼Ÿ
 
 	return texture
 end
@@ -754,7 +893,7 @@ function utils.drawField(cx, cy, cw, ch, subColor)
 	CS.UnityEngine.GL.PopMatrix()
 end
 
--- ÇóÏà½»boundsÃæ»ı
+-- æ±‚ç›¸äº¤boundsé¢ç§¯
 function utils.getBoundsIntersectsArea(lhs, rhs)
 	local c = lhs.center - rhs.center
 	local r = lhs.extents + rhs.extents
@@ -819,7 +958,7 @@ function utils.createUnityObject(p, name, x, y, width, height)
 	return script
 end
 	
--- È¡Õûº¯Êı
+-- å–æ•´å‡½æ•°
 function utils.getIntPart(x)
 	if x <= 0 then
 		return math.ceil(x);
@@ -833,7 +972,7 @@ function utils.getIntPart(x)
 	return x;
 end
 
--- ´´½¨Íø¸ñÎÆÀí
+-- åˆ›å»ºç½‘æ ¼çº¹ç†
 function utils.createLineTexture(tile_size, width, height)
 	local line_texture = CS.UnityEngine.Texture2D(tile_size * width, tile_size * height, CS.UnityEngine.TextureFormat.RGBA32, false, false)
 	line_texture.filterMode = CS.UnityEngine.FilterMode.Point
@@ -852,7 +991,7 @@ function utils.createLineTexture(tile_size, width, height)
 	return line_texture_sprite
 end
 
--- ´Ócsv¶ÁÈ¡Êı¾İ·ÅÈëDataTable
+-- ä»csvè¯»å–æ•°æ®æ”¾å…¥DataTable
 function utils.LoadTilesFromCSV(path)
 	local dt = CS.System.Data.DataTable("test")
 
@@ -861,11 +1000,11 @@ function utils.LoadTilesFromCSV(path)
 	local line = sr:ReadLine()
 	while line ~= nil do
 		local data = utils.split(line, ',')
-		if count == 0 then -- µÚÒ»ĞĞ×÷Îª±íÍ·
+		if count == 0 then -- ç¬¬ä¸€è¡Œä½œä¸ºè¡¨å¤´
 			for i, v in ipairs(data) do
 				dt.Columns:Add(CS.System.Data.DataColumn(v, typeof(CS.System.String)))
 			end
-		else -- ÆäÓà×÷ÎªÊı¾İ
+		else -- å…¶ä½™ä½œä¸ºæ•°æ®
 			local dr = dt:NewRow()
 			for i, v in ipairs(data) do
 				dr[i - 1] = v
@@ -888,29 +1027,29 @@ function utils.LoadTilesFromCSV(path)
 	return dt
 end
 
--- ´ÓÂ·¾¶¼ÓÔØÍ¼Æ¬×ö³Étexture2D
+-- ä»è·¯å¾„åŠ è½½å›¾ç‰‡åšæˆtexture2D
 function utils.LoadImageToTexture2DByPath(path)
 	local bytes = utils.openFileBytes(path)
-	-- ¼ÓÔØÍ¼Æ¬
+	-- åŠ è½½å›¾ç‰‡
 	local texture = CS.UnityEngine.Texture2D(0, 0, CS.UnityEngine.TextureFormat.RGBA32, false, false)
 	texture.filterMode = CS.UnityEngine.FilterMode.Point
-	CS.UnityEngine.ImageConversion.LoadImage(texture, bytes) -- Õâ¸öÔõÃ´²»ĞĞÁË£¿
-	-- texture:LoadImage(bytes) --- Texture2d  ³ÉÔ±·½·¨ÎŞ·¨Ê¹ÓÃ£¬ÎªÊ²Ã´£¿ÎªÊ²Ã´ÓÖÄÜÊ¹ÓÃÁË£¿
+	CS.UnityEngine.ImageConversion.LoadImage(texture, bytes) -- è¿™ä¸ªæ€ä¹ˆä¸è¡Œäº†ï¼Ÿ
+	-- texture:LoadImage(bytes) --- Texture2d  æˆå‘˜æ–¹æ³•æ— æ³•ä½¿ç”¨ï¼Œä¸ºä»€ä¹ˆï¼Ÿä¸ºä»€ä¹ˆåˆèƒ½ä½¿ç”¨äº†ï¼Ÿ
 	return texture
 end
 
--- ÓÃtexture2DÉú³Ésprite£¨Õı·½ĞÎ£©
+-- ç”¨texture2Dç”Ÿæˆspriteï¼ˆæ­£æ–¹å½¢ï¼‰
 function utils.CreateSprite(texture2D, x, y, size)
-	local sprite = CS.UnityEngine.Sprite.Create(texture2D, CS.UnityEngine.Rect(x * size, texture2D.height - (y + 1) * size, size, size), CS.UnityEngine.Vector2(1 - 16 / 16, 16 / 16)) -- ÕâÀïÒª×¢ÒâÓĞĞ©·½¿éµÄ²î
+	local sprite = CS.UnityEngine.Sprite.Create(texture2D, CS.UnityEngine.Rect(x * size, texture2D.height - (y + 1) * size, size, size), CS.UnityEngine.Vector2(1 - 16 / 16, 16 / 16)) -- è¿™é‡Œè¦æ³¨æ„æœ‰äº›æ–¹å—çš„å·®
 	return sprite
 end
 
--- base64½âÂëTileLayer
--- ½âÂëºóµÄÊı¾İ£¬³¤¶ÈÎªµØÍ¼µÄ³¤*¿î*2
--- Å¼ÊıÎ»*ÆæÊıÎ»µÃ0¡«65535
--- Êı×é³¤¶ÈÓ¦¸ÃÊÇµØÍ¼µÄ³¤*¿î
+-- base64è§£ç TileLayer
+-- è§£ç åçš„æ•°æ®ï¼Œé•¿åº¦ä¸ºåœ°å›¾çš„é•¿*æ¬¾*2
+-- å¶æ•°ä½*å¥‡æ•°ä½å¾—0ï½65535
+-- æ•°ç»„é•¿åº¦åº”è¯¥æ˜¯åœ°å›¾çš„é•¿*æ¬¾
 function utils.Base64DecodeToArray_Ground(str)
-	-- ÓÃC#×Ô´øµÄ½âÂëAPI
+	-- ç”¨C#è‡ªå¸¦çš„è§£ç API
 	local bytes = CS.System.Convert.FromBase64String(str)
 	--    print(#bytes)
 	local array = {}
@@ -922,15 +1061,15 @@ function utils.Base64DecodeToArray_Ground(str)
 	return array
 end
 
--- base64½âÂëDataLayer
--- 0¡«255
--- ½âÂëºóµÄÊı¾İ£¬³¤¶ÈÎªµØÍ¼µÄ³¤*¿î
+-- base64è§£ç DataLayer
+-- 0ï½255
+-- è§£ç åçš„æ•°æ®ï¼Œé•¿åº¦ä¸ºåœ°å›¾çš„é•¿*æ¬¾
 function utils.Base64DecodeToArray_TileMode(str)
-	-- ÓÃC#×Ô´øµÄ½âÂëAPI
+	-- ç”¨C#è‡ªå¸¦çš„è§£ç API
 	local bytes = CS.System.Convert.FromBase64String(str)
 	--    print(#bytes)
 	local array = {}
-	-- Ñ­»·°ÑÊı¾İ´æÈëÊı×é£¬ÏÂ±êÆğÊ¼ÊÇ1
+	-- å¾ªç¯æŠŠæ•°æ®å­˜å…¥æ•°ç»„ï¼Œä¸‹æ ‡èµ·å§‹æ˜¯1
 	for i = 1, #bytes, 1 do
 		array[i] = string.byte(string.sub(bytes, i, i))
 	--        print(string.byte(string.sub(bytes, i, i)), i, math.floor((i - 1) % 50), math.floor((i - 1) / 50))
@@ -938,30 +1077,30 @@ function utils.Base64DecodeToArray_TileMode(str)
 	return array
 end
 
--- base64½âÂëObjectMode
--- Object_Layer µÄÊı¾İ´æ´¢±àÂëÎª base64, 0xFFFF ±ê¼ÇÕâ¸öÍ¼²ãÎª Object_Layer, ½ÓÏÂÀ´ÓÉÓĞÊı¾İ:
+-- base64è§£ç ObjectMode
+-- Object_Layer çš„æ•°æ®å­˜å‚¨ç¼–ç ä¸º base64, 0xFFFF æ ‡è®°è¿™ä¸ªå›¾å±‚ä¸º Object_Layer, æ¥ä¸‹æ¥ç”±æœ‰æ•°æ®:
 
--- X Ñ¡ÇøµÄÎ»ÖÃX, µ¥Î»ÎªÏñËØ
--- Y Ñ¡ÇøµÄÎ»ÖÃY, µ¥Î»ÎªÏñËØ
--- ID ObjectµÄ±êÊ¶·û, Ëü±íÊ¾Õâ¸ö¶ÔÏóÎ»ÓÚ tileset µÄÎ»ÖÃ
--- ËùÓĞÕâÈı¸öÖµ¿ÉÒÔÓĞÆä×ÔÉíµÄ¸ßÎ»(bit set)µÄÉèÖÃ: ¶ÔÏóµÄĞı×ª´æ·ÅÓÚ¸ßÎ»µÄ X ºÍ Y, ¶ø flip Ôò´æ·ÅÔÚ ID ÉÏ
--- sample: xÑ¡Çø   yÑ¡Çø   ID
+-- X é€‰åŒºçš„ä½ç½®X, å•ä½ä¸ºåƒç´ 
+-- Y é€‰åŒºçš„ä½ç½®Y, å•ä½ä¸ºåƒç´ 
+-- ID Objectçš„æ ‡è¯†ç¬¦, å®ƒè¡¨ç¤ºè¿™ä¸ªå¯¹è±¡ä½äº tileset çš„ä½ç½®
+-- æ‰€æœ‰è¿™ä¸‰ä¸ªå€¼å¯ä»¥æœ‰å…¶è‡ªèº«çš„é«˜ä½(bit set)çš„è®¾ç½®: å¯¹è±¡çš„æ—‹è½¬å­˜æ”¾äºé«˜ä½çš„ X å’Œ Y, è€Œ flip åˆ™å­˜æ”¾åœ¨ ID ä¸Š
+-- sample: xé€‰åŒº   yé€‰åŒº   ID
 --   data: 128 129   0   0   32   0
--- xÑ¡ÇøºÍyÑ¡ÇøÓÒ±ßµÄÊı×ÖÆäÖĞ11111111µÄ×î×ó±ßµÄbitÎªĞı×ªbit£¬ËùÒÔÏñËØ±íÊ¾·¶Î§ÊÇ0¡«(127*256+255=32767)
--- IDÓÒ±ßµÄÊı×ÖÆäÖĞ11111111µÄ×î×ó±ßµÄbitÎªË®Æ½·­×ªbit£¬·¶Î§Í¬ÉÏ
--- xÑ¡ÇøµÄĞı×ªbitºÍyÑ¡ÇøµÄĞı×ªbit×éºÏ±íÊ¾ËÄ¸ö·½Ïò£¬10£º90¡ã£¬11:180¡ã£¬01:270¡ã£¬00£º0¡ã
+-- xé€‰åŒºå’Œyé€‰åŒºå³è¾¹çš„æ•°å­—å…¶ä¸­11111111çš„æœ€å·¦è¾¹çš„bitä¸ºæ—‹è½¬bitï¼Œæ‰€ä»¥åƒç´ è¡¨ç¤ºèŒƒå›´æ˜¯0ï½(127*256+255=32767)
+-- IDå³è¾¹çš„æ•°å­—å…¶ä¸­11111111çš„æœ€å·¦è¾¹çš„bitä¸ºæ°´å¹³ç¿»è½¬bitï¼ŒèŒƒå›´åŒä¸Š
+-- xé€‰åŒºçš„æ—‹è½¬bitå’Œyé€‰åŒºçš„æ—‹è½¬bitç»„åˆè¡¨ç¤ºå››ä¸ªæ–¹å‘ï¼Œ10ï¼š90Â°ï¼Œ11:180Â°ï¼Œ01:270Â°ï¼Œ00ï¼š0Â°
 
--- Õâ¶«Î÷Ì«Âé·³ÁË£¬ÔİÊ±ÓÃ²»µ½£¬ÏÈ¿Õ×Å
+-- è¿™ä¸œè¥¿å¤ªéº»çƒ¦äº†ï¼Œæš‚æ—¶ç”¨ä¸åˆ°ï¼Œå…ˆç©ºç€
 function utils.Base64DecodeToArray_ObjectMode(str)
-	-- ÓÃC#×Ô´øµÄ½âÂëAPI
+	-- ç”¨C#è‡ªå¸¦çš„è§£ç API
 	local bytes = CS.System.Convert.FromBase64String(str)
 	--    print(#bytes)
 	local array = {}
 	--     print(getStr(bytes, 1), getStr(bytes, 2))
-	-- Ñ­»·°ÑÊı¾İ´æÈëÊı×é£¬ÏÂ±êÆğÊ¼ÊÇ1
+	-- å¾ªç¯æŠŠæ•°æ®å­˜å…¥æ•°ç»„ï¼Œä¸‹æ ‡èµ·å§‹æ˜¯1
 	print("length: " .. #bytes)
 
-	-- ´ÓµÚ3¸öbyte¿ªÊ¼£¬ÒòÎªÇ°Ãæ2¸öbyteÊÇ0xFFFF
+	-- ä»ç¬¬3ä¸ªbyteå¼€å§‹ï¼Œå› ä¸ºå‰é¢2ä¸ªbyteæ˜¯0xFFFF
 	for i = 3, #bytes, 6 do
 		print(string.byte(string.sub(bytes, i, i)))
 	--        array[(i - 2 + 5) / 6] = string.byte(string.sub(bytes, i, i))
@@ -970,13 +1109,13 @@ function utils.Base64DecodeToArray_ObjectMode(str)
 		local cx = string.byte(string.sub(bytes, i, i)) + string.byte(string.sub(bytes, i + 1, i + 1)) * 256
 		local cy = string.byte(string.sub(bytes, i + 2, i + 2)) + string.byte(string.sub(bytes, i + 3, i + 3)) * 256
 		array[(i + 3) / 6] = {x = cx, y = cy}
-		-- ´ıĞø
+		-- å¾…ç»­
 		print(cx, cy)
 	end
 	return array
 end
 
--- Ç³¿½±´
+-- æµ…æ‹·è´
 function utils.shallow_copy(object)
 	local newObject
 	if type(object) == "table" then
@@ -990,7 +1129,7 @@ function utils.shallow_copy(object)
 	return newObject
 end
 
--- Éî¿½±´
+-- æ·±æ‹·è´
 function utils.deep_copy(object)
 	local lookup = {}
 	local function _copy(object)
@@ -1009,23 +1148,23 @@ function utils.deep_copy(object)
 	return _copy(object)
 end
 
--- ÏòÁ¿µã³Ë
+-- å‘é‡ç‚¹ä¹˜
 function utils.GetVector3Dot(v1, v2)
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
 end
 
--- ÏòÁ¿²æ³Ë
+-- å‘é‡å‰ä¹˜
 function utils.GetVector3Cross(v1, v2)
     local v3 ={x = v1.y*v2.z - v2.y*v1.z , y = v2.x*v1.z-v1.x*v2.z , z = v1.x*v2.y-v2.x*v1.y}
     return v3
 end
 
--- ÏòÁ¿µÄÄ£
+-- å‘é‡çš„æ¨¡
 function utils.GetVector3Module(v)
     return math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z)
 end
 
--- ÇóÁ½ÏòÁ¿¼ä¼Ğ½Ç
+-- æ±‚ä¸¤å‘é‡é—´å¤¹è§’
 function utils.GetVector3Angle(v1, v2)
     local cos = utils.GetVector3Dot(v1, v2)/ (utils.GetVector3Module(v1)*utils.GetVector3Module(v2))
     return math.acos(cos) * 180 / math.pi

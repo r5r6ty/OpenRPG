@@ -6,7 +6,7 @@
 
 local json = require "json"
 local utils = require 'LUtils'
--- require "LAI"
+require "LAI"
 
 castleDB = {DBPath = nil, DBFile = nil, DBData = nil, IMGFile = nil, IMGData = nil, DBSheets = nil}
 castleDB.__index = castleDB
@@ -70,7 +70,7 @@ function castleDB:writeIMG()
 	print(self.DBPath .. self.IMGFile .. ": json wrote!")
 end
 
--- ��ȡimages�е�pic
+-- 读取images中的pic
 function castleDB:loadIMGToTexture2Ds()
 	local result = {}
     for i, v in pairs(self.IMGData) do
@@ -251,6 +251,7 @@ function LCastleDBMap:createSprites()
 -- ?????
 function LCastleDBMap:createPalettes()
 	local palettes = {}
+	local palettes_ui = {}
 	for i, v in ipairs(self:getLines("palettes")) do
 
 		local texture = CS.UnityEngine.Texture2D(256, 1, CS.UnityEngine.TextureFormat.RGBA32, false, false)
@@ -309,14 +310,43 @@ function LCastleDBMap:createPalettes()
 		material:SetTexture("_Palette", texture)
 
 		table.insert(palettes, material)
+
+		local material_ui = CS.UnityEngine.Material(utils.getUIShader())
+		material_ui:SetTexture("_Palette", texture)
+		table.insert(palettes_ui, material_ui)
 	end
-	return palettes
+	return palettes, palettes_ui
 end
 
 
 --------------------------------------------------------------------------------------------------
 
-LCastleDBCharacter = {characters = nil, AI = nil, animations = nil, characters_state = nil, FBcontorller = nil, animationClips = nil, }
+Delegate = function()
+    local data = {}
+    local add = function(action) --????
+		data[tostring(action)] = action
+    end
+    local delete = function(action)  --????
+        data[tostring(action)] = nil
+    end
+	local invoke = function(...) --????
+		-- local r = nil
+        for _, v in pairs(data) do
+			if v then
+                v(...)
+            end
+		end
+		-- return r
+    end
+    return
+    {
+        add = add,
+        delete = delete,
+        invoke = invoke
+    }
+end
+
+LCastleDBCharacter = {palettes_ui = nil, characters = nil, AI = nil, animations = nil, characters_state = nil, vars = nil, animationClips = nil, eventManager = nil}
 setmetatable(LCastleDBCharacter, LCastleDBMap)
 LCastleDBCharacter.__index = LCastleDBCharacter
 function LCastleDBCharacter:new(path, file)
@@ -324,15 +354,23 @@ function LCastleDBCharacter:new(path, file)
 	self = LCastleDBMap:new(path, file)
 	setmetatable(self, LCastleDBCharacter)
 
+	self.palettes_ui = nil
 	self.characters = nil
 	self.AI = nil
 
 	self.animations = nil
 	self.characters_state = nil
-	self.FBcontorller = nil
+	self.vars = nil
 	self.animationClips = nil
+
+	self.eventManager = {}
 	return self
 end
+
+Rubbish = {}
+Rubbish.CS = CS
+Rubbish.print = print
+Rubbish.utils = utils
 
 function LCastleDBCharacter:readDB()
 	local str = utils.openFileText(self.DBPath .. self.DBFile)
@@ -348,10 +386,10 @@ function LCastleDBCharacter:readDB()
 	print(self.DBPath .. self.DBFile .. ": json read!")
 
 
-	self.characters = {}
-	for i, v in ipairs(self:getLines("actions")) do
-		self.characters[v.name] = v.frames
-	end
+	-- self.characters = {}
+	-- for i, v in ipairs(self:getLines("actions")) do
+	-- 	self.characters[v.name] = v.frames
+	-- end
 
 	if self.DBSheets["animations"] ~= nil then
 		self.animations = {}
@@ -366,7 +404,7 @@ function LCastleDBCharacter:readDB()
 			local delayC = 0
 			for j = 0, #v.clips - 1, 1 do
 				local currentFrame = v.clips[j + 1]
-				if currentFrame.category == "Sprite" then
+				if currentFrame.category == "Sprite" or currentFrame.category == "Trace" or currentFrame.category == "Image" or currentFrame.category == "Text" or currentFrame.category == "Button" then
 					if self.animations[v.name].eventQueue[delayC] == nil then
 						self.animations[v.name].eventQueue[delayC] = {}
 					end
@@ -378,18 +416,18 @@ function LCastleDBCharacter:readDB()
 					table.insert(self.animations[v.name].keyframes, delayC)
 
 					delayC = delayC + currentFrame.wait
-				elseif currentFrame.category == "Sound" then
+				elseif currentFrame.category == "Sound" or currentFrame.category == "Body" or currentFrame.category == "Attack" then
 					if self.animations[v.name].eventQueue[delayC] == nil then
 						self.animations[v.name].eventQueue[delayC] = {}
 					end
 					table.insert(self.animations[v.name].eventQueue[delayC], 1, currentFrame)
-				elseif currentFrame.category == "Trigger" or currentFrame.category == "Body" then -- currentFrame.category == "Act" or currentFrame.category == "Object" or 
-					for j = 0, currentFrame.wait - 1, 1 do
-						if self.animations[v.name].eventQueue[delayC + j] == nil then
-							self.animations[v.name].eventQueue[delayC + j] = {}
-						end
-						table.insert(self.animations[v.name].eventQueue[delayC + j], 1, currentFrame)
-					end
+				-- elseif currentFrame.category == "Trigger" or currentFrame.category == "Body" or currentFrame.category == "Attack" then -- currentFrame.category == "Act" or currentFrame.category == "Object" or 
+				-- 	for j = 0, currentFrame.wait - 1, 1 do
+				-- 		if self.animations[v.name].eventQueue[delayC + j] == nil then
+				-- 			self.animations[v.name].eventQueue[delayC + j] = {}
+				-- 		end
+				-- 		table.insert(self.animations[v.name].eventQueue[delayC + j], 1, currentFrame)
+				-- 	end
 				end
 			end
 
@@ -426,87 +464,618 @@ function LCastleDBCharacter:readDB()
 
 	end
 
-	self.FBcontorller = {}
+	self.vars = {}
+	for i, v in ipairs(self:getLines("vars")) do
+		if v.active then
+			self.vars[v.name] = v.default
+		end
+	end
 
 	self.characters_state = {}
 	for i, v in ipairs(self:getLines("states")) do
 		self.characters_state[v.name] = {}
-		self.characters_state[v.name].state = v.state
+		-- self.characters_state[v.name].state = v.state
 		self.characters_state[v.name].animation = v.animation
-		self.characters_state[v.name].x = v.x
-		self.characters_state[v.name].y = v.y
-
-		local p = utils.split(v.name, "_")
-
-		if self.FBcontorller[p[1]] == nil then
-			self.FBcontorller[p[1]] = {}
-		end
-
-		if p[2] == "front" and self.FBcontorller[p[1]].front == nil then
-			self.FBcontorller[p[1]].front = v.name
-
-			print("front", v.name)
-		elseif  p[2] == "back" and self.FBcontorller[p[1]].back == nil  then
-			self.FBcontorller[p[1]].back = v.name
-
-			print("back", v.name)
-		end
-	end
-
-	-- self.AI = LAI:new(self)
-
-	self.audioClips = self:createAudioClips()
-	self.texture2Ds, self.sprites = self:createSprites()
-	self.palettes = self:createPalettes()
-end
-
----------------------------------------------------------------------------------------
 
 
-LCastleDBCharacter_new = {characters2 = nil, animations = nil}
-setmetatable(LCastleDBCharacter_new, LCastleDBCharacter)
-LCastleDBCharacter_new.__index = LCastleDBCharacter_new
-function LCastleDBCharacter_new:new(path, file)
-	local self = {}
-	self = LCastleDBCharacter:new(path, file)
-	setmetatable(self, LCastleDBCharacter_new)
+		-- for j, v2 in ipairs(v.state) do
+		-- 	if v2.trigger ~= nil then
 
-	self.characters2 = nil
-	self.animations = nil
-	return self
-end
+		-- 		-- if self.characters_state[v.name][v2.trigger] == nil then
+		-- 			-- v2.func = load("return " .. v2.trigger, "trigger", "t") -- , self
+		-- 			v2.func = assert(load("function _trigger(this) return " .. v2.trigger .. " end return _trigger", "trigger", "t", Rubbish))()
+		-- 		-- 	self.characters_state[v.name][v2.trigger] = v2.func
+		-- 		-- else
+		-- 		-- 	v2.func = self.characters_state[v.name][v2.trigger]
+		-- 		-- end
+		-- 	else
+		-- 		v2.func = nil
+		-- 	end
+		-- end
 
-function LCastleDBCharacter_new:readDBLite()
-	local str = utils.openFileText(self.DBPath .. self.DBFile)
-    self.DBData = json.decode(str)
-end
+		local update = {}
+		self:setState(v.update, update)
 
-function LCastleDBCharacter_new:readDB()
-	local str = utils.openFileText(self.DBPath .. self.DBFile)
+		local fixedUpdate = {}
+		self:setState(v.fixedUpdate, fixedUpdate)
 
-    self.DBData = json.decode(str)
+		self.characters_state[v.name].update = update
+		self.characters_state[v.name].fixedUpdate = fixedUpdate
 
-	self.DBSheets = {}
-    for i, v in ipairs(self.DBData["sheets"]) do
-        if self.DBSheets[v.name] == nil then
-            self.DBSheets[v.name] = v
-        end
-	end
-	print(self.DBPath .. self.DBFile .. ": json read!")
+		-- local p = utils.split(v.name, "_")
 
+		-- if self.FBcontorller[p[1]] == nil then
+		-- 	self.FBcontorller[p[1]] = {}
+		-- end
 
-	self.characters = {}
-	self.characters2 = {}
-	for i, v in ipairs(self:getLines("actions")) do
-		self.characters[v.name] = v.frames
-		if v.animations ~= nil then
-			self.characters2[v.name] = v.animations
-		end
+		-- if p[2] == "front" and self.FBcontorller[p[1]].front == nil then
+		-- 	self.FBcontorller[p[1]].front = v.name
+
+		-- 	print("front", v.name)
+		-- elseif  p[2] == "back" and self.FBcontorller[p[1]].back == nil  then
+		-- 	self.FBcontorller[p[1]].back = v.name
+
+		-- 	print("back", v.name)
+		-- end
 	end
 
 	self.AI = LAI:new(self)
 
 	self.audioClips = self:createAudioClips()
 	self.texture2Ds, self.sprites = self:createSprites()
-	self.palettes = self:createPalettes()
+	self.palettes, self.palettes_ui = self:createPalettes()
+
+	----------------------------------------------------------------------------------------------------------------------
+
+	self:addEvent("Live", function(this, value)
+		-- self["HP"] = utils.toMaxvalue(self["HP"], self["maxHP"], self["HPRecoveryRate"])
+		-- self["MP"] = utils.toMaxvalue(self["MP"], self["maxMP"], self["MPRecoveryRate"] + (self["MPRecoveryRate"] * (1 - self["HP"] / self["maxHP"])))
+		-- self["falling"] = utils.toOne(self["falling"], self["maxFalling"], self["fallingRecoveryRate"])
+		-- self["defencing"] = utils.toOne(self["defencing"], self["maxDefencing"], self["defencingRecoveryRate"])
+
+		-- if self.target == nil then
+		-- 	local temp = {}
+		-- 	for i, v in pairs(utils.getObjects()) do
+		-- 		if v ~= nil and v.kind == 0 and v ~= self and v["HP"] > 0 then
+		-- 			table.insert(temp, v)
+		-- 		end
+		-- 	end
+		-- 	self.target = temp[CS.Tools.Instance:RandomRangeInt(1, #temp + 1)]
+		-- else
+		-- 	if self.target["HP"] <= 0 then
+		-- 		self.target = nil
+		-- 	end
+		-- end
+	end)
+	self:addEvent("Dead", function(this, value)
+		utils.destroyObject(this.physics_object:GetInstanceID())
+	end)
+
+	self:addEvent("Flying", function(this, value)
+		if this.kind ~= 3 and this.kind ~= 5 and not this["isCatched"] then
+			this.velocity = this.velocity + 0.5 * CS.UnityEngine.Physics.gravity * 2 / 60
+			-- this.velocity.y = this.velocity.y + 0.5 * -9.81 * 2 / 60 / 3
+		end
+	end)
+
+	self:addEvent("Ground", function(this, value)
+		-- if this.isOnGround ~= 1 then
+			local f = this.velocity * 0.2 -- ????
+			if this.velocity.x > 0 then
+				this.velocity.x = this.velocity.x - f.x
+				if this.velocity.x < 0 then
+					this.velocity.x = 0
+				end
+			elseif this.velocity.x < 0 then
+				this.velocity.x = this.velocity.x - f.x
+				if this.velocity.x > 0 then
+					this.velocity.x = 0
+				end
+			end
+
+			if this.velocity.z > 0 then
+				this.velocity.z = this.velocity.z - f.z
+				if this.velocity.z < 0 then
+					this.velocity.z = 0
+				end
+			elseif this.velocity.z < 0 then
+				this.velocity.z = this.velocity.z - f.z
+				if this.velocity.z > 0 then
+					this.velocity.z = 0
+				end
+			end
+		-- end
+		if this.kind == 99 then
+			if this.rotation > 0 then
+				this.rotation_velocity = this.rotation_velocity / 2
+			else
+				this.rotation_velocity = this.rotation_velocity / 2
+			end
+			if this.velocity.magnitude <= 0.5 then
+				this.sleep = true
+			end
+		end
+	end)
+
+	self:addEvent("Sprite", function(this, value)
+		-- print(value)
+		this.spriteRenderer.sprite = this.database.sprites[value.sprite]
+		this.pic_object.transform.localPosition = CS.UnityEngine.Vector3(value.x / 100, -value.y / 100, 0)
+	end)
+
+	self:addEvent("Image", function(this, value)
+		this.image.sprite = this.database.sprites[value.sprite]
+		this.image.rectTransform.anchoredPosition = CS.UnityEngine.Vector2(value.x, -value.y)
+		this.image.rectTransform.sizeDelta = CS.UnityEngine.Vector2(value.width, value.height)
+	end)
+
+	self:addEvent("Text", function(this, value)
+		this.text.text = value.text
+		this.text.rectTransform.anchoredPosition = CS.UnityEngine.Vector2(value.x, -value.y)
+		this.text.rectTransform.sizeDelta = CS.UnityEngine.Vector2(value.width, value.height)
+	end)
+
+	self:addEvent("Button", function(this, value)
+		this.image.sprite = this.database.sprites[value.sprite]
+		this.image.rectTransform.anchoredPosition = CS.UnityEngine.Vector2(value.x, -value.y)
+		this.image.rectTransform.sizeDelta = CS.UnityEngine.Vector2(value.width, value.height)
+
+		this.text.text = value.text
+		-- this.text.rectTransform.anchoredPosition = CS.UnityEngine.Vector2(value.x, -value.y)
+		-- this.text.rectTransform.sizeDelta = CS.UnityEngine.Vector2(value.width, value.height)
+	end)
+
+	self:addEvent("Trace", function(this, value)
+		local s = this.oriPos2
+		local e = this.physics_object.transform.position
+		this.lineRenderer:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
+		this.lineRenderer:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
+
+		this.oriPos2 = this.physics_object.transform.position
+	end)
+
+	self:addEvent("Sound", function(this, value)
+		this.audioSource.clip = this.database.audioClips[value.sfx]
+		-- local r = math.random() / 2.5
+		-- this.audioSource.pitch = 1 + r - 0.2
+		this.audioSource:Play()
+	end)
+
+	-- self:addEvent("Object", function(this, value)
+	-- 	if value.isWorldPosition then
+	-- 		utils.createObject(nil, this.id, value.action,value.frame, value.x, value.y, 0, 0, value.kind)
+	-- 	else
+	-- 		utils.createObject(nil, this.id, value.action, value.frame, this.rigidbody.position.x + value.x, this.rigidbody.position.y + value.y, 0, 0, value.kind)
+	-- 	end
+	-- end)
+
+	self:addEvent("Body", function(this, value)
+		if this.bodyArray[value.id] == nil and not (value.width == 0 or value.height == 0) then
+			this.bodyArray[value.id] = LColliderBDY:new(this, this.bdy_object, value.id)
+			this.bodyArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.bodyFlags, value.layers)
+			-- this.bodyArray_InstanceID[this.bodyArray[value.id].collider2:GetInstanceID()] = this.bodyArray[value.id]
+			this.bodyArray_InstanceID[this.bodyArray[value.id].collider:GetInstanceID()] = this.bodyArray[value.id]
+
+			-- this.deubg_object.transform.localScale = CS.UnityEngine.Vector3(value.width / 100, value.height / 100, value.width / 100)
+			-- this.deubg_object.transform.localPosition = CS.UnityEngine.Vector3((value.x + value.width / 2) / 100, -(value.y + value.height / 2) / 100, 0)
+		else
+			if this.bodyArray[value.id] ~= nil then
+				if value.width == 0 or value.height == 0 then
+					local IID = this.bodyArray[value.id].collider:GetInstanceID()
+					this.bodyArray[value.id]:deleteCollider()
+					this.bodyArray[value.id] = nil
+					this.bodyArray_InstanceID[IID] = nil
+				else
+					-- this.bodyArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.bodyFlags, value.layers)
+				end
+			end
+		end
+	end)
+
+	self:addEvent("Attack", function(this, value)
+		if this.attckArray[value.id] == nil and not (value.width == 0 or value.height == 0) then
+			this.attckArray[value.id] = LColliderATK:new(this, this.atk_object, value.id)
+			this.attckArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.attackFlags,
+														value.damage, value.fall, value.defence, value.frequency, value.directionX, value.directionY, false, value.var,
+														value.action, value.frame)
+		else
+			if this.attckArray[value.id] ~= nil then
+				if value.width == 0 or value.height == 0 then
+					this.attckArray[value.id]:deleteCollider()
+					this.attckArray[value.id] = nil
+				else
+					-- this.attckArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.attackFlags,
+					-- 										value.damage, value.fall, value.defence, value.frequency, value.directionX, value.directionY, value.ignoreFlag, value.var,
+					-- 										value.action, value.frame)
+				end
+			end
+		end
+	end)
+
+	self:addEvent("Force", function(this, value)
+		-- this.velocity.x = this.velocity.x + value.x
+		-- this.velocity.y = this.velocity.y + value.y
+		-- this.velocity.z = this.velocity.z + value.z
+		local object = this.attckArray["0"].hitObject
+
+		local spd = this.attckArray["0"].direction * 40 / 100
+
+		object.velocity.x = object.velocity.x + spd.x
+		object.velocity.y = object.velocity.y + spd.y
+		object.velocity.z = object.velocity.z + spd.z
+	end)
+
+	self:addEvent("Hurt", function(this, value)
+		this.hp = this.hp - value.damage
+	end)
+
+	-- self:addEvent("TurnRight", function(this, value)
+	-- 	if this.direction.x == -1 and this.target ~= nil and this.physics_object.transform.position.x - this.target.physics_object.transform.position.x < 0 then
+	-- 		this.direction.x = 1
+	-- 	end
+	-- 	if this.direction.x == 1 and this.target ~= nil and this.physics_object.transform.position.x - this.target.physics_object.transform.position.x >= 0 then
+	-- 		this.direction.x = -1
+	-- 	end
+	-- end)
+
+	self:addEvent("Mouse", function(this, value)
+		local mousePos = CS.UnityEngine.Input.mousePosition
+		-- mousePos.z = v3.z
+		local worldPos = utils.CAMERA:ScreenToWorldPoint(mousePos)
+		this.physics_object.transform.position = CS.UnityEngine.Vector3(worldPos.x, 0, worldPos.y - utils.PLAYER.object.physics_object.transform.position.y)
+	end)
+	-- this:frameLoop() -- ????
+
+	-- this.animation:Play(this.action)
+	-- this.functions = CS.Tools.Instance:GetAnimationState(this.animation, this.action)
+
+	self:addEvent("State", function(this, value)
+		this:changeState(value.state)
+	end)
+
+	self:addEvent("Animation", function(this, value)
+		this:changeAnimation(value.animation)
+	end)
+
+	self:addEvent("Child", function(this, value)
+		local object = this.children[value.id]
+		if object ~= nil then
+			if value.rotation ~= nil then
+				object.rotation = value.rotation
+			end
+
+			if value.direction_x ~= nil then
+				object.direction.x = value.direction_x
+			end
+
+			-- local z = value.layer / 100
+			-- if this.root.direction.x == -1 then
+			-- 	z = -z
+			-- end
+			-- object.gameObject.transform.localPosition = CS.UnityEngine.Vector3(value.x / 100, value.y / 100, z)
+
+			object.physics_object.transform.localPosition = CS.UnityEngine.Vector3(this.direction.x * value.x / 100, value.y / 100, 0)
+
+			object.spriteRenderer.sortingOrder = -(value.layer * this.root.direction.z - this.spriteRenderer.sortingOrder)
+		end
+	end)
+
+	self:addEvent("MoveAC", function(this, value)
+		this.accvvvY = value.id
+	end)
+
+	self:addEvent("Move", function(this, value)
+		if value.x ~= nil then
+			this.velocity.x = value.x
+		end
+		if value.y ~= nil then
+			this.velocity.y = value.y
+		end
+		if value.z ~= nil then
+			this.velocity.z = value.z
+		end
+		-- this.rigidbody.position = this.rigidbody.position + CS.UnityEngine.Vector2(v.x, v.y) * CS.UnityEngine.Time.deltaTime
+		-- this.gameObject.transform.position = this.gameObject.transform.position + CS.UnityEngine.Vector3(v.x, v.y, 0) * CS.UnityEngine.Time.deltaTime
+	end)
+
+	self:addEvent("Set", function(this, value)
+		value.func(this)
+	end)
+
+	self:addEvent("TurnToTarget", function(this, value)
+		if this.root.target ~= nil then
+			local pos = this.root.target.physics_object.transform.position
+			if this.root.target.state == "cursor" then
+				local object = this.children[value.id]
+				if object ~= nil then
+					pos.z = pos.z - this.physics_object.transform.localPosition.y * 2 + value.y / 100 * 2
+				end
+			end
+			local rad = CS.UnityEngine.Mathf.Atan2(this.physics_object.transform.position.z - pos.z, this.physics_object.transform.position.x - pos.x)
+
+			local deg = rad * CS.UnityEngine.Mathf.Rad2Deg + 180
+
+			local root = this.root
+			if root ~= nil then
+
+				-- if root.direction.x == -1 then
+				-- 	deg = -(360 - rad * CS.UnityEngine.Mathf.Rad2Deg)
+				-- end
+				this.physics_object.transform.localEulerAngles = CS.UnityEngine.Vector3(0, -deg, 0)
+			end
+		end
+	end)
+
+	self:addEvent("Ray", function(this, value)
+		local hitinfo = nil
+		local s = nil
+		local e = nil
+
+		local first = nil
+		if this.physics_object.transform.childCount > 1 + 1 then
+			first = this.physics_object.transform:GetChild(2)
+		else
+			first = CS.UnityEngine.GameObject("debug_1")
+			first.transform.parent = this.physics_object.transform
+		end
+		if first ~= nil then
+			local flag, lr = first:TryGetComponent(typeof(CS.UnityEngine.LineRenderer))
+
+			if not flag then
+				lr = first:AddComponent(typeof(CS.UnityEngine.LineRenderer))
+
+				lr.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
+				lr.startWidth = 0.02
+				lr.endWidth = 0.02
+
+				-- local color = CS.UnityEngine.Color.green
+				local color = CS.UnityEngine.Color.red
+
+				lr.startColor = color
+				color.a = 0
+				lr.endColor = color
+				lr.numCapVertices = 90
+				lr.material = utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY
+
+				-- lr.useWorldSpace = false
+			end
+
+			if lr ~= nil then
+				local r = this.physics_object.transform.rotation
+				-- local r = CS.UnityEngine.Quaternion.Euler(r2.x, r2.z, r2.y)
+				-- pos = r * CS.UnityEngine.Vector3(v.x / 100 * 2, -v.y / 100 * 2, 0)
+
+				-- pos = CS.UnityEngine.Quaternion.Euler() * CS.UnityEngine.Vector3(v.x / 100 * 2, -v.y / 100 * 2, 0)
+
+				-- hitinfo = CS.Tools.Instance:PhysicsRaycastAll(pos + this.rigidbody.position, this.gameObject.transform.right, 25, 15)
+
+				-- local gen = pos + this.physics_object.transform.position
+				local gen = this.physics_object.transform:TransformPoint(CS.UnityEngine.Vector3(v.x / 100, -v.y / 100, 0))
+
+				hitinfo = CS.Tools.Instance:PhysicsRaycast(gen, this.physics_object.transform.right, 25, 1048575)
+				-- local t_pos = this.root.target.gameObject.transform.position
+				-- local offset = t_pos - (pos + this.rigidbody.position)
+				-- hitinfo = CS.Tools.Instance:PhysicsRaycast(pos + this.rigidbody.position, offset.normalized, offset.magnitude, 15)
+
+				if hitinfo.collider ~= nil then
+					s = gen
+					e = hitinfo.point
+					-- lr:SetPosition(0, s)
+					-- lr:SetPosition(1, e)
+					lr:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
+					lr:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
+				else
+					s = gen
+					e = gen + this.physics_object.transform.right * 25
+					-- lr:SetPosition(0, s)
+					-- lr:SetPosition(1, e)
+					lr:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
+					lr:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
+				end
+			end
+		end
+
+		-- local second = nil
+		-- if this.physics_object.transform.childCount > 2 + 1 then
+		-- 	second = this.physics_object.transform:GetChild(3)
+		-- else
+		-- 	second = CS.UnityEngine.GameObject("debug_2")
+		-- 	second.transform.parent = this.physics_object.transform
+		-- end
+		-- if second ~= nil then
+		-- 	local flag, lr = second:TryGetComponent(typeof(CS.UnityEngine.LineRenderer))
+
+		-- 	if not flag then
+		-- 		lr = second:AddComponent(typeof(CS.UnityEngine.LineRenderer))
+
+		-- 		lr.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
+		-- 		lr.startWidth = 0.02
+		-- 		lr.endWidth = 0.02
+
+		-- 		local color = CS.UnityEngine.Color.red
+
+		-- 		lr.startColor = color
+		-- 		color.a = 0
+		-- 		lr.endColor = color
+		-- 		lr.numCapVertices = 90
+		-- 		lr.material = utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY
+
+		-- 		-- lr.useWorldSpace = false
+		-- 	end
+
+		-- 	if lr ~= nil then
+		-- 		lr:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
+		-- 		lr:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
+		-- 	end
+		-- end
+	end)
+
+	self:addEvent("Object", function(this, value)
+
+		local d = this.root.direction.x
+		
+		for i2 = 1, value.amount, 1 do
+
+			local r = CS.Tools.Instance:RandomRangeInt(0, value.precise + 1) - value.precise / 2
+
+			local rot = nil
+			local velocityyy = nil
+			local offset = nil
+			if value.amount > 1 then
+				offset = CS.Tools.Instance:RandomRangeInt(0, value.precise)
+			else
+				offset = 0
+			end
+
+			local randomvector = CS.UnityEngine.Vector3(0, CS.Tools.Instance:RandomRangeFloat(0, 1), CS.Tools.Instance:RandomRangeFloat(0, 1)).normalized
+
+			rot = CS.UnityEngine.Quaternion.AngleAxis(r, randomvector) * this.physics_object.transform.rotation 
+
+			velocityyy = rot * CS.UnityEngine.Vector3(value.x2 - offset, value.y2, value.z2)
+
+			local pos = this.physics_object.transform.rotation * CS.UnityEngine.Vector3(value.x / 100 * 2, -value.y / 100 * 2, 0)
+
+			local kk = nil
+			if value.animation == "shell1" or value.animation == "shell2" then
+				kk = 99
+			else
+				kk = 5
+			end
+			local object = utils.createObject(nil, tonumber(value.id), value.animation, 0, value.state, this.rigidbody.position.x + pos.x, this.rigidbody.position.y + pos.y, this.rigidbody.position.z + pos.z, velocityyy.x, velocityyy.y, velocityyy.z, kk)
+			object.team = this.team
+			-- local lr = object.pic_object:AddComponent(typeof(CS.UnityEngine.LineRenderer))
+			-- -- lr.enabled = false
+			-- lr.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
+			-- lr.startWidth = 0.01
+			-- lr.endWidth = 0.02
+
+			-- local rc = CS.Tools.Instance:RandomRangeInt(0, #v.colors) + 1
+			-- local color = CS.Tools.Instance:ColorTryParseHtmlString("#" .. string.format("%X", v.colors[rc].color))
+
+			-- lr.startColor = color
+			-- lr.endColor = color
+			-- lr.numCapVertices = 90
+			-- lr.material = utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY
+
+			object.direction.x = d
+
+			object.physics_object.transform.rotation = rot
+
+			-- object.rotation = rot.eulerAngles.z
+			
+		end
+	end)
+
+	self:addEvent("Rotation", function(this, value)
+		if this.rotation_velocity == 0 then
+			this.rotation_velocity = value.y2
+		end
+	end)
+
+	self:addEvent("Destory", function(this, value)
+		utils.destroyObject(this.physics_object:GetInstanceID())
+	end)
+
+	self:addEvent("OnClick", function(this, value)
+		utils.invokeEvent("OnClick", this)
+	end)
 end
+
+function LCastleDBCharacter:setState(from, to)
+	local temp = {}
+	for j, v2 in ipairs(from) do
+		if v2.active then
+
+			local _json = nil
+			local _category = nil
+
+			if v2.category == "Set" and type(v2.json) == "string" then
+				_category = v2.category
+				_json = {}
+				_json.func = assert(load("function _set(this) " .. v2.json .. " end return _set", "set", "t", Rubbish))()
+			else
+				local s = nil
+				if v2.json ~= nil then
+					for k, v3 in pairs(v2.json) do
+						local str = v3
+						local p = ""
+						if type(str) == "string" and string.sub(v3, 1, 1) == "-" then
+							str = string.sub(v3, 2)
+							p = "-"
+							print(p)
+						end
+						if type(str) == "string" and tonumber(str) == nil and assert(load("return vars." .. str .." ~= nil", "vars", "t", self))() then
+							if s == nil then
+								s = {}
+							end
+							s[k] = p .. "this.database.vars." .. str
+						end
+					end
+				end
+				if s ~= nil then
+					local value = "{"
+					for k, v3 in pairs(v2.json) do
+						if s[k] ~= nil then
+							value = value .. k .. " = " .. s[k] .. ", "
+						else
+							value = value .. k .. " = " .. v3 .. ", "
+						end
+					end
+					value = string.sub(value, 1, -3)
+					value = value .. "}"
+					-- print(value)
+					_category = "Set"
+					_json = {}
+					_json.func = assert(load("function _set(this) " .. "this.database:invokeEvent('" .. v2.category .. "', this, " .. value .. ")" .. " end return _set", "set", "t", Rubbish))()
+				else
+					_category = v2.category
+					_json = utils.deep_copy(v2.json)
+				end
+			end
+
+			if tonumber(v2.trigger) then
+				table.insert(temp[tonumber(v2.trigger)].test, {category = v2.category, json = _json})
+			else
+				local stateDef = {}
+				stateDef.func = nil
+				stateDef.test = {}
+
+				if v2.trigger ~= nil and v2.trigger ~= "" then
+					stateDef.func = assert(load("function _trigger(this) return " .. v2.trigger .. " end return _trigger", "trigger", "t", Rubbish))()
+				end
+
+				table.insert(stateDef.test, {category = _category, json = _json})
+
+				table.insert(to, stateDef)
+				temp[j - 1] = stateDef
+			end
+		end
+	end
+end
+
+-- 添加事件
+function LCastleDBCharacter:addEvent(eventName, action)
+	if not self.eventManager[eventName] then
+		self.eventManager[eventName] = Delegate()
+	end
+	self.eventManager[eventName].add(action)
+end
+
+-- 移除事件
+function LCastleDBCharacter:removeEvent(eventName, action)
+	self.eventManager[eventName].delete(action)
+end
+
+-- 移除所有事件
+function LCastleDBCharacter:removeAllEvent()
+	self.eventManager = {}
+end
+
+-- 触发事件
+function LCastleDBCharacter:invokeEvent(eventName, ...)
+	if self.eventManager[eventName] then
+		self.eventManager[eventName].invoke(...)
+	end
+end
+
+---------------------------------------------------------------------------------------

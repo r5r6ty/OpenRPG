@@ -6,16 +6,16 @@
 
 local utils = require "LUtils"
 
---~ -- ¹¹ÔìÌålinker
+--~ -- æ„é€ ä½“linker
 --~ local linker = {kind = 0, pos = {}}
--- ÀàµÄÉùÃ÷£¬ÕâÀïÉùÃ÷ÁËÀàÃû»¹ÓĞÊôĞÔ£¬²¢ÇÒ¸ø³öÁËÊôĞÔµÄ³õÊ¼Öµ
+-- ç±»çš„å£°æ˜ï¼Œè¿™é‡Œå£°æ˜äº†ç±»åè¿˜æœ‰å±æ€§ï¼Œå¹¶ä¸”ç»™å‡ºäº†å±æ€§çš„åˆå§‹å€¼
 tileRoom = {name = nil, x = 0, y = 0, width = 0, height = 0, linkers = nil, map = nil}
--- ÉèÖÃÔª±íµÄË÷Òı£¬ÏëÄ£ÄâÀàµÄ»°£¬Õâ²½²Ù×÷ºÜ¹Ø¼ü
+-- è®¾ç½®å…ƒè¡¨çš„ç´¢å¼•ï¼Œæƒ³æ¨¡æ‹Ÿç±»çš„è¯ï¼Œè¿™æ­¥æ“ä½œå¾ˆå…³é”®
 tileRoom.__index = tileRoom
--- ¹¹Ôì·½·¨new
+-- æ„é€ æ–¹æ³•new
 function tileRoom:new(x, y, level, map, n)
-    local self = {}  --³õÊ¼»¯self£¬Èç¹ûÃ»ÓĞÕâ¾ä£¬ÄÇÃ´ÀàËù½¨Á¢µÄ¶ÔÏóÈç¹ûÓĞÒ»¸ö¸Ä±ä£¬ÆäËû¶ÔÏó¶¼»á¸Ä±ä
-    setmetatable(self, tileRoom)  --½«selfµÄÔª±íÉè¶¨ÎªClass
+    local self = {}  --åˆå§‹åŒ–selfï¼Œå¦‚æœæ²¡æœ‰è¿™å¥ï¼Œé‚£ä¹ˆç±»æ‰€å»ºç«‹çš„å¯¹è±¡å¦‚æœæœ‰ä¸€ä¸ªæ”¹å˜ï¼Œå…¶ä»–å¯¹è±¡éƒ½ä¼šæ”¹å˜
+    setmetatable(self, tileRoom)  --å°†selfçš„å…ƒè¡¨è®¾å®šä¸ºClass
     self.x = x
     self.y = y
     self.width = level.width
@@ -24,7 +24,7 @@ function tileRoom:new(x, y, level, map, n)
 	self.linkers = {}
 	self.map = {}
 
-	-- °ÑroomµÄĞÅÏ¢Ğ´ÈëmapÖĞ
+	-- æŠŠroomçš„ä¿¡æ¯å†™å…¥mapä¸­
     for i = x, x + level.width - 1, 1 do
         if map[i] == nil then
             map[i] = {}
@@ -32,7 +32,7 @@ function tileRoom:new(x, y, level, map, n)
 		self.map[i] = {}
         for j = y, y + level.height - 1, 1 do
             local num = ((i - x) + (j - y) * level.width) + 1
-			-- Èç¹ûÒªÉú³ÉµÄ·¿¼äµÄÎ»ÖÃÉÏÃ»ÓĞ»òÕßÊÇÇ½±Ú£¬²ÅÉú³É·¿¼ä
+			-- å¦‚æœè¦ç”Ÿæˆçš„æˆ¿é—´çš„ä½ç½®ä¸Šæ²¡æœ‰æˆ–è€…æ˜¯å¢™å£ï¼Œæ‰ç”Ÿæˆæˆ¿é—´
 			if map[i][j] == nil or map[i][j] == 0  then
 				map[i][j] = level.blocks[num]
 			end
@@ -40,7 +40,7 @@ function tileRoom:new(x, y, level, map, n)
         end
     end
 
-	-- Éî¿½±´levelÖĞµÄÁ¬½Óµã£¬°ÑÁ¬½Óµã×ø±ê¼ÓÉÏ·¿¼ä×ø±êµÃµ½Êµ¼Ê×ø±ê
+	-- æ·±æ‹·è´levelä¸­çš„è¿æ¥ç‚¹ï¼ŒæŠŠè¿æ¥ç‚¹åæ ‡åŠ ä¸Šæˆ¿é—´åæ ‡å¾—åˆ°å®é™…åæ ‡
 	if #level.connectors > 0 then
 		print(#level.connectors)
 		self.linkers = utils.deep_copy(level.connectors)
@@ -56,19 +56,19 @@ function tileRoom:new(x, y, level, map, n)
 		end
 	end
 --    print("new", self.linkers, level.connectors)
-    return self  --·µ»Ø×ÔÉí
+    return self  --è¿”å›è‡ªèº«
 end
 
--- Á¬½Ó·¿¼ä£¨ÄÄ¸öÁ¬½Óµã£¬·¿¼äÔ¤Éè£¬´óµØÍ¼£©
+-- è¿æ¥æˆ¿é—´ï¼ˆå“ªä¸ªè¿æ¥ç‚¹ï¼Œæˆ¿é—´é¢„è®¾ï¼Œå¤§åœ°å›¾ï¼‰
 function tileRoom:link(linkIndex, level, map, n)
 	if #self.linkers == 0 then
 		return nil, nil, nil
 	end
-	-- ×Ô¼ºroomµÄÁ¬½ÓµãÔİÊ±Ñ¡ÔñÎªµÚ1¸ö
+	-- è‡ªå·±roomçš„è¿æ¥ç‚¹æš‚æ—¶é€‰æ‹©ä¸ºç¬¬1ä¸ª
     local myLinker = self.linkers[linkIndex]
     local ml_x = myLinker.position[1].x
     local ml_y = myLinker.position[1].y
-	-- Éî¿½±´levelµÄÁ¬½Óµã·ÅÈëÁÙÊ±
+	-- æ·±æ‹·è´levelçš„è¿æ¥ç‚¹æ”¾å…¥ä¸´æ—¶
     local temp = utils.deep_copy(level.connectors)
     local num = CS.Tools.Instance:RandomRangeInt(1, #temp + 1)
     local linker = temp[num]
@@ -76,24 +76,24 @@ function tileRoom:link(linkIndex, level, map, n)
 	local y2 = nil
 	-- print("temp: " .. #temp)
 
-	-- Èç¹ûÁÙÊ±ÖĞÓĞÁ¬½Óµã£¬Ëæ»úÄÃÒ»¸öÀ´judge
+	-- å¦‚æœä¸´æ—¶ä¸­æœ‰è¿æ¥ç‚¹ï¼Œéšæœºæ‹¿ä¸€ä¸ªæ¥judge
     while #temp > 0 do
-		-- Èç¹ûÁ¬½Óµã²»Âú×ãÒÔÏÂÌõ¼ş£¬ÔòÅĞ¶ÏÎª¿ÉÒÔÉú³ÉÁ¬½Ó£¬·ñÔòremoveÕâ¸öÁ¬½Óµã
-		if myLinker.kind ~= linker.kind or myLinker.isConnected ~= linker.isConnected then -- or myLinker.width ~= linker.width or myLinker.height ~= linker.height -- ¿í¶È£¬¸ß¶ÈÔİÊ±²»¿¼ÂÇ
+		-- å¦‚æœè¿æ¥ç‚¹ä¸æ»¡è¶³ä»¥ä¸‹æ¡ä»¶ï¼Œåˆ™åˆ¤æ–­ä¸ºå¯ä»¥ç”Ÿæˆè¿æ¥ï¼Œå¦åˆ™removeè¿™ä¸ªè¿æ¥ç‚¹
+		if myLinker.kind ~= linker.kind or myLinker.isConnected ~= linker.isConnected then -- or myLinker.width ~= linker.width or myLinker.height ~= linker.height -- å®½åº¦ï¼Œé«˜åº¦æš‚æ—¶ä¸è€ƒè™‘
 			table.remove(temp, num)
 			num = CS.Tools.Instance:RandomRangeInt(1, #temp + 1)
 			linker = temp[num]
 		else
-			-- Èç¹ûÅĞ¶ÏÎª¿ÉÒÔÉú³ÉÁ¬½Ó£¬Ôò½øÈëjudgeÑ­»·
+			-- å¦‚æœåˆ¤æ–­ä¸ºå¯ä»¥ç”Ÿæˆè¿æ¥ï¼Œåˆ™è¿›å…¥judgeå¾ªç¯
 
-			-- Éî¿½±´level
+			-- æ·±æ‹·è´level
 			local tempLevel = utils.deep_copy(level)
 			local ip = {}
 			for a = 1, #tempLevel.connectors, 1 do
 				for b = 1, #tempLevel.connectors[a].position, 1 do
 					local x = tempLevel.connectors[a].position[b].x
 					local y = tempLevel.connectors[a].position[b].y
-					-- ½«µ±Ç°ÒÔÍâµÄÁ¬½Ó´¦È«²¿·âÉÏ£¬µ±Ç°Á´½ÓµÄµã·ÅÈëÊı×é
+					-- å°†å½“å‰ä»¥å¤–çš„è¿æ¥å¤„å…¨éƒ¨å°ä¸Šï¼Œå½“å‰é“¾æ¥çš„ç‚¹æ”¾å…¥æ•°ç»„
 					if tempLevel.connectors[a].index ~= linker.index then
 						tempLevel.blocks[(x + y * tempLevel.width) + 1] = 1
 					else
@@ -106,7 +106,7 @@ function tileRoom:link(linkIndex, level, map, n)
 			local n = CS.Tools.Instance:RandomRangeInt(1, #linker.position + 1)
 			while #linker.position > 0 do
 				x2, y2 = self:judge(n, linker, ml_x, ml_y, tempLevel, map, ip)
-				-- judge½á¹ûÎªÃ»ÓĞ×ø±ê£¬ÔòremoveÕâ¸öÁ¬½ÓµãµÄÆäÖĞÒ»¸ö×ø±êµã£¬·ñÔòbreak
+				-- judgeç»“æœä¸ºæ²¡æœ‰åæ ‡ï¼Œåˆ™removeè¿™ä¸ªè¿æ¥ç‚¹çš„å…¶ä¸­ä¸€ä¸ªåæ ‡ç‚¹ï¼Œå¦åˆ™break
 				if x2 == nil or y2 == nil then
 					table.remove(linker.position, n)
 					n = CS.Tools.Instance:RandomRangeInt(1, #linker.position + 1)
@@ -115,7 +115,7 @@ function tileRoom:link(linkIndex, level, map, n)
 					break
 				end
 			end
-			-- Èç¹ûÕÒµ½ÁË¿ÉÒÔ´´½¨·¿¼äµÄµã£¬Ôòbreak£¬·ñÔòremoveÕâ¸öÁ¬½Óµã
+			-- å¦‚æœæ‰¾åˆ°äº†å¯ä»¥åˆ›å»ºæˆ¿é—´çš„ç‚¹ï¼Œåˆ™breakï¼Œå¦åˆ™removeè¿™ä¸ªè¿æ¥ç‚¹
 			if f == false then
 				table.remove(temp, num)
 				num = CS.Tools.Instance:RandomRangeInt(1, #temp + 1)
@@ -131,18 +131,18 @@ function tileRoom:link(linkIndex, level, map, n)
         return nil, nil, nil
     end
 
-	-- ´´½¨·¿¼ä
+	-- åˆ›å»ºæˆ¿é—´
 	local r = self:new(x2, y2, level, map, n)
 	-- print("created room name: ".. n .. ", x2: " .. x2 .. ", y2: " .. y2)
 
-	-- Á¬½Ó´¦ÉèÖÃÎªÒÑÁ¬½Ó
+	-- è¿æ¥å¤„è®¾ç½®ä¸ºå·²è¿æ¥
     myLinker.isConnected = true
 	r.linkers[linker.index].isConnected = true
 
     return x2, y2, r
 end
 
--- ÅĞ¶¨·¿¼äÊÇ·ñÄÜ±»Éú³É£¬·µ»Ø·¿¼ä×óÉÏ½ÇµÄ×ø±ê
+-- åˆ¤å®šæˆ¿é—´æ˜¯å¦èƒ½è¢«ç”Ÿæˆï¼Œè¿”å›æˆ¿é—´å·¦ä¸Šè§’çš„åæ ‡
 function tileRoom:judge(n, linker, ml_x, ml_y, level, map, ignorePoint)
     local l_x = linker.position[n].x
     local l_y = linker.position[n].y
@@ -157,13 +157,13 @@ function tileRoom:judge(n, linker, ml_x, ml_y, level, map, ignorePoint)
         for j = y2, y2 + level.height - 1, 1 do
             if map[i] ~= nil then
                 if map[i][j] ~= nil then
-					-- ·¿¼äºÍmapÓĞ²»Í¬µÄ·½¿éµÄ»°¾ÍÅĞ¶ÏÎªÊ§°Ü
+					-- æˆ¿é—´å’Œmapæœ‰ä¸åŒçš„æ–¹å—çš„è¯å°±åˆ¤æ–­ä¸ºå¤±è´¥
 
 					if map[i][j] ~= level.blocks[((i - x2) + (j - y2) * level.width) + 1] then
 						-- print(i, j, map[i][j], level.blocks[((i - x2) + (j - y2) * level.width) + 1], i - x2, j - y2)
 						-- print("gen map failed0")
 
-						-- µ±Ç°Á¬½Ó´¦µÄµã²»×öÅĞ¶Ï£¬Ö±½Ó+1
+						-- å½“å‰è¿æ¥å¤„çš„ç‚¹ä¸åšåˆ¤æ–­ï¼Œç›´æ¥+1
 						local b = false
 						for f = 1, #ignorePoint, 1 do
 							if i - x2 == ignorePoint[f].cx and j - y2 == ignorePoint[f].cy then
@@ -183,7 +183,7 @@ function tileRoom:judge(n, linker, ml_x, ml_y, level, map, ignorePoint)
             end
         end
     end
-	-- Èç¹û·¿¼äÍêÈ«ÖØµşÔòÅĞ¶ÏÎªÊ§°Ü
+	-- å¦‚æœæˆ¿é—´å®Œå…¨é‡å åˆ™åˆ¤æ–­ä¸ºå¤±è´¥
 	if count == #level.blocks then
 		-- print("gen map failed1")
 		return nil, nil
@@ -192,9 +192,9 @@ function tileRoom:judge(n, linker, ml_x, ml_y, level, map, ignorePoint)
 	return x2, y2
 end
 
--- ·â±ÕÁ´½Óµã
+-- å°é—­é“¾æ¥ç‚¹
 function tileRoom:close(map)
-	-- Èç¹ûÁ¬½ÓµãÃ»ÓĞ±»Á¬½Ó£¬ÔòÉèÖÃÎª1£¨Ç½±Ú£©
+	-- å¦‚æœè¿æ¥ç‚¹æ²¡æœ‰è¢«è¿æ¥ï¼Œåˆ™è®¾ç½®ä¸º1ï¼ˆå¢™å£ï¼‰
     for i = 1, #self.linkers, 1 do
         if self.linkers[i].isConnected == false then
             for j = 1, #self.linkers[i].position, 1 do

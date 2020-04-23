@@ -81,4 +81,23 @@ public class TestConsole : MonoBehaviour
     {
         t.text += txt + "\n";
     }
+
+    private static void HandleLog2(string message, string stackTrace, LogType type)
+    {
+        if (type == LogType.Exception || type == LogType.Error)
+        {
+            System.Console.WriteLine(type.ToString() + ":" + message + "\n stack: " + stackTrace);
+            Time.timeScale = 0;
+            Application.logMessageReceived -= HandleLog2;
+        }
+        else if (type == LogType.Log)
+        {
+            System.Console.WriteLine(message);
+        }
+    }
+
+    public static void Start2()
+    {
+        Application.logMessageReceived += HandleLog2;
+    }
 }

@@ -18,12 +18,12 @@
 				{
 					"name": "HP",
 					"default": 500,
-					"active": false
+					"active": true
 				},
 				{
 					"name": "maxHP",
 					"default": 500,
-					"active": false
+					"active": true
 				},
 				{
 					"name": "HPRecoveryRate",
@@ -33,12 +33,12 @@
 				{
 					"name": "MP",
 					"default": 500,
-					"active": false
+					"active": true
 				},
 				{
 					"name": "maxMP",
 					"default": 500,
-					"active": false
+					"active": true
 				},
 				{
 					"name": "MPRecoveryRate",
@@ -115,9 +115,19 @@
 					"name": "runSpeed",
 					"active": true,
 					"default": {
-						"x": 1,
-						"z": 1
+						"x": true,
+						"z": true
 					}
+				},
+				{
+					"name": "ammo",
+					"active": true,
+					"default": true
+				},
+				{
+					"name": "maxAmmo",
+					"active": true,
+					"default": true
 				}
 			],
 			"props": [],
@@ -140,9 +150,474 @@
 			]
 		},
 		{
-			"name": "prototype",
-			"columns": [],
-			"lines": [],
+			"name": "groups",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "name",
+					"display": null
+				},
+				{
+					"typeStr": "8",
+					"name": "group",
+					"display": null
+				},
+				{
+					"typeStr": "2",
+					"name": "active"
+				}
+			],
+			"lines": [
+				{
+					"group": [
+						{
+							"component": "Active"
+						},
+						{
+							"component": "DataBase",
+							"value": [
+								9
+							]
+						},
+						{
+							"component": "SpriteRenderer"
+						},
+						{
+							"component": "Sound"
+						},
+						{
+							"component": "Animation",
+							"value": [
+								"shell2"
+							]
+						},
+						{
+							"component": "State",
+							"value": [
+								"shell2"
+							]
+						},
+						{
+							"component": "Physics"
+						},
+						{
+							"component": "BDY"
+						},
+						{
+							"component": "Sleep"
+						},
+						{
+							"component": "Gravity"
+						}
+					],
+					"name": "shell2",
+					"active": true
+				},
+				{
+					"name": "shell1",
+					"group": [
+						{
+							"component": "Active"
+						},
+						{
+							"component": "DataBase",
+							"value": [
+								9
+							]
+						},
+						{
+							"component": "SpriteRenderer"
+						},
+						{
+							"component": "Sound"
+						},
+						{
+							"component": "Animation",
+							"value": [
+								"shell1"
+							]
+						},
+						{
+							"component": "State",
+							"value": [
+								"shell1"
+							]
+						},
+						{
+							"component": "Physics"
+						},
+						{
+							"component": "BDY"
+						},
+						{
+							"component": "Sleep"
+						},
+						{
+							"component": "Gravity"
+						}
+					],
+					"active": true
+				},
+				{
+					"name": "fire_effect2",
+					"group": [
+						{
+							"component": "Active"
+						},
+						{
+							"component": "DataBase",
+							"value": [
+								9
+							]
+						},
+						{
+							"component": "SpriteRenderer"
+						},
+						{
+							"component": "Sound"
+						},
+						{
+							"component": "Animation",
+							"value": [
+								"fire_effect2"
+							]
+						},
+						{
+							"component": "State",
+							"value": [
+								"fire_effect2"
+							]
+						},
+						{
+							"component": "Physics"
+						}
+					],
+					"active": true
+				},
+				{
+					"name": "fire_effect",
+					"group": [
+						{
+							"component": "Active"
+						},
+						{
+							"component": "DataBase",
+							"value": [
+								9
+							]
+						},
+						{
+							"component": "SpriteRenderer"
+						},
+						{
+							"component": "Sound"
+						},
+						{
+							"component": "Animation",
+							"value": [
+								"fire_effect"
+							]
+						},
+						{
+							"component": "State",
+							"value": [
+								"fire_effect2"
+							]
+						},
+						{
+							"component": "Physics"
+						}
+					],
+					"active": true
+				},
+				{
+					"name": "blood_effect",
+					"group": [
+						{
+							"component": "Active"
+						},
+						{
+							"component": "DataBase",
+							"value": [
+								9
+							]
+						},
+						{
+							"component": "SpriteRenderer"
+						},
+						{
+							"component": "Animation",
+							"value": [
+								"blood_effect"
+							]
+						},
+						{
+							"component": "Sound"
+						},
+						{
+							"component": "State",
+							"value": [
+								"fire_effect2"
+							]
+						},
+						{
+							"component": "Physics"
+						}
+					],
+					"active": true
+				},
+				{
+					"name": "bullet",
+					"group": [
+						{
+							"component": "Active"
+						},
+						{
+							"component": "DataBase",
+							"value": [
+								9
+							]
+						},
+						{
+							"component": "SpriteRenderer"
+						},
+						{
+							"component": "TrailRenderer"
+						},
+						{
+							"component": "Animation",
+							"value": [
+								"bullet"
+							]
+						},
+						{
+							"component": "State",
+							"value": [
+								"bullet"
+							]
+						},
+						{
+							"component": "Physics"
+						},
+						{
+							"component": "BDY"
+						},
+						{
+							"component": "ATK"
+						}
+					],
+					"active": true
+				},
+				{
+					"name": "bullet",
+					"group": [
+						{
+							"component": "Active"
+						},
+						{
+							"component": "DataBase",
+							"value": [
+								9
+							]
+						},
+						{
+							"component": "Animation",
+							"value": [
+								"bullet"
+							]
+						},
+						{
+							"component": "State",
+							"value": [
+								"bullet"
+							]
+						},
+						{
+							"component": "Physics"
+						},
+						{
+							"component": "BDY"
+						},
+						{
+							"component": "LineRenderer"
+						}
+					],
+					"active": false
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "prototypes",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "name"
+				},
+				{
+					"typeStr": "8",
+					"name": "prototype",
+					"display": null
+				},
+				{
+					"typeStr": "2",
+					"name": "active",
+					"display": null
+				}
+			],
+			"lines": [
+				{
+					"name": "girl",
+					"prototype": [
+						{
+							"id": 9,
+							"animation": "body_idle_front",
+							"state": "aim",
+							"name": "body",
+							"kind": 0,
+							"vars": [
+								{
+									"var": "runSpeed",
+									"default": {
+										"x": 1,
+										"z": 1
+									}
+								},
+								{
+									"var": "HP",
+									"default": 250
+								},
+								{
+									"var": "maxHP",
+									"default": 500
+								},
+								{
+									"var": "MP",
+									"default": 250
+								},
+								{
+									"var": "maxMP",
+									"default": 500
+								}
+							]
+						},
+						{
+							"name": "lefthand",
+							"parent": "girl,body",
+							"id": 9,
+							"animation": "aim_right_hand",
+							"state": "left_aim_hand",
+							"id2": "0",
+							"kind": 0,
+							"vars": []
+						},
+						{
+							"name": "righthand",
+							"parent": "girl,body",
+							"id": 9,
+							"animation": "aim_right_hand",
+							"state": "right_aim_hand",
+							"id2": "1",
+							"kind": 0,
+							"vars": []
+						}
+					],
+					"active": true
+				},
+				{
+					"name": "girl_with_gun1",
+					"prototype": [
+						{
+							"name": "gun",
+							"id": 9,
+							"animation": "aim_weapon_HK416c",
+							"state": "weapon_idle_HK416c",
+							"parent": "girl,righthand",
+							"id2": "0",
+							"kind": 0,
+							"vars": [
+								{
+									"var": "ammo",
+									"default": 30
+								},
+								{
+									"var": "ammo",
+									"default": 30
+								}
+							]
+						}
+					],
+					"active": true
+				},
+				{
+					"name": "girl_with_gun2_shield",
+					"prototype": [
+						{
+							"name": "gun",
+							"id": 9,
+							"animation": "aim_weapon_J",
+							"state": "weapon_idle_J",
+							"parent": "girl,righthand",
+							"id2": "0",
+							"kind": 0,
+							"vars": [
+								{
+									"var": "ammo",
+									"default": 30
+								},
+								{
+									"var": "ammo",
+									"default": 30
+								}
+							]
+						},
+						{
+							"name": "shield",
+							"id": 9,
+							"animation": "shield_0_front",
+							"state": "shield_0",
+							"kind": 0,
+							"vars": [],
+							"parent": "girl,lefthand",
+							"id2": "0"
+						}
+					],
+					"active": true
+				},
+				{
+					"name": "UI_HP",
+					"prototype": [
+						{
+							"name": "white",
+							"id": 9,
+							"animation": "UI_HP",
+							"kind": 1,
+							"vars": [],
+							"state": "UI_HP"
+						},
+						{
+							"name": "black",
+							"id": 9,
+							"animation": "UI_HP_black",
+							"kind": 1,
+							"vars": [],
+							"parent": "UI_HP,white",
+							"id2": "0"
+						},
+						{
+							"name": "red",
+							"id": 9,
+							"animation": "UI_HP_red",
+							"kind": 1,
+							"vars": [],
+							"parent": "UI_HP,white",
+							"id2": "1"
+						}
+					],
+					"active": true
+				}
+			],
 			"separators": [],
 			"props": {}
 		},
@@ -1188,11 +1663,25 @@
 					"comment": "",
 					"necessary": [],
 					"optional": []
+				},
+				{
+					"id": "Bind",
+					"color": 0,
+					"comment": "",
+					"necessary": [],
+					"optional": []
+				},
+				{
+					"id": "UnBind",
+					"color": 0,
+					"comment": "",
+					"necessary": [],
+					"optional": []
 				}
 			],
 			"props": [],
 			"separators": [
-				30
+				32
 			],
 			"name": "frameType",
 			"columns": [
@@ -1233,59 +1722,6 @@
 				{
 					"name": "default",
 					"typeStr": "16"
-				}
-			]
-		},
-		{
-			"lines": [
-				{
-					"id": "Idle",
-					"kind": "<>"
-				},
-				{
-					"id": "Walk",
-					"kind": "~"
-				},
-				{
-					"id": "Run",
-					"kind": "~"
-				},
-				{
-					"id": "Jump",
-					"kind": "~"
-				},
-				{
-					"id": "Dash",
-					"kind": ""
-				},
-				{
-					"id": "Injured",
-					"kind": ""
-				},
-				{
-					"id": "hissatsu",
-					"kind": ""
-				},
-				{
-					"id": "XaxisMove",
-					"kind": ""
-				},
-				{
-					"id": "YaxisMove",
-					"kind": ""
-				}
-			],
-			"props": [],
-			"separators": [],
-			"name": "actionType",
-			"columns": [
-				{
-					"name": "id",
-					"typeStr": "0"
-				},
-				{
-					"name": "kind",
-					"typeStr": "1"
 				}
 			]
 		},
@@ -1796,7 +2232,7 @@
 							"category": "Sprite",
 							"sprite": "c17edd9a009e17594a7934bf316b8510",
 							"wait": 598,
-							"x": -18,
+							"x": -17,
 							"y": -5
 						}
 					]
@@ -1853,7 +2289,7 @@
 					"clips": [
 						{
 							"category": "Attack",
-							"wait": 1,
+							"wait": 600,
 							"id": "0",
 							"x": 0,
 							"y": 0,
@@ -1861,10 +2297,10 @@
 							"height": 1
 						},
 						{
-							"wait": 1,
+							"wait": 600,
 							"x": 0,
 							"y": 0,
-							"category": "Trace"
+							"category": "Sprite"
 						}
 					]
 				},
@@ -1879,7 +2315,8 @@
 							"width": 2,
 							"height": 2,
 							"id": "0",
-							"bodyFlags": 1
+							"bodyFlags": 1,
+							"bounciness": 0.7
 						},
 						{
 							"sprite": "52c3a3ff78f2d5ee224f9e794be9d923",
@@ -1901,7 +2338,8 @@
 							"width": 2,
 							"height": 2,
 							"id": "0",
-							"bodyFlags": 1
+							"bodyFlags": 1,
+							"bounciness": 0.7
 						},
 						{
 							"sprite": "952ff89bc127d28b14479be282e68ed3",
@@ -1989,7 +2427,7 @@
 							"category": "Sprite",
 							"sprite": "3af11424e3fefc6e20655deba999294f",
 							"wait": 598,
-							"x": -4,
+							"x": -3,
 							"y": -6
 						}
 					]
@@ -2011,7 +2449,7 @@
 					"clips": [
 						{
 							"sprite": "de2ed0865b33813536db7aebb4259028",
-							"x": -19,
+							"x": -20,
 							"y": -9,
 							"wait": 1,
 							"category": "Sprite"
@@ -2020,7 +2458,7 @@
 							"category": "Sprite",
 							"sprite": "de2ed0865b33813536db7aebb4259028",
 							"wait": 1,
-							"x": -19,
+							"x": -20,
 							"y": -9
 						},
 						{
@@ -2178,7 +2616,9 @@
 							"x": 0,
 							"y": 0,
 							"width": 23,
-							"height": 23
+							"height": 23,
+							"horizontalAlignment": 1,
+							"verticalAlignment": 1
 						}
 					]
 				},
@@ -2239,6 +2679,86 @@
 							"height": 100
 						}
 					]
+				},
+				{
+					"name": "UI_HP",
+					"clips": [
+						{
+							"category": "Image",
+							"wait": 6000,
+							"width": 202,
+							"height": 17,
+							"id": "82",
+							"verticalAlignment": 0,
+							"margin": {
+								"left": 9,
+								"top": 9,
+								"right": 30,
+								"bottom": 40
+							},
+							"horizontalAlignment": 0
+						}
+					]
+				},
+				{
+					"name": "UI_HP_black",
+					"clips": [
+						{
+							"category": "Image",
+							"wait": 6000,
+							"width": 200,
+							"height": 15,
+							"id": "66",
+							"verticalAlignment": 0,
+							"margin": {
+								"left": 1,
+								"top": 1,
+								"right": 30,
+								"bottom": 40
+							},
+							"horizontalAlignment": 0
+						}
+					]
+				},
+				{
+					"name": "UI_HP_red",
+					"clips": [
+						{
+							"category": "Image",
+							"wait": 6000,
+							"width": 200,
+							"height": 15,
+							"id": "114",
+							"verticalAlignment": 0,
+							"margin": {
+								"left": 1,
+								"top": 1,
+								"right": 30,
+								"bottom": 40
+							},
+							"horizontalAlignment": 0
+						}
+					]
+				},
+				{
+					"name": "UI_HP_yellow",
+					"clips": [
+						{
+							"category": "Image",
+							"wait": 6000,
+							"width": 200,
+							"height": 15,
+							"id": "98",
+							"verticalAlignment": 0,
+							"margin": {
+								"left": 1,
+								"top": 1,
+								"right": 30,
+								"bottom": 40
+							},
+							"horizontalAlignment": 0
+						}
+					]
 				}
 			],
 			"separators": [],
@@ -2256,6 +2776,15 @@
 					"typeStr": "6:animations",
 					"name": "animation",
 					"opt": true,
+					"display": null
+				},
+				{
+					"typeStr": "8",
+					"name": "entry"
+				},
+				{
+					"typeStr": "8",
+					"name": "Exit",
 					"display": null
 				},
 				{
@@ -2320,7 +2849,9 @@
 							},
 							"trigger": "this.controller ~= nil and this.controller.commands[\"walkD2idle\"].UIActive ~= nil and this.state == \"run\""
 						}
-					]
+					],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "aim",
@@ -2454,7 +2985,9 @@
 							"json": "local p = this.children['1'].children['0'] this.children['1'].children['0'] = this.children['2'] this.children['1'].children['0'].rotation = 0 this.children['1'].children['0'].direction.x = 1 this.children['1'].children['0']:SetParentAndRoot(this.children['1']) this.children['2'] = p this.children['2']:SetParentAndRoot(this)"
 						}
 					],
-					"animation": "body_idle_front"
+					"animation": "body_idle_front",
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "run",
@@ -2646,7 +3179,7 @@
 							"active": true,
 							"trigger": "this.controller ~= nil and this.controller.commands[\"walk\"].UIActive ~= nil and this.controller.commands[\"walk\"].UIActive == 1",
 							"json": {
-								"x": "runSpeed.x"
+								"x": 1
 							}
 						},
 						{
@@ -2654,7 +3187,7 @@
 							"active": true,
 							"trigger": "this.controller ~= nil and this.controller.commands[\"walk\"].UIActive ~= nil and this.controller.commands[\"walk\"].UIActive == -1",
 							"json": {
-								"x": "-runSpeed.x"
+								"x": -1
 							}
 						},
 						{
@@ -2662,7 +3195,7 @@
 							"active": true,
 							"trigger": "this.controller ~= nil and this.controller.commands[\"walkU\"].UIActive ~= nil",
 							"json": {
-								"z": "runSpeed.z"
+								"z": 1
 							}
 						},
 						{
@@ -2670,7 +3203,7 @@
 							"active": true,
 							"trigger": "this.controller ~= nil and this.controller.commands[\"walkD\"].UIActive ~= nil",
 							"json": {
-								"z": "-runSpeed.z"
+								"z": -1
 							}
 						},
 						{
@@ -2680,7 +3213,9 @@
 							"json": "local p = this.children['1'].children['0'] this.children['1'].children['0'] = this.children['2'] this.children['1'].children['0'].rotation = 0 this.children['1'].children['0'].direction.x = 1 this.children['1'].children['0']:SetParentAndRoot(this.children['1']) this.children['2'] = p this.children['2']:SetParentAndRoot(this)"
 						}
 					],
-					"animation": "body_run_front"
+					"animation": "body_run_front",
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "right_aim_hand",
@@ -2707,7 +3242,9 @@
 							}
 						}
 					],
-					"fixedUpdate": []
+					"fixedUpdate": [],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "left_aim_hand",
@@ -2734,7 +3271,9 @@
 							}
 						}
 					],
-					"fixedUpdate": []
+					"fixedUpdate": [],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "weapon_idle",
@@ -2753,12 +3292,14 @@
 						{
 							"category": "State",
 							"active": true,
-							"trigger": "this.root.controller ~= nil and this.root.controller.commands[\"punch_l\"].UIActive ~= nil and (this.parent.state == \"right_aim_hand\" or this.parent.state == \"left_aim_hand\")",
+							"trigger": "this.root.controller ~= nil and this.root.controller.commands[\"punch_h\"].UIActive ~= nil and (this.parent.state == \"right_aim_hand\" or this.parent.state == \"left_aim_hand\")",
 							"json": {
 								"state": "weapon_shoot"
 							}
 						}
-					]
+					],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "weapon_shoot",
@@ -2778,14 +3319,14 @@
 							"trigger": "this.delayCounter == 1 and this.localTimeLine == 0",
 							"json": {
 								"x": 24,
-								"y": -2,
-								"x2": 40,
+								"y": -1,
+								"x2": 30,
 								"y2": 0,
 								"z2": 0,
 								"state": "bullet",
 								"animation": "bullet",
 								"id": "9",
-								"amount": 10,
+								"amount": 12,
 								"precise": 30
 							}
 						},
@@ -2813,9 +3354,9 @@
 							"json": {
 								"x": 0,
 								"y": -2,
-								"x2": -0.5,
+								"x2": 0.15,
 								"y2": 1,
-								"z2": -0.5,
+								"z2": -1,
 								"state": "shell1",
 								"animation": "shell1",
 								"id": "9",
@@ -2826,13 +3367,15 @@
 						{
 							"category": "State",
 							"active": true,
-							"trigger": "this.timeLine >= 15 / 60",
+							"trigger": "this.timeLine >= 60 / 10 / 60",
 							"json": {
 								"state": "weapon_idle"
 							}
 						}
 					],
-					"fixedUpdate": []
+					"fixedUpdate": [],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "bullet",
@@ -2857,7 +3400,7 @@
 						},
 						{
 							"category": "Force",
-							"active": true,
+							"active": false,
 							"trigger": "0",
 							"json": {
 								"id": "0",
@@ -2868,28 +3411,19 @@
 						},
 						{
 							"category": "Set",
-							"active": true,
+							"active": false,
 							"trigger": "0",
-							"json": "this.attckArray['0'].hitObject.hp = this.attckArray['0'].hitObject.hp - 3"
+							"json": "this.attckArray['0'].hitObject.HP = this.attckArray['0'].hitObject.HP - 3"
 						},
 						{
 							"category": "Destory",
 							"active": true,
-							"trigger": "this.attckArray[\"0\"] ~= nil and this.attckArray[\"0\"].isHit ~= -1"
+							"trigger": "(this.attckArray[\"0\"] ~= nil and this.attckArray[\"0\"].isHit ~= -1) or this.timeLine >= 1"
 						}
 					],
-					"animation": "bullet"
-				},
-				{
-					"name": "fire_effect",
-					"update": [
-						{
-							"category": "Destory",
-							"active": true,
-							"trigger": "this.delayCounter == 6"
-						}
-					],
-					"fixedUpdate": []
+					"animation": "bullet",
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "fire_effect2",
@@ -2900,7 +3434,9 @@
 							"trigger": "this.delayCounter == 6"
 						}
 					],
-					"fixedUpdate": []
+					"fixedUpdate": [],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "shell1",
@@ -2923,7 +3459,9 @@
 								"sfx": "shell"
 							}
 						}
-					]
+					],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "shell2",
@@ -2946,7 +3484,9 @@
 								"sfx": "shell2"
 							}
 						}
-					]
+					],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "cursor",
@@ -2956,7 +3496,9 @@
 							"active": true
 						}
 					],
-					"fixedUpdate": []
+					"fixedUpdate": [],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "weapon_idle_J",
@@ -2980,7 +3522,9 @@
 								"state": "weapon_shoot_J"
 							}
 						}
-					]
+					],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "weapon_shoot_J",
@@ -3054,7 +3598,9 @@
 							}
 						}
 					],
-					"fixedUpdate": []
+					"fixedUpdate": [],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "weapon_idle_HK416c",
@@ -3078,20 +3624,14 @@
 								"state": "weapon_shoot_HK416c"
 							}
 						}
-					]
+					],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "weapon_shoot_HK416c",
 					"animation": "fire_weapon_HK416c",
 					"update": [
-						{
-							"category": "Ray",
-							"active": false,
-							"json": {
-								"x": 21,
-								"y": -2
-							}
-						},
 						{
 							"category": "Object",
 							"active": true,
@@ -3106,13 +3646,13 @@
 								"animation": "bullet",
 								"id": "9",
 								"amount": 1,
-								"precise": 10
+								"precise": 5
 							}
 						},
 						{
 							"category": "Object",
 							"active": true,
-							"trigger": "1",
+							"trigger": "0",
 							"json": {
 								"x": 21,
 								"y": -2,
@@ -3129,13 +3669,13 @@
 						{
 							"category": "Object",
 							"active": true,
-							"trigger": "1",
+							"trigger": "0",
 							"json": {
 								"x": 0,
 								"y": -2,
 								"x2": 0.5,
 								"y2": 1,
-								"z2": -0.5,
+								"z2": -0.7,
 								"state": "shell2",
 								"animation": "shell2",
 								"id": "9",
@@ -3146,13 +3686,15 @@
 						{
 							"category": "State",
 							"active": true,
-							"trigger": "this.timeLine >= 5 / 60",
+							"trigger": "this.timeLine >= 60 / 12 / 60",
 							"json": {
 								"state": "weapon_idle_HK416c"
 							}
 						}
 					],
-					"fixedUpdate": []
+					"fixedUpdate": [],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "aim_hand_1",
@@ -3178,7 +3720,9 @@
 							}
 						}
 					],
-					"fixedUpdate": []
+					"fixedUpdate": [],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "shield_0",
@@ -3201,7 +3745,9 @@
 							}
 						}
 					],
-					"fixedUpdate": []
+					"fixedUpdate": [],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "cursor_test",
@@ -3209,12 +3755,12 @@
 						{
 							"category": "Set",
 							"active": false,
-							"json": "this.image.rectTransform.anchoredPosition = CS.UnityEngine.Vector2((CS.UnityEngine.Input.mousePosition.x - CS.UnityEngine.Screen.width / 2) / 3, (CS.UnityEngine.Input.mousePosition.y - CS.UnityEngine.Screen.height / 2) / 3)"
+							"json": "this.rectTransform.anchoredPosition = CS.UnityEngine.Vector2((CS.UnityEngine.Input.mousePosition.x - CS.UnityEngine.Screen.width / 2) / 3, (CS.UnityEngine.Input.mousePosition.y - CS.UnityEngine.Screen.height / 2) / 3)"
 						},
 						{
 							"category": "Set",
 							"active": true,
-							"json": "this.image.rectTransform.anchoredPosition = CS.UnityEngine.Vector2(CS.UnityEngine.Input.mousePosition.x - CS.UnityEngine.Screen.width / 2, CS.UnityEngine.Input.mousePosition.y - CS.UnityEngine.Screen.height / 2)"
+							"json": "this.rectTransform.anchoredPosition = CS.UnityEngine.Vector2(CS.UnityEngine.Input.mousePosition.x - CS.UnityEngine.Screen.width / 2, CS.UnityEngine.Input.mousePosition.y - CS.UnityEngine.Screen.height / 2)"
 						}
 					],
 					"fixedUpdate": [
@@ -3224,12 +3770,16 @@
 							"trigger": "this.controller ~= nil and this.controller.commands[\"punch_h\"].UIActive ~= nil"
 						}
 					],
-					"animation": "cursor_test"
+					"animation": "cursor_test",
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "UI_Test",
 					"update": [],
-					"fixedUpdate": []
+					"fixedUpdate": [],
+					"Exit": [],
+					"entry": []
 				},
 				{
 					"name": "UI_Test_Panel",
@@ -3252,12 +3802,41 @@
 							"active": true,
 							"trigger": "this.UI_object.activeSelf == false",
 							"json": "utils.PLAYER.object.controller = utils.PLAYER"
-						},
+						}
+					],
+					"Exit": [],
+					"entry": []
+				},
+				{
+					"name": "UI_Button",
+					"update": [
 						{
 							"category": "Set",
 							"active": true,
-							"json": "CS.UnityEngine.EventSystems.EventSystem.current:SetSelectedGameObject(this.UI_object)",
-							"trigger": "CS.UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject == nil"
+							"trigger": "CS.UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject == nil",
+							"json": "CS.UnityEngine.EventSystems.EventSystem.current:SetSelectedGameObject(this.button_object)"
+						}
+					],
+					"fixedUpdate": [],
+					"Exit": [],
+					"entry": []
+				},
+				{
+					"name": "UI_HP",
+					"update": [
+						{
+							"category": "Set",
+							"active": false,
+							"json": "this.children['1'].rectTransform.sizeDelta = CS.UnityEngine.Vector2(utils.PLAYER.object.HP / utils.PLAYER.object.maxHP * 200, this.children['1'].rectTransform.sizeDelta.y)"
+						}
+					],
+					"fixedUpdate": [],
+					"Exit": [],
+					"entry": [
+						{
+							"category": "Bind",
+							"active": false,
+							"json": "this."
 						}
 					]
 				}
@@ -3355,6 +3934,12 @@
 					"opt": true
 				},
 				{
+					"typeStr": "4",
+					"name": "bounciness",
+					"display": 1,
+					"opt": true
+				},
+				{
 					"typeStr": "6:sounds",
 					"name": "sfx",
 					"opt": true,
@@ -3363,6 +3948,21 @@
 				{
 					"typeStr": "1",
 					"name": "text",
+					"opt": true
+				},
+				{
+					"typeStr": "5:Left,Center,Right,Stretch",
+					"name": "horizontalAlignment",
+					"opt": true
+				},
+				{
+					"typeStr": "5:Top,Center,Bottom,Stretch",
+					"name": "verticalAlignment",
+					"opt": true
+				},
+				{
+					"typeStr": "16",
+					"name": "margin",
 					"opt": true
 				}
 			]
@@ -3422,6 +4022,219 @@
 				{
 					"typeStr": "2",
 					"name": "active",
+					"display": null
+				}
+			]
+		},
+		{
+			"name": "prototypes@prototype",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "1",
+					"name": "name"
+				},
+				{
+					"typeStr": "1",
+					"name": "parent",
+					"opt": true
+				},
+				{
+					"typeStr": "1",
+					"name": "id2",
+					"opt": true
+				},
+				{
+					"typeStr": "3",
+					"name": "id",
+					"display": null
+				},
+				{
+					"typeStr": "6:animations",
+					"name": "animation"
+				},
+				{
+					"typeStr": "6:states",
+					"name": "state",
+					"opt": true
+				},
+				{
+					"typeStr": "3",
+					"name": "kind",
+					"display": null
+				},
+				{
+					"typeStr": "8",
+					"name": "vars",
+					"display": null
+				}
+			]
+		},
+		{
+			"name": "prototypes@prototype@vars",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:vars",
+					"name": "var"
+				},
+				{
+					"typeStr": "16",
+					"name": "default"
+				}
+			]
+		},
+		{
+			"name": "states@entry",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:frameType",
+					"name": "category"
+				},
+				{
+					"typeStr": "1",
+					"name": "trigger",
+					"opt": true
+				},
+				{
+					"typeStr": "16",
+					"name": "json",
+					"opt": true
+				},
+				{
+					"typeStr": "2",
+					"name": "active"
+				}
+			]
+		},
+		{
+			"name": "states@Exit",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:frameType",
+					"name": "category"
+				},
+				{
+					"typeStr": "1",
+					"name": "trigger",
+					"opt": true
+				},
+				{
+					"typeStr": "16",
+					"name": "json",
+					"opt": true
+				},
+				{
+					"typeStr": "2",
+					"name": "active"
+				}
+			]
+		},
+		{
+			"name": "components",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "name"
+				}
+			],
+			"lines": [
+				{
+					"name": "Active"
+				},
+				{
+					"name": "DataBase"
+				},
+				{
+					"name": "SpriteRenderer"
+				},
+				{
+					"name": "TrailRenderer"
+				},
+				{
+					"name": "Image"
+				},
+				{
+					"name": "Sound"
+				},
+				{
+					"name": "Animation"
+				},
+				{
+					"name": "State"
+				},
+				{
+					"name": "Physics"
+				},
+				{
+					"name": "ATK"
+				},
+				{
+					"name": "BDY"
+				},
+				{
+					"name": "LineRenderer"
+				},
+				{
+					"name": "Sleep"
+				},
+				{
+					"name": "Parent"
+				},
+				{
+					"name": "Children"
+				},
+				{
+					"name": "Player"
+				},
+				{
+					"name": "AI"
+				},
+				{
+					"name": "Target"
+				},
+				{
+					"name": "Gravity"
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "groups@group",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "6:components",
+					"name": "component",
+					"opt": true
+				},
+				{
+					"typeStr": "16",
+					"name": "value",
+					"opt": true,
 					"display": null
 				}
 			]

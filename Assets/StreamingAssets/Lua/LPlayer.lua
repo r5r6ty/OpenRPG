@@ -143,7 +143,7 @@ function LSystem:input()
 						v.antiKey.state = 0
 					elseif v.antiKey.count == 1 then -- 如果之前刚按下，现在就是刚放开
 						v.antiKey.state = 3
-					elseif vantiKey..count > 1 then -- 如果之前是按住，现在就是刚放开
+					elseif v.antiKey.count > 1 then -- 如果之前是按住，现在就是刚放开
 						v.antiKey.state = 3
 					end
 				end
@@ -473,10 +473,10 @@ end
 
 -- 摄像机跟随主角，比较简陋
 function LPlayer:followCharacter()
-	if self.object.kind == 0 then
+	-- if self.object.kind == 0 then
 		local charPos = self.object.physics_object.transform.position
 		self.camera.transform.position = CS.UnityEngine.Vector3(charPos.x, charPos.y + charPos.z, self.camera.transform.position.z)
-	end
+	-- end
 end
 
 -- 创建招式

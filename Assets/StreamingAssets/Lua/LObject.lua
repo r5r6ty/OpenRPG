@@ -8,158 +8,287 @@ utils = require "LUtils"
 require "LCollider"
 -- local cs_coroutine = (require 'cs_coroutine')
 
-LObject = {database = nil,
-			id = nil,
-			palette = nil,
-			action = nil,
-			nextAction = nil,
-			frame = nil,
-			delay = nil,
-			delayCounter = nil,
-			nextDelayCounter = nil,
+-- wolai = setmetatable({5}, {
+-- 	__call = function(n)
+-- 		if wolai[1] ~= n then
+-- 			print("bian le!", wolai[1], n)
+-- 			wolai[1] = n
+-- 		end
+-- 		return wolai[1]
+-- 	end
+-- })
 
-			kind = nil,
+local maxBitCount = 63 -- 最大实体数
+local maxBit = (1 << maxBitCount) - 1
 
-			direction = nil,
-			directionBuff = nil,
+local cache = {}
 
-			velocity = nil,
+function utils.getCache()
+	return cache
+end
 
-			rigidbody = nil,
-			rigidbody_id = nil,
-			audioSource =nil,
+local components = { _typeIDCounter = 0 }
 
-			vvvX = nil,
-			vvvY = nil,
-			accvvvX = nil,
-			accvvvY = nil,
-			accvvvZ = nil,
+-- 注册组件
+function utils.registerComponent(newtype, func)
 
-			vars = nil,
-			functions = nil,
-			eventQueue = nil,
-			eventManager = nil,
+	local typeid = components._typeIDCounter + 1
+	assert(typeid <= maxBitCount)
+	components._typeIDCounter = typeid
+	components[newtype] = typeid
+	components[typeid] = func
 
-			parent = nil,
-			children = nil,
-			root = nil,
-			animation = nil,
-			speed = nil,
-			timeLine = nil,
-			localTimeLine = nil,
-			state = nil,
-			target = nil,
-			controller = nil,
+	-- components[typeid] = { new = cnew, del = cdel }
+end
 
-			oriPos = nil,
-			oriPos2 = nil,
-			deubg_object = nil,
-			physics_object = nil,
-			-- isWall = nil,
-			isOnGround = nil,
-			-- isCeiling = nil,
-			-- isElse = nil,
-			-- elseArray = nil,
-		
-			spriteRenderer = nil,
-		
-			attckArray = nil,
-			bodyArray = nil,
-			bodyArray_InstanceID = nil,
-		
-			pic_offset_object = nil,
-			pic_offset_object_id = nil,
-			pic_object = nil,
-			pic_object_id = nil,
-			atk_object = nil,
-			bdy_object = nil,
-			lineRenderer = nil,
-		
-			AI = nil,
-			catchedObjects = nil,
+-- 添加组件
+function utils.addComponent(object, ctype, ...)
+    local typeid = components[ctype]
 
-			sleep = nil,
-			rotation = nil,
-			rotation_velocity = nil,
+    components[typeid](object, ...)
 
-			team = nil,
+    object._bit = object._bit | 2 ^ (typeid - 1)
+end
 
-			hp = nil,
-			mp = nil,
-			hpMax = nil,
-			mpMax = nil,
+function utils.newLObject()
+	local this = { _bit = 0 }
+    -- 组件添加或删除时执行
+    bind(this, "_bit", function(t, val, old)
+        cache[old] = cache[old] or {}
+        cache[old][t] = nil
+        if next(cache[old]) == nil then
+            cache[old] = nil
+        end
 
-			level = nil
-			}
-LObject.__index = LObject
-function LObject:new(parent, db, id, a, f, s, x, y, z, vx, vy, vz, k)
-	local self = {}
-	setmetatable(self, LObject)
-	self.eventQueue = {}
-	self.eventManager = {}
+        if val ~= 0 and val ~= nil then
+            cache[val] = cache[val] or {}
+            cache[val][t] = t
+        end
+    end)
+	return this
+end
 
-    self.database = db
-	self.id = id
-	self.action = a
-	self.nextAction = self.action
-	self.frame = f
-	self.delay = 0
-	self.delayCounter = 0
-	self.nextDelayCounter = self.delayCounter
+-- 删除实体
+function utils.deleteLObject(object)
+    for i, v in pairs(object.bind____) do
+        unbind(object, i)
+    end
+    object._bit = 0
+    
+	utils.destroyObject()
+end
 
-	self.root = self
-	self.parent = self
-	self.children = {}
-	self.animation = nil
-	self.speed = 1
-	self.timeLine = 0
-	self.localTimeLine = 0
-	self.state = s
-	self.target = nil
-	self.controller = nil
-	self.sleep = false
+function utils.allOf(...)
+    local f = { ... }
+    local bit = 0
+    for i, v in ipairs(f) do
+		bit = bit | 2 ^ (v - 1)
+    end
+    return bit
+end
 
-	self.team = 0
+function utils.getComponentID(ctype)
+    return components[ctype]
+end
 
-	self.rotation = 0
-	self.rotation_velocity = 0
+-- 获取匹配的实体
+function utils.getMatchedEntity(bit)
+    local res = {}
 
-	-- for _i, _v in ipairs(self.database:getLines("vars")) do
-	-- 	self[_v.name] = _v.default
-	-- 	-- print(_v.name, self[_v.name])
-	-- end
+    for i, v in pairs(cache) do
+        if i >= bit and i | bit == i then
+            for j, v2 in pairs(v) do
+                table.insert(res, j)
+            end
+        end
+    end
 
-	-- self.functions = {}
-	-- for _i, _v in ipairs(self.database:getLines("functions")) do
-	-- 	self.functions[_v.name] = _v.value
-	-- end
+    return res
+end
 
-	-- self["parent"] = parent
+local systems = { _typeIDCounter = 0 }
 
-	-- if k ~= 5 then
-	-- 	self["story"] = self.database:getLines("story")
-	-- end
+function utils.registerSystem(newtype, bit, func)
 
-	self.direction = CS.UnityEngine.Vector3(1, -1, 1)
-	-- self.directionBuff = CS.UnityEngine.Vector3(1, -1, 1)
+    local typeid = systems._typeIDCounter + 1
+	-- assert(typeid <= maxBitCount)
+	systems._typeIDCounter = typeid
+	systems[newtype] = typeid
+    
+	systems[typeid] = {
+        MatchedBit = bit,
+        matchedEntity = {},
+        execute = func
+    }
 
-	self.velocity = CS.UnityEngine.Vector3(vx, vy, vz)
+	-- components[typeid] = { new = cnew, del = cdel }
+end
 
-	self.kind = k
+utils.registerComponent("DataBase", function(this, id, a, s)
+	this.database = utils.getIDData(id)
+	this.id = id
+	this.palette = 1
+	this.action = a
+	this.state = s
+	this.delayCounter = 0
+
+	this.direction = CS.UnityEngine.Vector3(1, -1, 1)
+	this.root = this
+	this.parent = this
+	this.children = {}
+	this.speed = 1
+	this.timeLine = 0
+	this.localTimeLine = 0
+end)
+
+utils.registerComponent("Render", function(this)
+	this.rotation = 0
+	this.rotation_velocity = 0
+
+	this.pic_offset_object = CS.UnityEngine.GameObject("pic_offset")
+	this.pic_offset_object_id = this.pic_offset_object:GetInstanceID()
+	CS.LuaUtil.AddID(this.pic_offset_object_id, this.pic_offset_object)
+	-- self.pic_offset_object.transform:SetParent(self.gameObject.transform)
+	this.pic_offset_object.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
+	this.pic_offset_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+	-- self.pic_offset_object.transform.localScale = CS.UnityEngine.Vector3.one
+	this.pic_offset_object.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
+
+	this.audioSource = this.pic_offset_object:AddComponent(typeof(CS.UnityEngine.AudioSource))
+	this.audioSource.playOnAwake = false
+
+	this.pic_object = CS.UnityEngine.GameObject("pic")
+	this.pic_object_id = this.pic_object:GetInstanceID()
+	CS.LuaUtil.AddID(this.pic_object_id, this.pic_object)
+	this.pic_object.transform:SetParent(this.pic_offset_object.transform)
+	this.pic_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+	this.pic_object.transform.localScale = CS.UnityEngine.Vector3.one
+	this.spriteRenderer = this.pic_object:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
+	this.spriteRenderer.material = this.database.palettes[1]
+end)
+utils.registerComponent("UI", function(this, parent, kind)
+	if kind == 1 then
+		this.image_object = CS.UnityEngine.GameObject("image")
+		-- this.image_object.transform:SetParent(this.UI_object.transform)
+		this.image_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+		this.image_object.transform.localScale = CS.UnityEngine.Vector3.one
 	
-	-- self.gameObject:AddComponent(typeof(CS.GameAnimation)).luaBehaviour = utils.LUABEHAVIOUR
+		-- local rectTransform = this.image_object:AddComponent(typeof(CS.UnityEngine.RectTransform))
+		-- -- rectTransform.anchoredPosition = CS.UnityEngine.Vector2(x, y)
+		-- -- rectTransform.sizeDelta = CS.UnityEngine.Vector2(w, h)
+		-- rectTransform.anchorMin = CS.UnityEngine.Vector2(0.5, 0.5)
+		-- rectTransform.anchorMax = CS.UnityEngine.Vector2(0.5, 0.5)
+		-- rectTransform.pivot = CS.UnityEngine.Vector2(0.5, 0.5)
 
-	-- self.animation = self.gameObject:AddComponent(typeof(CS.UnityEngine.Animation))
-	-- for _i, _v in pairs(self.database.animationClips) do
+		this.image = this.image_object:AddComponent(typeof(CS.UnityEngine.UI.Image))
+		this.image.sprite = nil
+		this.image.material = this.database.palettes_ui[1]
+
+		this.image.raycastTarget = false
+
+		this.UI_object = this.image_object
+	elseif kind == 2 then
+		this.text_object = CS.UnityEngine.GameObject("text")
+		this.text_object.transform:SetParent(this.UI_object.transform)
+		this.text_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+		this.text_object.transform.localScale = CS.UnityEngine.Vector3.one
+	
+		-- local rectTransform = this.text_object:AddComponent(typeof(CS.UnityEngine.RectTransform))
+		-- -- rectTransform.anchoredPosition = CS.UnityEngine.Vector2(x, y)
+		-- -- rectTransform.sizeDelta = CS.UnityEngine.Vector2(w, h)
+		-- rectTransform.anchorMin = CS.UnityEngine.Vector2(0.5, 0.5)
+		-- rectTransform.anchorMax = CS.UnityEngine.Vector2(0.5, 0.5)
+		-- rectTransform.pivot = CS.UnityEngine.Vector2(0.5, 0.5)
+
+		this.text = this.text_object:AddComponent(typeof(CS.UnityEngine.UI.Text))
+		this.text.font = utils.getFont()
+		this.text.fontSize = 12
+		this.text.alignment = CS.UnityEngine.TextAnchor.MiddleCenter
+
+		-- this.text.material = this.database.palettes_ui[1]
+	elseif kind == 3 then
+		this.button_object = CS.UnityEngine.GameObject("button")
+		this.button_object.transform:SetParent(this.UI_object.transform)
+		this.button_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+		this.button_object.transform.localScale = CS.UnityEngine.Vector3.one
+	
+		-- local rectTransform = this.button_object:AddComponent(typeof(CS.UnityEngine.RectTransform))
+		-- -- rectTransform.anchoredPosition = CS.UnityEngine.Vector2(x, y)
+		-- -- rectTransform.sizeDelta = CS.UnityEngine.Vector2(w, h)
+		-- rectTransform.anchorMin = CS.UnityEngine.Vector2(0.5, 0.5)
+		-- rectTransform.anchorMax = CS.UnityEngine.Vector2(0.5, 0.5)
+		-- rectTransform.pivot = CS.UnityEngine.Vector2(0.5, 0.5)
+
+		this.image = this.button_object:AddComponent(typeof(CS.UnityEngine.UI.Image))
+		this.image.sprite = nil
+		this.image.material = this.database.palettes_ui[1]
+
+		this.button = this.button_object:AddComponent(typeof(CS.UnityEngine.UI.Button))
+
+		utils.setButtonColor(this, 127, 127, 127, 255, 240, 199, 50, 255, 191, 0, 0, 255)
+
+		this.text_object = CS.UnityEngine.GameObject("text")
+		this.text_object.transform:SetParent(this.button_object.transform)
+		this.text_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+		this.text_object.transform.localScale = CS.UnityEngine.Vector3.one
+	
+		-- local rectTransform = this.text_object:AddComponent(typeof(CS.UnityEngine.RectTransform))
+		-- rectTransform.anchoredPosition = CS.UnityEngine.Vector2(0, -15)
+		-- rectTransform.sizeDelta = CS.UnityEngine.Vector2(100, 12)
+		-- rectTransform.anchorMin = CS.UnityEngine.Vector2(0.5, 0.5)
+		-- rectTransform.anchorMax = CS.UnityEngine.Vector2(0.5, 0.5)
+		-- rectTransform.pivot = CS.UnityEngine.Vector2(0.5, 0.5)
+
+		this.text = this.text_object:AddComponent(typeof(CS.UnityEngine.UI.Text))
+		this.text.font = utils.getFont()
+		this.text.fontSize = 12
+		this.text.alignment = CS.UnityEngine.TextAnchor.MiddleCenter
+
+		-- this.text.material = this.database.palettes_ui[1]
+
+		-- utils.addEvent("OnClick", function(this, value)
+		-- 	if this.image.rectTransform.anchoredPosition.x <= this.image.rectTransform.anchoredPosition.x then
+		-- 		print("wocao")
+		-- 	end
+		-- end)
+
+		-- this.button.onClick:AddListener(function()
+		-- 	print("wocao")
+		-- end)
 		
+	end
+
+	if parent == nil then
+		this.UI_object.transform:SetParent(utils.getLCanvas().transform)
+	else
+		-- this.UI_object.transform:SetParent(p.transform)
+		this.UI_object.transform:SetParent(parent.rectTransform)
+
+		this.team = parent.team
+		if this.image ~= nil then
+			this.image.material = parent.image.material
+		end
+	end
+
+	this.rectTransform = this.UI_object:GetComponent(typeof(CS.UnityEngine.RectTransform))
+	-- this.rectTransform.anchoredPosition = CS.UnityEngine.Vector2(x, y)
+	-- this.rectTransform.sizeDelta = CS.UnityEngine.Vector2(0, 0)
+	-- this.rectTransform.anchorMin = CS.UnityEngine.Vector2(0.5, 0.5)
+	-- this.rectTransform.anchorMax = CS.UnityEngine.Vector2(0.5, 0.5)
+	-- this.rectTransform.pivot = CS.UnityEngine.Vector2(0, 1)
+end)
+utils.registerComponent("Physical", function(this, parent, x, y, z, vx, vy, vz)
+	this.team = 0
+	this.velocity = CS.UnityEngine.Vector3(vx, vy, vz)
+
 	-- 	self.animation:AddClip(_v, _v.name)
 	-- end
 	-- self.animation.animatePhysics = true
 
-	self.physics_object = CS.UnityEngine.GameObject("physics")
+	this.physics_object = CS.UnityEngine.GameObject("physics")
 	-- self.physics_object.transform:SetParent(self.gameObject.transform)
-	self.physics_object.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
-	self.physics_object.transform.position = CS.UnityEngine.Vector3(x, y, z)
+	this.physics_object.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
+	this.physics_object.transform.position = CS.UnityEngine.Vector3(x, y, z)
 	-- self.physics_object.transform.localPosition = CS.UnityEngine.Vector3.zero
 	-- self.physics_object.transform.localScale = CS.UnityEngine.Vector3.one
 
@@ -172,157 +301,362 @@ function LObject:new(parent, db, id, a, f, s, x, y, z, vx, vy, vz, k)
 	-- self.rigidbody.gravityScale = 0
 	-- -- self.rigidbody.useAutoMass = true
 
-	self.rigidbody = self.physics_object:AddComponent(typeof(CS.UnityEngine.Rigidbody))
+	this.rigidbody = this.physics_object:AddComponent(typeof(CS.UnityEngine.Rigidbody))
 	-- self.rigidbody.useGravity = false
-	self.rigidbody.isKinematic = true
+	this.rigidbody.isKinematic = true
 	-- self.rigidbody.detectCollisions = false
-	self.rigidbody.freezeRotation = true
+	this.rigidbody.freezeRotation = true
 
-	self.rigidbody_id = self.rigidbody:GetInstanceID()
-	CS.LuaUtil.AddID2(self.rigidbody_id, self.rigidbody)
+	this.rigidbody_id = this.rigidbody:GetInstanceID()
+	CS.LuaUtil.AddID2(this.rigidbody_id, this.rigidbody)
 
-	self.vvvX = nil
-	self.vvvY = nil
-	self.accvvvX = nil
-	self.accvvvY = nil
-	self.accvvvZ = nil
+	-- this.vvvX = nil
+	-- this.vvvY = nil
+	-- this.accvvvX = nil
+	-- this.accvvvY = nil
+	-- this.accvvvZ = nil
 
 	
 	-- self.isWall = false
 	-- self.isCeiling = false
-	self.isOnGround = -1
+	this.isOnGround = -1
 	-- self.isElse = 1
 	-- self.elseArray = {}
 
-	self.attckArray = {}
-	self.bodyArray = {}
-	self.bodyArray_InstanceID = {}
-
-	self.pic_offset_object = CS.UnityEngine.GameObject("pic_offset")
-	self.pic_offset_object_id = self.pic_offset_object:GetInstanceID()
-	CS.LuaUtil.AddID(self.pic_offset_object_id, self.pic_offset_object)
-	-- self.pic_offset_object.transform:SetParent(self.gameObject.transform)
-	self.pic_offset_object.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
-	self.pic_offset_object.transform.localPosition = CS.UnityEngine.Vector3.zero
-	-- self.pic_offset_object.transform.localScale = CS.UnityEngine.Vector3.one
-	self.pic_offset_object.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
-
-	self.audioSource = self.pic_offset_object:AddComponent(typeof(CS.UnityEngine.AudioSource))
-	self.audioSource.playOnAwake = false
-
-	self.pic_object = CS.UnityEngine.GameObject("pic")
-	self.pic_object_id = self.pic_object:GetInstanceID()
-	CS.LuaUtil.AddID(self.pic_object_id, self.pic_object)
-	self.pic_object.transform:SetParent(self.pic_offset_object.transform)
-	self.pic_object.transform.localPosition = CS.UnityEngine.Vector3.zero
-	self.pic_object.transform.localScale = CS.UnityEngine.Vector3.one
-	self.spriteRenderer = self.pic_object:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
-	self.spriteRenderer.material = self.database.palettes[1]
+	this.attckArray = {}
+	this.bodyArray = {}
+	this.bodyArray_InstanceID = {}
 
 	-- if self.kind == 3 then -- 非人物体暂定-20层
 	-- 	self.spriteRenderer.sortingOrder = 20
 	-- end
 
-	self.audioSource = self.physics_object:AddComponent(typeof(CS.UnityEngine.AudioSource))
-	self.audioSource.playOnAwake = false
+	this.atk_object = CS.UnityEngine.GameObject("atk")
+	this.atk_object.transform:SetParent(this.physics_object.transform)
+	this.atk_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+	this.atk_object.transform.localScale = CS.UnityEngine.Vector3.one
 
-	self.atk_object = CS.UnityEngine.GameObject("atk")
-	self.atk_object.transform:SetParent(self.physics_object.transform)
-	self.atk_object.transform.localPosition = CS.UnityEngine.Vector3.zero
-	self.atk_object.transform.localScale = CS.UnityEngine.Vector3.one
+	this.bdy_object = CS.UnityEngine.GameObject("bdy[16]")
+	this.bdy_object.transform:SetParent(this.physics_object.transform)
+	this.bdy_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+	this.bdy_object.transform.localScale = CS.UnityEngine.Vector3.one
+	this.bdy_object.layer = 16 -- bdy的layer暂定16
 
-	self.bdy_object = CS.UnityEngine.GameObject("bdy[16]")
-	self.bdy_object.transform:SetParent(self.physics_object.transform)
-	self.bdy_object.transform.localPosition = CS.UnityEngine.Vector3.zero
-	self.bdy_object.transform.localScale = CS.UnityEngine.Vector3.one
-	self.bdy_object.layer = 16 -- bdy的layer暂定16
+	utils.SetParentAndRoot(this, parent)
 
-	-- self.bdy_object_test = CS.UnityEngine.GameObject("bdy[16]_test")
-	-- self.bdy_object_test.transform:SetParent(self.gameObject.transform)
-	-- self.bdy_object_test.transform.localPosition = CS.UnityEngine.Vector3.zero
-	-- self.bdy_object_test.transform.localScale = CS.UnityEngine.Vector3.one
-	-- self.bdy_object_test.layer = 16 -- bdy的layer暂定16
+	this.oriPos2 = this.physics_object.transform.position
+	this.oriPos = this.rigidbody.position
+end)
+utils.registerComponent("Control", function(this, c, ai)
+	this.controller = c
+	this.AI = ai
+end)
+utils.registerComponent("Target", function(this, t)
+	this.target = t
+end)
+utils.registerComponent("Active", function(this)
+	-- this.sleep = false
+end)
 
-	-- self.deubg_object = CS.UnityEngine.GameObject.CreatePrimitive(CS.UnityEngine.PrimitiveType.Cube)
-	-- self.deubg_object.name = "debug"
-	-- self.deubg_object.transform:SetParent(self.bdy_object.transform)
-	-- if self.kind ~= 5 then
-	-- 	self.deubg_object.transform.localScale = CS.UnityEngine.Vector3.zero
-	-- else
-	-- 	self.deubg_object.transform.localScale = CS.UnityEngine.Vector3(0.16 / 5, 1, 0.16 / 5)
-	-- end
-	-- self.deubg_object.transform.localPosition = CS.UnityEngine.Vector3.zero
-	-- self.deubg_object:GetComponent(typeof(CS.UnityEngine.MeshRenderer)).material = utils.DEBUG3D
+-- function LObject(parent, db, id, a, f, s, x, y, z, vx, vy, vz, k)
+-- 	local self = {}
+-- 	-- setmetatable(self, LObject)
 
-	-- CS.UnityEngine.GameObject.Destroy(self.deubg_object:GetComponent(typeof(CS.UnityEngine.BoxCollider)))
+--     self.database = db
+-- 	self.id = id
+-- 	self.action = a
+-- 	self.frame = f
+-- 	self.delayCounter = 0
 
-	self.lineRenderer = self.pic_object:AddComponent(typeof(CS.UnityEngine.LineRenderer))
-	-- self.lineRenderer.enabled = false
-	self.lineRenderer.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
-	self.lineRenderer.startWidth = 0.01
-	self.lineRenderer.endWidth = 0.02
-	-- self.lineRenderer.startColor = color
-	-- self.lineRenderer.endColor = color
-	self.lineRenderer.numCapVertices = 90
-	self.lineRenderer.material = utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY
+-- 	self.root = self
+-- 	self.parent = self
+-- 	self.children = {}
+-- 	self.speed = 1
+-- 	self.timeLine = 0
+-- 	self.localTimeLine = 0
+-- 	self.state = s
+-- 	self.controller = nil
+-- 	self.sleep = false
 
-	self:SetParentAndRoot(parent)
+-- 	self.team = 0
 
-	self.AI = false
-	self.target = nil
+-- 	self.rotation = 0
+-- 	self.rotation_velocity = 0
 
-	self.catchedObjects = {}
+-- 	-- for _i, _v in ipairs(self.database:getLines("vars")) do
+-- 	-- 	self[_v.name] = _v.default
+-- 	-- 	-- print(_v.name, self[_v.name])
+-- 	-- end
 
-	self.children = {}
+-- 	-- self.functions = {}
+-- 	-- for _i, _v in ipairs(self.database:getLines("functions")) do
+-- 	-- 	self.functions[_v.name] = _v.value
+-- 	-- end
 
-	self.hp = 500
-	self.hpMax = self.hp
-	self.mp = 500
-	self.mpMax = self.mp
+-- 	-- self["parent"] = parent
 
-	self.level = 1
+-- 	-- if k ~= 5 then
+-- 	-- 	self["story"] = self.database:getLines("story")
+-- 	-- end
 
-	self.oriPos2 = self.physics_object.transform.position
-	self.oriPos = self.rigidbody.position
-	return self
-end
+-- 	self.direction = CS.UnityEngine.Vector3(1, -1, 1)
+-- 	-- self.directionBuff = CS.UnityEngine.Vector3(1, -1, 1)
 
--- -- 添加事件
--- function LObject:addEvent(eventName, action)
--- 	if not self.eventManager[eventName] then
--- 		self.eventManager[eventName] = Delegate()
+-- 	self.velocity = CS.UnityEngine.Vector3(vx, vy, vz)
+
+-- 	self.kind = k
+
+	
+-- 	self.AI = false
+-- 	self.target = nil
+
+
+-- 	if self.kind == 1 or self.kind == 2 or self.kind == 3 then
+-- 		if self.kind == 1 then
+-- 			self.image_object = CS.UnityEngine.GameObject("image")
+-- 			-- self.image_object.transform:SetParent(self.UI_object.transform)
+-- 			self.image_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+-- 			self.image_object.transform.localScale = CS.UnityEngine.Vector3.one
+		
+-- 			-- local rectTransform = self.image_object:AddComponent(typeof(CS.UnityEngine.RectTransform))
+-- 			-- -- rectTransform.anchoredPosition = CS.UnityEngine.Vector2(x, y)
+-- 			-- -- rectTransform.sizeDelta = CS.UnityEngine.Vector2(w, h)
+-- 			-- rectTransform.anchorMin = CS.UnityEngine.Vector2(0.5, 0.5)
+-- 			-- rectTransform.anchorMax = CS.UnityEngine.Vector2(0.5, 0.5)
+-- 			-- rectTransform.pivot = CS.UnityEngine.Vector2(0.5, 0.5)
+
+-- 			self.image = self.image_object:AddComponent(typeof(CS.UnityEngine.UI.Image))
+-- 			self.image.sprite = nil
+-- 			self.image.material = self.database.palettes_ui[1]
+
+-- 			self.image.raycastTarget = false
+
+-- 			self.UI_object = self.image_object
+-- 		elseif self.kind == 2 then
+-- 			self.text_object = CS.UnityEngine.GameObject("text")
+-- 			self.text_object.transform:SetParent(self.UI_object.transform)
+-- 			self.text_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+-- 			self.text_object.transform.localScale = CS.UnityEngine.Vector3.one
+		
+-- 			-- local rectTransform = self.text_object:AddComponent(typeof(CS.UnityEngine.RectTransform))
+-- 			-- -- rectTransform.anchoredPosition = CS.UnityEngine.Vector2(x, y)
+-- 			-- -- rectTransform.sizeDelta = CS.UnityEngine.Vector2(w, h)
+-- 			-- rectTransform.anchorMin = CS.UnityEngine.Vector2(0.5, 0.5)
+-- 			-- rectTransform.anchorMax = CS.UnityEngine.Vector2(0.5, 0.5)
+-- 			-- rectTransform.pivot = CS.UnityEngine.Vector2(0.5, 0.5)
+
+-- 			self.text = self.text_object:AddComponent(typeof(CS.UnityEngine.UI.Text))
+-- 			self.text.font = utils.getFont()
+-- 			self.text.fontSize = 12
+-- 			self.text.alignment = CS.UnityEngine.TextAnchor.MiddleCenter
+
+-- 			-- self.text.material = self.database.palettes_ui[1]
+-- 		elseif self.kind == 3 then
+-- 			self.button_object = CS.UnityEngine.GameObject("button")
+-- 			self.button_object.transform:SetParent(self.UI_object.transform)
+-- 			self.button_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+-- 			self.button_object.transform.localScale = CS.UnityEngine.Vector3.one
+		
+-- 			-- local rectTransform = self.button_object:AddComponent(typeof(CS.UnityEngine.RectTransform))
+-- 			-- -- rectTransform.anchoredPosition = CS.UnityEngine.Vector2(x, y)
+-- 			-- -- rectTransform.sizeDelta = CS.UnityEngine.Vector2(w, h)
+-- 			-- rectTransform.anchorMin = CS.UnityEngine.Vector2(0.5, 0.5)
+-- 			-- rectTransform.anchorMax = CS.UnityEngine.Vector2(0.5, 0.5)
+-- 			-- rectTransform.pivot = CS.UnityEngine.Vector2(0.5, 0.5)
+
+-- 			self.image = self.button_object:AddComponent(typeof(CS.UnityEngine.UI.Image))
+-- 			self.image.sprite = nil
+-- 			self.image.material = self.database.palettes_ui[1]
+
+-- 			self.button = self.button_object:AddComponent(typeof(CS.UnityEngine.UI.Button))
+
+-- 			utils.setButtonColor(self, 127, 127, 127, 255, 240, 199, 50, 255, 191, 0, 0, 255)
+
+-- 			self.text_object = CS.UnityEngine.GameObject("text")
+-- 			self.text_object.transform:SetParent(self.button_object.transform)
+-- 			self.text_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+-- 			self.text_object.transform.localScale = CS.UnityEngine.Vector3.one
+		
+-- 			-- local rectTransform = self.text_object:AddComponent(typeof(CS.UnityEngine.RectTransform))
+-- 			-- rectTransform.anchoredPosition = CS.UnityEngine.Vector2(0, -15)
+-- 			-- rectTransform.sizeDelta = CS.UnityEngine.Vector2(100, 12)
+-- 			-- rectTransform.anchorMin = CS.UnityEngine.Vector2(0.5, 0.5)
+-- 			-- rectTransform.anchorMax = CS.UnityEngine.Vector2(0.5, 0.5)
+-- 			-- rectTransform.pivot = CS.UnityEngine.Vector2(0.5, 0.5)
+
+-- 			self.text = self.text_object:AddComponent(typeof(CS.UnityEngine.UI.Text))
+-- 			self.text.font = utils.getFont()
+-- 			self.text.fontSize = 12
+-- 			self.text.alignment = CS.UnityEngine.TextAnchor.MiddleCenter
+
+-- 			-- self.text.material = self.database.palettes_ui[1]
+
+-- 			-- utils.addEvent("OnClick", function(this, value)
+-- 			-- 	if this.image.rectTransform.anchoredPosition.x <= self.image.rectTransform.anchoredPosition.x then
+-- 			-- 		print("wocao")
+-- 			-- 	end
+-- 			-- end)
+
+-- 			-- self.button.onClick:AddListener(function()
+-- 			-- 	print("wocao")
+-- 			-- end)
+			
+-- 		end
+
+-- 		if parent == nil then
+-- 			self.UI_object.transform:SetParent(utils.getLCanvas().transform)
+-- 		else
+-- 			-- self.UI_object.transform:SetParent(p.transform)
+-- 			self.UI_object.transform:SetParent(parent.rectTransform)
+	
+-- 			self.team = parent.team
+-- 			if self.image ~= nil then
+-- 				self.image.material = parent.image.material
+-- 			end
+-- 		end
+
+-- 		self.rectTransform = self.UI_object:GetComponent(typeof(CS.UnityEngine.RectTransform))
+-- 		-- self.rectTransform.anchoredPosition = CS.UnityEngine.Vector2(x, y)
+-- 		-- self.rectTransform.sizeDelta = CS.UnityEngine.Vector2(0, 0)
+-- 		-- self.rectTransform.anchorMin = CS.UnityEngine.Vector2(0.5, 0.5)
+-- 		-- self.rectTransform.anchorMax = CS.UnityEngine.Vector2(0.5, 0.5)
+-- 		-- self.rectTransform.pivot = CS.UnityEngine.Vector2(0, 1)
+-- 		return self
 -- 	end
--- 	self.eventManager[eventName].add(action)
+	
+-- 	-- self.gameObject:AddComponent(typeof(CS.GameAnimation)).luaBehaviour = utils.LUABEHAVIOUR
+
+
+		
+-- 	-- 	self.animation:AddClip(_v, _v.name)
+-- 	-- end
+-- 	-- self.animation.animatePhysics = true
+
+-- 	self.physics_object = CS.UnityEngine.GameObject("physics")
+-- 	-- self.physics_object.transform:SetParent(self.gameObject.transform)
+-- 	self.physics_object.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
+-- 	self.physics_object.transform.position = CS.UnityEngine.Vector3(x, y, z)
+-- 	-- self.physics_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+-- 	-- self.physics_object.transform.localScale = CS.UnityEngine.Vector3.one
+
+-- 	-- self.rigidbody = self.gameObject:AddComponent(typeof(CS.UnityEngine.Rigidbody2D))
+-- 	-- self.rigidbody.bodyType = CS.UnityEngine.RigidbodyType2D.Kinematic
+-- 	-- -- self.rigidbody.collisionDetectionMode = CS.UnityEngine.CollisionDetectionMode2D.Continuous
+-- 	-- -- self.rigidbody.sleepMode = CS.UnityEngine.RigidbodySleepMode2D.NeverSleep
+-- 	-- -- self.rigidbody.interpolation = CS.UnityEngine.RigidbodyInterpolation2D.Interpolate
+-- 	-- self.rigidbody.constraints = CS.UnityEngine.RigidbodyConstraints2D.FreezeRotation
+-- 	-- self.rigidbody.gravityScale = 0
+-- 	-- -- self.rigidbody.useAutoMass = true
+
+-- 	self.rigidbody = self.physics_object:AddComponent(typeof(CS.UnityEngine.Rigidbody))
+-- 	-- self.rigidbody.useGravity = false
+-- 	self.rigidbody.isKinematic = true
+-- 	-- self.rigidbody.detectCollisions = false
+-- 	self.rigidbody.freezeRotation = true
+
+-- 	self.rigidbody_id = self.rigidbody:GetInstanceID()
+-- 	CS.LuaUtil.AddID2(self.rigidbody_id, self.rigidbody)
+
+-- 	self.vvvX = nil
+-- 	self.vvvY = nil
+-- 	self.accvvvX = nil
+-- 	self.accvvvY = nil
+-- 	self.accvvvZ = nil
+
+	
+-- 	-- self.isWall = false
+-- 	-- self.isCeiling = false
+-- 	self.isOnGround = -1
+-- 	-- self.isElse = 1
+-- 	-- self.elseArray = {}
+
+-- 	self.attckArray = {}
+-- 	self.bodyArray = {}
+-- 	self.bodyArray_InstanceID = {}
+
+-- 	self.pic_offset_object = CS.UnityEngine.GameObject("pic_offset")
+-- 	self.pic_offset_object_id = self.pic_offset_object:GetInstanceID()
+-- 	CS.LuaUtil.AddID(self.pic_offset_object_id, self.pic_offset_object)
+-- 	-- self.pic_offset_object.transform:SetParent(self.gameObject.transform)
+-- 	self.pic_offset_object.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
+-- 	self.pic_offset_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+-- 	-- self.pic_offset_object.transform.localScale = CS.UnityEngine.Vector3.one
+-- 	self.pic_offset_object.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
+
+-- 	self.audioSource = self.pic_offset_object:AddComponent(typeof(CS.UnityEngine.AudioSource))
+-- 	self.audioSource.playOnAwake = false
+
+-- 	self.pic_object = CS.UnityEngine.GameObject("pic")
+-- 	self.pic_object_id = self.pic_object:GetInstanceID()
+-- 	CS.LuaUtil.AddID(self.pic_object_id, self.pic_object)
+-- 	self.pic_object.transform:SetParent(self.pic_offset_object.transform)
+-- 	self.pic_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+-- 	self.pic_object.transform.localScale = CS.UnityEngine.Vector3.one
+-- 	self.spriteRenderer = self.pic_object:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
+-- 	self.spriteRenderer.material = self.database.palettes[1]
+
+-- 	-- if self.kind == 3 then -- 非人物体暂定-20层
+-- 	-- 	self.spriteRenderer.sortingOrder = 20
+-- 	-- end
+
+-- 	self.atk_object = CS.UnityEngine.GameObject("atk")
+-- 	self.atk_object.transform:SetParent(self.physics_object.transform)
+-- 	self.atk_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+-- 	self.atk_object.transform.localScale = CS.UnityEngine.Vector3.one
+
+-- 	self.bdy_object = CS.UnityEngine.GameObject("bdy[16]")
+-- 	self.bdy_object.transform:SetParent(self.physics_object.transform)
+-- 	self.bdy_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+-- 	self.bdy_object.transform.localScale = CS.UnityEngine.Vector3.one
+-- 	self.bdy_object.layer = 16 -- bdy的layer暂定16
+
+-- 	-- self.bdy_object_test = CS.UnityEngine.GameObject("bdy[16]_test")
+-- 	-- self.bdy_object_test.transform:SetParent(self.gameObject.transform)
+-- 	-- self.bdy_object_test.transform.localPosition = CS.UnityEngine.Vector3.zero
+-- 	-- self.bdy_object_test.transform.localScale = CS.UnityEngine.Vector3.one
+-- 	-- self.bdy_object_test.layer = 16 -- bdy的layer暂定16
+
+-- 	-- self.deubg_object = CS.UnityEngine.GameObject.CreatePrimitive(CS.UnityEngine.PrimitiveType.Cube)
+-- 	-- self.deubg_object.name = "debug"
+-- 	-- self.deubg_object.transform:SetParent(self.bdy_object.transform)
+-- 	-- if self.kind ~= 5 then
+-- 	-- 	self.deubg_object.transform.localScale = CS.UnityEngine.Vector3.zero
+-- 	-- else
+-- 	-- 	self.deubg_object.transform.localScale = CS.UnityEngine.Vector3(0.16 / 5, 1, 0.16 / 5)
+-- 	-- end
+-- 	-- self.deubg_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+-- 	-- self.deubg_object:GetComponent(typeof(CS.UnityEngine.MeshRenderer)).material = utils.DEBUG3D
+
+-- 	-- CS.UnityEngine.GameObject.Destroy(self.deubg_object:GetComponent(typeof(CS.UnityEngine.BoxCollider)))
+
+-- 	self.lineRenderer = self.pic_object:AddComponent(typeof(CS.UnityEngine.LineRenderer))
+-- 	-- self.lineRenderer.enabled = false
+-- 	self.lineRenderer.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
+-- 	self.lineRenderer.startWidth = 0.01
+-- 	self.lineRenderer.endWidth = 0.02
+-- 	-- self.lineRenderer.startColor = color
+-- 	-- self.lineRenderer.endColor = color
+-- 	self.lineRenderer.numCapVertices = 90
+-- 	self.lineRenderer.material = utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY
+
+-- 	utils.SetParentAndRoot(self, parent)
+
+-- 	self.oriPos2 = self.physics_object.transform.position
+-- 	self.oriPos = self.rigidbody.position
+-- 	return self
 -- end
 
--- -- 移除事件
--- function LObject:removeEvent(eventName, action)
--- 	self.eventManager[eventName].delete(action)
--- end
+-- -- 显示信息
+-- function LObject:displayInfo()
 
--- -- 移除所有事件
--- function LObject:removeAllEvent()
--- 	self.eventManager = {}
--- end
+-- 	if self.kind == 0 and self.root == self then
+-- 		local a = utils.CAMERA:WorldToScreenPoint(CS.UnityEngine.Vector3(self.pic_offset_object.transform.position.x, self.pic_offset_object.transform.position.y, 0))
 
--- -- 触发事件
--- function LObject:invokeEvent(eventName, ...)
--- 	if self.eventManager[eventName] then
--- 		self.eventManager[eventName].invoke(...)
+-- 		-- local b = utils.CAMERA:WorldToScreenPoint(CS.UnityEngine.Vector3(0, self.pic_offset_object.transform.position.z, 0))
+
+-- 		utils.drawHPMP(a.x, -a.y + CS.UnityEngine.Screen.height - 75 / 2, self.HP / self.maxHP)
 -- 	end
 -- end
-
--- 显示信息
-function LObject:displayInfo()
-
-	if self.kind == 0 and self.root == self then
-		local a = utils.CAMERA:WorldToScreenPoint(CS.UnityEngine.Vector3(self.pic_offset_object.transform.position.x, self.pic_offset_object.transform.position.y, 0))
-
-		-- local b = utils.CAMERA:WorldToScreenPoint(CS.UnityEngine.Vector3(0, self.pic_offset_object.transform.position.z, 0))
-
-		utils.drawHPMP(a.x, -a.y + CS.UnityEngine.Screen.height - 75, self.hp / self.hpMax)
-	end
-end
 
 -- function LObject:playAnimationEvent(clip, frame)
 -- 	local f = self.database.animations[clip].eventQueue[frame]
@@ -336,266 +670,3 @@ end
 -- 	-- 	self.rigidbody.position = self.rigidbody.position + CS.UnityEngine.Vector2(0.5, 0) * CS.UnityEngine.Time.deltaTime
 -- 	-- end
 -- end
-
-function LObject:update()
-	
-	if self.sleep == false then
-		-- if self.animation.isPlaying == true then
-
-		-- 	-- if self.frame >= self.functions.time then
-		-- 	-- 	self.delayCounter = self.delayCounter + 1
-		-- 	-- end
-
-		-- 	-- print(CS.Tools.Instance:GetAnimationState(self.animation, "body_run_front").time)
-		-- 	-- self.frame = self.frame + CS.UnityEngine.Time.deltaTime * self.functions.speed
-
-		-- 	if self.functions.time >= self.delayCounter * (1 / 60) then
-		-- 		print(self.delayCounter)
-		-- 		self.delayCounter = self.delayCounter + 1
-		-- 	end
-		-- end
-
-		if self.action ~= nil then
-			local c = self.database.animations[self.action].keyframes[self.delayCounter + 1]
-
-
-			if c == nil then
-				self.delayCounter = 0
-				self.timeLine = 0
-				self.localTimeLine = 0
-				c = self.database.animations[self.action].keyframes[self.delayCounter + 1]
-			end
-
-			-- if self.kind == 5 and self.state ~= "cursor" then
-			-- 	print(self.delayCounter, self.timeLine)
-			-- end
-			if self.timeLine >= c * (1 / 60) then
-
-				local f = self.database.animations[self.action].eventQueue[c]
-				self.delayCounter = self.delayCounter + 1
-				self.localTimeLine = 0
-				if f ~= nil then
-					for i, v in ipairs(f) do
-						self.database:invokeEvent(v.category, self, v)
-					end
-				end
-
-			end
-		end
-
-		self:runStateUpdate()
-
-		-- if c < self.database.animations[self.action].delay then
-		self.timeLine = self.timeLine + CS.UnityEngine.Time.deltaTime * self.speed
-		self.localTimeLine = self.localTimeLine + CS.UnityEngine.Time.deltaTime * self.speed
-		-- else
-		-- 	self.delayCounter = 0
-		-- 	self.timeLine = 0
-		-- end
-
-		-- local x = "timeLine + 5"
-		-- local func = assert(load("return " .. x, "trigger", "t", self))
-
-		-- local y = func()
-		
-		-- self:runState()
-
-		-- if self.state == "weapon_shoot_HK416c" then
-		-- 	print(self.timeLine, self.localTimeLine, self.delayCounter)
-		-- end
-
-		-- if self.parent == self then
-		-- 	-- local spriteLowerBound = self.spriteRenderer.bounds.size.y * 0.5
-		-- 	local floorHeight = 0
-		-- 	local posX = self.gameObject.transform.position.x
-		-- 	local posY = self.gameObject.transform.position.y
-		-- 	local posZ = (posY + floorHeight) * utils.Tan30
-		-- 	self.gameObject.transform.position = CS.UnityEngine.Vector3(posX, posY, posZ)
-		-- end
-		
-		-- local pos = self.physics_object.transform.position
-		-- self.pic_offset_object.transform.position = CS.UnityEngine.Vector3(pos.x , pos.y + pos.z, self.root.physics_object.transform.position.z)
-		local pos = self.physics_object.transform.position
-		CS.LuaUtil.SetPos(self.pic_offset_object_id, pos.x, pos.y + pos.z, self.root.physics_object.transform.position.z)
-
-		-- if self.parent == self then
-		-- 	local pos2 = self.pic_offset_object.transform.position
-		-- 	local pos3 = self.root.physics_object.transform.position.z
-		-- 	CS.LuaUtil.SetLocalPos(self.pic_offset_object_id, pos2.x, pos2.y, 0)
-		-- end
-
-		self.rotation = self.rotation + self.rotation_velocity
-
-		local rrr = self.physics_object.transform.eulerAngles
-		if (self.root == self and self.direction.x == 1) or (self.root ~= self and self.root.direction.x * self.direction.x == 1) then
-			if rrr.magnitude > 0 then
-				CS.LuaUtil.SetRotationEuler(self.pic_offset_object_id, 0, 0, 360 - rrr.y + self.rotation)
-			else
-				CS.LuaUtil.SetRotationEuler(self.pic_offset_object_id, 0, 0, 0 + self.rotation)
-			end
-		else
-			if rrr.magnitude > 0 then
-				CS.LuaUtil.SetRotationEuler(self.pic_offset_object_id, 0, 180, rrr.y + 180 + self.rotation)
-			else
-				CS.LuaUtil.SetRotationEuler(self.pic_offset_object_id, 0, 180, 0 + self.rotation)
-			end
-		end
-
-		-- local pos2 = self.gameObject.transform.position
-		-- self.bdy_object_test.transform.position = CS.UnityEngine.Vector3(pos2.x , pos2.y + pos2.z, 0)
-	end
-end
-
-function LObject:changeState(state)
-	local animation = nil
-	if state ~= nil then
-		self.state = state
-		animation = self.database.characters_state[self.state].animation
-	end
-	if animation ~= nil then
-		self.action = animation
-		self.delayCounter = 0
-		self.timeLine = 0
-		return true
-	end
-	return false
-end
-
-function LObject:changeAnimation(animation)
-	if animation ~= nil then
-		self.action = animation
-		self.delayCounter = 0
-		self.timeLine = 0
-	end
-end
-
-function LObject:SetParentAndRoot(object)
-	if object ~= nil and (self.physics_object.transform.parent == nil or self.physics_object.transform.parent ~= self.physics_object.transform) then
-
-		self.physics_object.transform:SetParent(object.physics_object.transform)
-		self.rigidbody.isKinematic = true
-		self.parent = object
-		if object.parent ~= nil then
-			self.root = object.parent
-		else
-			self.root = object
-		end
-		self.physics_object.transform.localEulerAngles = CS.UnityEngine.Vector3(0, 0, 0)
-
-		self.team = object.team
-		self.spriteRenderer.material = object.spriteRenderer.material
-	end
-end
-
-
-function LObject:fixedupdate()
-
-	if self.sleep == false then
-		self.oriPos = self.rigidbody.position
-		-- self:runState()
-
-		self:runStateFxiedUpdate()
-
-		if self.accvvvX ~= nil then
-			self.velocity.x = self.velocity.x + self.accvvvX * self.direction.x
-		end
-		if self.accvvvY ~= nil then
-			self.velocity.y = self.velocity.y + self.accvvvY * self.direction.y
-		end
-		if self.accvvvZ ~= nil then
-			self.velocity.z = self.velocity.z + self.accvvvZ * self.direction.z
-		end
-		self.accvvvX = nil
-		self.accvvvY = nil
-		self.accvvvZ = nil
-
-
-		-- self.velocity = self.velocity + CS.UnityEngine.Physics.gravity * 0.01
-
-		-- self.gameObject.transform.position = self.gameObject.transform.position + CS.UnityEngine.Vector3(self.velocity.x, self.velocity.y, self.velocity.z) * CS.UnityEngine.Time.deltaTime
-
-		-- self.rigidbody.position = self.rigidbody.position + self.velocity * CS.UnityEngine.Time.deltaTime
-
-		-- CS.LuaUtil.SetPos2(self.rigidbody_id, self.rigidbody.position.x + self.velocity.x * CS.UnityEngine.Time.deltaTime, self.rigidbody.position.y + self.velocity.y * CS.UnityEngine.Time.deltaTime, self.rigidbody.position.z + self.velocity.z * CS.UnityEngine.Time.deltaTime)
-
-		if self.root ~= self then
-			return
-		end
-
-		-- local pos2 = self.rigidbody.position
-		-- self.bdy_object_test.transform.position = CS.UnityEngine.Vector3(pos2.x, pos2.y + pos2.z, 0)
-		
-		-- print(self.velocity)
-		-- self.elseArray = {}
-		-- 碰撞检测
-
-		local f = 0
-		for i, v in pairs(self.bodyArray) do
-			self.isOnGround = v:BDYFixedUpdate()
-
-			if self.isOnGround ~= -1 then
-
-				if self.kind ~= 99 then
-					self.velocity.y = -0.01
-				end
-			end
-			i = i
-		end
-		if f == 0 then
-			self.rigidbody.position = self.rigidbody.position + self.velocity * CS.UnityEngine.Time.deltaTime
-		end
-
-		if self.isOnGround ~= -1 then
-			self.database:invokeEvent("Ground", self, nil)
-		else
-			self.database:invokeEvent("Flying", self, nil)
-		end
-
-		-- 攻击检测
-		for i, v in pairs(self.attckArray) do
-			v:ATKFixedUpdate()
-		end
-
-		if self.hp > 0 then
-			self.database:invokeEvent("Live", self, nil)
-		else
-			self.database:invokeEvent("Dead", self, nil)
-		end
-	end
-end
-
-function LObject:runStateUpdate()
-	if self.state ~= nil then
-		local st = self.database.characters_state[self.state]
-		for i, v in ipairs(st.update) do
-			if v.func == nil or v.func(self) then
-				-- print(#v.test)
-				for j, v2 in ipairs(v.test) do
-					self.database:invokeEvent(v2.category, self, v2.json)
-				end
-			end
-		end
-	end
-end
-
-function LObject:runStateFxiedUpdate()
-	local st = self.database.characters_state["global"]
-	for i, v in ipairs(st.fixedUpdate) do
-		if v.func == nil or v.func(self) then
-			for j, v2 in ipairs(v.test) do
-				self.database:invokeEvent(v2.category, self, v2.json)
-			end
-		end
-	end
-
-	if self.state ~= nil and self.state ~= "global" then
-		st = self.database.characters_state[self.state]
-		for i, v in ipairs(st.fixedUpdate) do
-			if v.func == nil or v.func(self) then
-				for j, v2 in ipairs(v.test) do
-					self.database:invokeEvent(v2.category, self, v2.json)
-				end
-			end
-		end
-	end
-end

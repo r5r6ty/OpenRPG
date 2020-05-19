@@ -1,9 +1,11 @@
-LMap = require "LMap"
-utils = require "LUtils"
+local LMap = require "LMap"
+local utils = require "LUtils"
 require "LObject_Gun"
 require "LUIObject"
 
 require "LPlayer"
+
+local readCharacterData
 
 local k1, k2, k3 = nil
 local curve = nil
@@ -16,14 +18,21 @@ local dataTable = nil
 
 local mychar = nil
 
-local player = nil
 local system = nil
 
 local lastTime = CS.UnityEngine.Time.realtimeSinceStartup
 
+local _update
+local _fixedUpdate
+
 local luaBehaviour = nil
 
 local console = nil
+
+local LObject_bit
+local UI_bit
+
+local ecs = require "ecs"
 
 function start()
 
@@ -75,88 +84,78 @@ function start()
     -- LMap.gen()
 
     -- 生成角色
-    utils.CURSOR = utils.createObject(nil, 9, "cursor", 0, 0, 0, 0, 0, 0, 0, 5)
-    utils.CURSOR:changeState("cursor")
+    -- utils.CURSOR = utils.createObject(nil, 9, "cursor", 0, "cursor", 0, 0, 0, 0, 0, 0, 5)
 
-    local t = utils.CURSOR
+
+    -- local t = utils.CURSOR
 
     local f = {}
 
     local ppp = nil
 
-    for i = 0, 1, 1 do
-        -- Iz3I2bJTSC=GI+
-        local p, sid = utils.createObject(nil, 9, "body_idle_front", 0, "aim", i * 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0, 0)
+    -- for i = 0, 0, 1 do
+    --     local prostr = nil
+    --     if i % 3 == 0 then
+    --         prostr = "girl_with_gun1"
+    --     elseif i % 3 == 1 then
+    --         prostr = "girl_with_gun2_shield"
+    --     elseif i % 3 == 2 then
+    --         prostr = "girl_with_gun1"
+    --     end
+    --     local mychar, proto = utils.InstantiateFromDataBase(nil, 9, prostr, i * 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0, 1, i % 3 + 1)
 
-        -- p.controller = p.database.AI
-        p.AI = true
+    --     -- bind(mychar, "timeLine", function(val, old)
+    --     --     print("timeLine changed:", "new:", val, "old:", old)
+    --     -- end)
 
-        mychar = p
+    --     -- mychar.timeLine = 999
 
-        mychar.speed = (100 - i) / 100
-        -- mychar:changeState("aim")
-        -- mychar.target = t
-        -- t = mychar
-        -- print(mychar.state)
+    --     rawset(mychar, "controller", mychar.database.AI)
+    --     rawset(mychar, "AI", true)
 
-        mychar.spriteRenderer.material = mychar.database.palettes[i % 3 + 1]
-        if i == 0 then
-            mychar.team = 1
+    --     -- mychar.speed = (100 - i) / 100
 
-            mychar.target = t
-            ppp = mychar
-        else
-            mychar.team = 2
+    --     -- mychar.spriteRenderer.material = mychar.database.palettes[i % 3 + 1]
+    --     if i == 0 then
+    --         mychar.team = 1
 
-            mychar.target = ppp
-        end
+    --         rawset(mychar, "target", t)
+    --         ppp = mychar
+    --     else
+    --         mychar.team = 2
 
-        mychar.children["0"] = utils.createObject(mychar, 9, "aim_right_hand", 0, "left_aim_hand", 0, 0, 0, 0, 0, 0, 0)
+    --         rawset(mychar, "target", ppp)
+    --     end
 
-        mychar.children["1"] = utils.createObject(mychar, 9, "aim_right_hand", 0, "right_aim_hand", 0, 0, 0, 0, 0, 0, 0)
+    --     -- CS.Tools.Instance:GetAnimationState(p.animation, "body_run_front").speed = (100 - i) / 100 + 1
 
-        -- mychar.children["1"] = utils.createObject(mychar, 9, "aim_right_hand_1", 0, "aim_hand_1", 0, 0, 0, 0, 0, 0, 0)
+    --     table.insert(f, mychar)
+    -- end
+    -- mychar = f[1]
 
-        if i % 3 == 1 then
-            -- mychar.children["1"].children["0"] = utils.createObject(mychar.children["1"], 9, "aim_weapon", 0, "weapon_idle", 0, 0, 0, 0, 0, 0, 0)
-            mychar.children["0"].children["0"] = utils.createObject(mychar.children["0"], 9, "shield_0_front", 0, "shield_0", 0, 0, 0, 0, 0, 0, 0)
+    -- local mychar = utils.NewLObject()
 
-            mychar.children["1"].children["0"] = utils.createObject_Gun(mychar.children["1"], 9, "aim_weapon_J", 0, "weapon_idle_J", 0, 0, 0, 0, 0, 0, 0)
+    -- utils.addComponent(mychar ,"DataBase", 9, "body_idle_front", "aim")
+    -- utils.addComponent(mychar ,"SpriteRenderer")
+    -- utils.addComponent(mychar ,"Physical", nil,  0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0)
+    -- utils.addComponent(mychar ,"Control", nil, false)
+    -- utils.addComponent(mychar ,"Target", nil)
+    -- utils.addComponent(mychar ,"Sleep")
 
-        elseif i % 3 == 2 then
-            mychar.children["1"].children["0"] = utils.createObject(mychar.children["1"], 9, "aim_weapon", 0, "weapon_idle", 0, 0, 0, 0, 0, 0, 0)
-        elseif i % 3 == 3 then
-            mychar.children["0"].children["0"] = utils.createObject_Gun(mychar.children["0"], 9, "aim_weapon_J", 0, "weapon_idle_J", 0, 0, 0, 0, 0, 0, 0)
-
-            mychar.children["1"].children["0"] = utils.createObject_Gun(mychar.children["1"], 9, "aim_weapon_J", 0, "weapon_idle_J", 0, 0, 0, 0, 0, 0, 0)
-        elseif i % 3 == 0 then
-            -- mychar.children["0"].children["0"] = utils.createObject(mychar.children["0"], 9, "aim_weapon_HK416c", 0, "weapon_idle_HK416c", 0, 0, 0, 0, 0, 0, 0)
-            mychar.children["1"].children["0"] = utils.createObject(mychar.children["1"], 9, "aim_weapon_HK416c", 0, "weapon_idle_HK416c", 0, 0, 0, 0, 0, 0, 0)
-
-            mychar.children["2"] = utils.createObject(mychar, 9, "aim_weapon_J", 0, "weapon_idle_J", 0, 0, 0, 0, 0, 0, 0)
-        end
-
-        -- CS.Tools.Instance:GetAnimationState(p.animation, "body_run_front").speed = (100 - i) / 100 + 1
-
-        table.insert(f, mychar)
-    end
-    mychar = f[1]
+    -- IID = mychar.physics_object:GetInstanceID()
+    -- utils.addObject(IID, bindable(mychar))
 
 
-
-    -- mychar = LObjectController:new(nil, 9, "aim_back", 0, 0, 0, 0, 0, 0)
-
-
-    player = LPlayer:new(mychar, LMainCamera) -- LMainCamera:GetComponent(typeof(CS.UnityEngine.Camera))
-    -- system = LSystem:new(nil)
-    -- utils.setLSystem(system)
+    -- player = LPlayer:new(mychar, LMainCamera) -- LMainCamera:GetComponent(typeof(CS.UnityEngine.Camera))
+    -- -- system = LSystem:new(nil)
+    -- -- utils.setLSystem(system)
 
 
 
-    utils.PLAYER = player
+    -- utils.PLAYER = player
     
-    mychar.controller = utils.PLAYER
-    mychar.AI = false
+    -- rawset(mychar, "controller", utils.PLAYER)
+    -- mychar.AI = false
 
     -- -- 2bJT6/;-
 
@@ -209,32 +208,119 @@ function start()
     -- local t = luaBehaviour.scriptEnv
 
     -- print(t.moveSpeed)
-    local ccc = utils.createUIObject(nil, 9, "cursor_test", 0, "cursor_test", 0, 0, 0, 0, 0, 0, 1)
-    ccc.controller = utils.PLAYER
+    -- local ccc = utils.createObject(nil, 9, "cursor_test", 0, "cursor_test", 0, 0, 0, 0, 0, 0, 1)
+    -- rawset(ccc, "controller", utils.PLAYER)
 
     -- utils.createUIObject(nil, 9, "UI_Test", 0, "UI_Test", 100, 0, 0, 0, 0, 0, 3)
     -- utils.createUIObject(nil, 9, "UI_Test", 0, "UI_Test", -100, 0, 0, 0, 0, 0, 3)
 
 
-    local wepaon_table = {
-                            {id = 9, animation = "UI_Test", data1 = "aim_weapon_HK416c", data2 = "weapon_idle_HK416c"},
-                            {id = 9, animation = "UI_Test2", data1 = "aim_weapon", data2 = "weapon_idle"},
-                            {id = 9, animation = "UI_Test3", data1 = "aim_weapon_J", data2 = "weapon_idle_J"}
-                        }
-    local weapons = utils.createUIObject(nil, 9, "UI_Test_Panel", 0, "UI_Test_Panel", 0, 50, 0, 0, 0, 0, 1)
-    weapons.controller = utils.PLAYER
+    -- local wepaon_table = {
+    --                         {id = 9, animation = "UI_Test", data1 = "aim_weapon_HK416c", data2 = "weapon_idle_HK416c"},
+    --                         {id = 9, animation = "UI_Test2", data1 = "aim_weapon", data2 = "weapon_idle"},
+    --                         {id = 9, animation = "UI_Test3", data1 = "aim_weapon_J", data2 = "weapon_idle_J"}
+    --                     }
+    -- local weapons = utils.createUIObject(nil, 9, "UI_Test_Panel", 0, "UI_Test_Panel", 0, 50, 0, 0, 0, 0, 1)
+    -- weapons.controller = utils.PLAYER
 
-    for i, v in ipairs(wepaon_table) do
-        local btn = utils.createUIObject(weapons, v.id, v.animation, 0, nil, (i - 2) * 100, 0, 0, 0, 0, 0, 3)
+    -- for i, v in ipairs(wepaon_table) do
+    --     local btn = utils.createUIObject(weapons, v.id, v.animation, 0, "UI_Button", (i - 2) * 100, 0, 0, 0, 0, 0, 3)
 
-        btn.button.onClick:AddListener(function()
-            utils.PLAYER.object.children["1"].children["0"]:changeState(v.data2)
+    --     btn.button.onClick:AddListener(function()
+    --         utils.PLAYER.object.children["1"].children["0"]:changeState(v.data2)
 
-            weapons.UI_object:SetActive(false)
-            -- print(v.data1, v.data2)
-            -- CS.UnityEngine.EventSystems.EventSystem.current:SetSelectedGameObject(phase.UIParts[idC].gameObject)
-		end)
+    --         weapons.UI_object:SetActive(false)
+    --         -- print(v.data1, v.data2)
+    --         -- CS.UnityEngine.EventSystems.EventSystem.current:SetSelectedGameObject(phase.UIParts[idC].gameObject)
+	-- 	end)
+    -- end
+
+    -- local ttt = utils.InstantiateFromDataBase(nil, 9, "UI_HP", 0, 0, 0, 0, 0, 0, nil, 1)
+
+    -- bind(utils.PLAYER.object, "HP", function(this, value)
+    --     local s = ttt.children["1"].rectTransform.sizeDelta
+    --     s.x = utils.PLAYER.object.HP / utils.PLAYER.object.maxHP * 200
+    --     ttt.children["1"].rectTransform.sizeDelta = s
+    -- end)
+
+    -- LObject_bit = utils.allOf(utils.getComponentID("Active"), utils.getComponentID("DataBase"), utils.getComponentID("SpriteRenderer"), utils.getComponentID("Physical"))
+    -- UI_bit = utils.allOf(utils.getComponentID("Active"), utils.getComponentID("DataBase"), utils.getComponentID("UI"))
+
+    -- 创建系统集合
+    _update = {"JudgePlayerSystem", "AnimationSystem1", "StateUpdateSystem", "AnimationSystem2", "SpriteRenderSystem", "LineRenderSystem", "JudgeAISystem"}
+    _fixedUpdate = {"StateFxiedUpdateSystem", "BDYSystem", "ATKSystem", "ResetAISystem", "ResetPlayerSystem", "SleepSystem"} -- , "PhysicsSystem"
+
+    -- 创建一个实体
+    for i = 1, 1, 1 do
+        local id1 = ecs.newEntity()
+        ecs.addComponent(id1, "Active")
+        ecs.addComponent(id1, "DataBase", 9)
+        ecs.addComponent(id1, "Image", nil)
+        ecs.addComponent(id1, "Animation", "cursor_test")
+        ecs.addComponent(id1, "State", "cursor_test")
+        ecs.applyEntity(id1)
     end
+
+    local ppp
+    -- 创建一个实体
+    for i = 1, 1, 1 do
+        local id1 = ecs.newEntity()
+        ecs.addComponent(id1, "Active")
+        ecs.addComponent(id1, "DataBase", 9)
+        ecs.addComponent(id1, "Children")
+        ecs.addComponent(id1, "SpriteRenderer")
+        ecs.addComponent(id1, "Animation", "body_idle_front")
+        ecs.addComponent(id1, "State", "aim")
+        ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0)
+        ecs.addComponent(id1, "BDY")
+        ecs.addComponent(id1, "Gravity")
+
+        utils.PLAYER = LPlayer:new(ecs.entities[id1], LMainCamera) -- LMainCamera:GetComponent(typeof(CS.UnityEngine.Camera))
+        ecs.addComponent(id1, "Player")
+        ppp = ecs.applyEntity(id1)
+
+
+        local id2 = ecs.newEntity()
+        ecs.addComponent(id2, "Active")
+        ecs.addComponent(id2, "DataBase", 9)
+        ecs.addComponent(id2, "SpriteRenderer")
+        ecs.addComponent(id2, "Animation", "aim_right_hand")
+        ecs.addComponent(id2, "State", "right_aim_hand")
+        ecs.addComponent(id2, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0)
+        ecs.addComponent(id2, "Parent", ppp, "1")
+        local hand = ecs.applyEntity(id2)
+
+        local id3 = ecs.newEntity()
+        ecs.addComponent(id3, "Active")
+        ecs.addComponent(id3, "DataBase", 9)
+        ecs.addComponent(id3, "SpriteRenderer")
+        ecs.addComponent(id3, "Animation", "aim_weapon")
+        ecs.addComponent(id3, "State", "weapon_idle")
+        ecs.addComponent(id3, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0)
+        ecs.addComponent(id3, "Parent", hand, "0")
+        ecs.applyEntity(id3)
+    end
+
+    -- 创建一个实体
+    for i = 2, 2, 1 do
+        local id1 = ecs.newEntity()
+        ecs.addComponent(id1, "Active")
+        ecs.addComponent(id1, "DataBase", 9)
+        ecs.addComponent(id1, "SpriteRenderer")
+        ecs.addComponent(id1, "Animation", "body_idle_front")
+        ecs.addComponent(id1, "State", "aim")
+        ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0)
+        ecs.addComponent(id1, "BDY")
+        ecs.addComponent(id1, "AI")
+        ecs.addComponent(id1, "Target", ppp)
+        ecs.addComponent(id1, "Gravity")
+        local eee = ecs.applyEntity(id1)
+
+        ecs.addComponent(ppp._eid, "Target", eee)
+        ecs.applyEntity(ppp._eid)
+    end
+
+    -- dump(ecs.getCache())
 end
 
 function update()
@@ -259,16 +345,16 @@ function update()
     -- end
 
     -- player:followCharacter()
-    player:input()
-    player:judgeCommand()
+    -- player:input()
+    -- player:judgeCommand()
 
-    if system ~= nil then
+    -- if system ~= nil then
         -- system:input()
         -- if system.object ~= nil then
         --     system:judgeCommand()
         -- end
         -- system:systemInput(player.object)
-    end
+    -- end
 
     -- local deltaTime = CS.UnityEngine.Time.realtimeSinceStartup - lastTime
     -- utils.runObjectsFrame()
@@ -277,23 +363,34 @@ function update()
 
     -- lastTime = CS.UnityEngine.Time.realtimeSinceStartup
 
-    utils.runObjectsUpdate()
+    -- utils.runObjectsUpdate()
+
+    for _, v in ipairs(_update) do
+        ecs.processMultipleSystem(v)
+    end
 end
 
 function lateupdate()
-    player:followCharacter()
+    -- player:followCharacter()
+
+    ecs.processMultipleSystem("FollowPlayerSystem")
 end
 
 function fixedupdate()
     -- mychar:runState()
 
-    utils.runObjectsFixedupdate()
+    -- utils.runObjectsFixedupdate()
     -- if system.object ~= nil then
     --     system:resetCommands()
     -- end
-    player:resetCommands()
-    
+
+    -- player:resetCommands()
     -- collectgarbage("collect")
+
+    -- utils.UpdateBinding()
+    for _, v in ipairs(_fixedUpdate) do
+        ecs.processMultipleSystem(v)
+    end
 end
 
 function ongui()
@@ -304,16 +401,33 @@ function ongui()
 --    end
 
     -- ceshi
-    if CS.UnityEngine.Event.current.keyCode == CS.UnityEngine.KeyCode.KeypadEnter and CS.UnityEngine.Event.current.type == CS.UnityEngine.EventType.KeyDown then
+    -- if CS.UnityEngine.Event.current.keyCode == CS.UnityEngine.KeyCode.KeypadEnter and CS.UnityEngine.Event.current.type == CS.UnityEngine.EventType.KeyDown then
         -- print(k1.inTangent, k1.outTangent, k1.inWeight, k1.outWeight, k1.weightedMode)
         -- print(k2.inTangent, k2.outTangent, k2.inWeight, k2.outWeight, k2.weightedMode)
         -- print(k3.inTangent, k3.outTangent, k3.inWeight, k3.outWeight, k3.weightedMode)
 
-        local kkk = curve.keys[1]
-        print(kkk.inTangent, kkk.outTangent, kkk.inWeight, kkk.outWeight, kkk.weightedMode)
+    --     local kkk = curve.keys[1]
+    --     print(kkk.inTangent, kkk.outTangent, kkk.inWeight, kkk.outWeight, kkk.weightedMode)
+    -- end
+
+	-- 热更新角色数据库
+    if CS.UnityEngine.Event.current.keyCode == CS.UnityEngine.KeyCode.KeypadEnter and CS.UnityEngine.Event.current.type == CS.UnityEngine.EventType.KeyDown then
+		readCharacterData()
+		for i, v in pairs(utils.getObjects()) do
+			v.database = utils.getIDData(v.id)
+		end
+	end
+
+    -- CS.UnityEngine.GUI.Label(CS.UnityEngine.Rect(10, CS.UnityEngine.Screen.height - 56, 200, 20), "LObjects: " .. ecs.total)
+    -- utils.display()
+    -- utils.displayObjectsInfo()
+
+	for _, v in ipairs(_update) do
+		CS.UnityEngine.GUILayout.Label(string.format("%s: %d", v, ecs.displayMultipleSystem(v)))
     end
-    
-    utils.displayObjectsInfo()
+    for _, v in ipairs(_fixedUpdate) do
+		CS.UnityEngine.GUILayout.Label(string.format("%s: %d", v, ecs.displayMultipleSystem(v)))
+	end
 end
 
 function ondestroy()
@@ -327,12 +441,7 @@ function readCharacterData()
     for i, v in ipairs(data:getLines("data")) do
         local p = utils.split(v.file, "/")
 
-        local cdb = nil
-        if v.kind == 5 then
-            cdb = LCastleDBCharacter_new:new(utils.resourcePathDataPath .. p[1] .. "/", p[2])
-        else
-            cdb = LCastleDBCharacter:new(utils.resourcePathDataPath .. p[1] .. "/", p[2])
-        end
+        local cdb = LCastleDBCharacter:new(utils.resourcePathDataPath .. p[1] .. "/", p[2])
         cdb:readDB()
 
         -- local p2 = utils.split(p[2], ".")

@@ -7,6 +7,7 @@
 local json = require "json"
 local utils = require 'LUtils'
 require "LAI"
+local ecs = require "ecs"
 
 castleDB = {DBPath = nil, DBFile = nil, DBData = nil, IMGFile = nil, IMGData = nil, DBSheets = nil}
 castleDB.__index = castleDB
@@ -85,7 +86,7 @@ function castleDB:getLines(name)
 	return self.DBSheets[name].lines
 end
 
-LCastleDBMap = {texture2D = nil, sprites = nil, audioClips = nil, palettes = nil}
+LCastleDBMap = {texture2Ds = nil, texture256 = nil, sprites = nil, audioClips = nil, palettes = nil}
 setmetatable(LCastleDBMap, castleDB)
 LCastleDBMap.__index = LCastleDBMap
 function LCastleDBMap:new(path, file)
@@ -94,6 +95,7 @@ function LCastleDBMap:new(path, file)
 	setmetatable(self, LCastleDBMap)
 
 	self.texture2D = nil
+	self.texture256 = nil
 	self.sprites = nil
 	self.audioClips = nil
 	self.palettes = nil
@@ -115,7 +117,7 @@ function LCastleDBMap:readDB()
 	print(self.DBPath .. self.DBFile .. ": json read!")
 
 	self.audioClips = self:createAudioClips()
-	self.texture2Ds, self.sprites = self:createSprites()
+	self.texture2Ds, self.texture256, self.sprites = self:createSprites()
 	self.palettes = self:createPalettes()
 end
 
@@ -240,10 +242,22 @@ function LCastleDBMap:createSprites()
 					pics[v.id] = CS.UnityEngine.Sprite.Create(texture2D, CS.UnityEngine.Rect(v.x, v.y, v.w, v.h), CS.UnityEngine.Vector2(0, 1))
 				end
 			end
+
+			local texture256 = CS.UnityEngine.Texture2D(16, 16, CS.UnityEngine.TextureFormat.RGBA32, false, false)
+			texture256.wrapMode = CS.UnityEngine.TextureWrapMode.Clamp
+			texture256.filterMode = CS.UnityEngine.FilterMode.Point
+			for i = 0, texture256.width - 1, 1 do
+				for j = 0, texture256.height - 1, 1 do
+					local color = j * 16 + i
+					texture256:SetPixel(i, j, CS.UnityEngine.Color(color / 255, 0, 0))
+					pics[tostring(color)] = CS.UnityEngine.Sprite.Create(texture256, CS.UnityEngine.Rect(i, j, 1, 1), CS.UnityEngine.Vector2(0, 1))
+				end
+			end
+			texture256:Apply()
 		
-			return texture2D, pics
+			return texture2D, texture256, pics
 		else
-			return nil, {}
+			return nil, nil, {}
 		end
 	end
 
@@ -346,7 +360,18 @@ Delegate = function()
     }
 end
 
-LCastleDBCharacter = {palettes_ui = nil, characters = nil, AI = nil, animations = nil, characters_state = nil, vars = nil, animationClips = nil, eventManager = nil}
+LCastleDBCharacter = {
+						palettes_ui = nil,
+						characters = nil,
+						AI = nil,
+						animations = nil,
+						characters_state = nil,
+						vars = nil,
+						animationClips = nil,
+						prototypes = nil,
+						-- eventManager = nil
+						groups = nil
+					}
 setmetatable(LCastleDBCharacter, LCastleDBMap)
 LCastleDBCharacter.__index = LCastleDBCharacter
 function LCastleDBCharacter:new(path, file)
@@ -362,8 +387,11 @@ function LCastleDBCharacter:new(path, file)
 	self.characters_state = nil
 	self.vars = nil
 	self.animationClips = nil
+	self.prototypes = nil
 
-	self.eventManager = {}
+	-- self.eventManager = {}
+
+	self.groups = nil
 	return self
 end
 
@@ -464,6 +492,64 @@ function LCastleDBCharacter:readDB()
 
 	end
 
+	self.prototypes = {}
+	for i, v in ipairs(self:getLines("prototypes")) do
+		if v.active then
+			self.prototypes[v.name] = v.prototype
+		end
+	end
+
+	self.groups = {}
+	for _, v in ipairs(self:getLines("groups")) do
+		if v.active then
+			local vvv = {}
+			local str = "function _new(%s) "
+			str = str .. "local eid = ecs.newEntity() "
+			for _, v2 in ipairs(v.group) do
+
+				local vs = {}
+				local j = 2
+				while true do
+					local cnew = ecs.getComponent(v2.component).new
+					if cnew == nil then
+						break
+					end
+					local vn = debug.getlocal(cnew, j)
+					if vn == nil then
+						break
+					end
+					j = j + 1
+					table.insert(vs, vn)
+				end
+				local vv
+				if #vs > 0 then
+					if v2.value == nil then
+						vv = table.concat(vs, ", ")
+						table.insert(vvv, vv)
+						vv = ", " .. vv
+					else
+						vv = ""
+						for i in ipairs(vs) do
+							if type(v2.value[i]) == "string" then
+								vv = vv .. ", '" .. v2.value[i] .. "'"
+							else
+								vv = vv .. ", " .. v2.value[i]
+							end
+						end
+					end
+				else
+					vv = ""
+				end
+
+				str = str .. "ecs.addComponent(eid, '" .. v2.component .."'" .. vv .. ") "
+			end
+			str = str .. "return ecs.applyEntity(eid) end return _new"
+			local r = string.format(str, table.concat(vvv, ", "))
+			-- print(r)
+			self.groups[v.name] = assert(load(r, "_new", "t", {ecs = require "ecs"}))()
+		end
+	end
+
 	self.vars = {}
 	for i, v in ipairs(self:getLines("vars")) do
 		if v.active then
@@ -492,12 +578,11 @@ function LCastleDBCharacter:readDB()
 		-- 		v2.func = nil
 		-- 	end
 		-- end
-
 		local update = {}
 		self:setState(v.update, update)
-
 		local fixedUpdate = {}
 		self:setState(v.fixedUpdate, fixedUpdate)
+
 
 		self.characters_state[v.name].update = update
 		self.characters_state[v.name].fixedUpdate = fixedUpdate
@@ -522,463 +607,542 @@ function LCastleDBCharacter:readDB()
 	self.AI = LAI:new(self)
 
 	self.audioClips = self:createAudioClips()
-	self.texture2Ds, self.sprites = self:createSprites()
+	self.texture2Ds, self.texture256, self.sprites = self:createSprites()
 	self.palettes, self.palettes_ui = self:createPalettes()
 
 	----------------------------------------------------------------------------------------------------------------------
 
-	self:addEvent("Live", function(this, value)
-		-- self["HP"] = utils.toMaxvalue(self["HP"], self["maxHP"], self["HPRecoveryRate"])
-		-- self["MP"] = utils.toMaxvalue(self["MP"], self["maxMP"], self["MPRecoveryRate"] + (self["MPRecoveryRate"] * (1 - self["HP"] / self["maxHP"])))
-		-- self["falling"] = utils.toOne(self["falling"], self["maxFalling"], self["fallingRecoveryRate"])
-		-- self["defencing"] = utils.toOne(self["defencing"], self["maxDefencing"], self["defencingRecoveryRate"])
+	-- self:addEvent("Live", function(this, value)
+	-- 	-- self["HP"] = utils.toMaxvalue(self["HP"], self["maxHP"], self["HPRecoveryRate"])
+	-- 	-- self["MP"] = utils.toMaxvalue(self["MP"], self["maxMP"], self["MPRecoveryRate"] + (self["MPRecoveryRate"] * (1 - self["HP"] / self["maxHP"])))
+	-- 	-- self["falling"] = utils.toOne(self["falling"], self["maxFalling"], self["fallingRecoveryRate"])
+	-- 	-- self["defencing"] = utils.toOne(self["defencing"], self["maxDefencing"], self["defencingRecoveryRate"])
 
-		-- if self.target == nil then
-		-- 	local temp = {}
-		-- 	for i, v in pairs(utils.getObjects()) do
-		-- 		if v ~= nil and v.kind == 0 and v ~= self and v["HP"] > 0 then
-		-- 			table.insert(temp, v)
-		-- 		end
-		-- 	end
-		-- 	self.target = temp[CS.Tools.Instance:RandomRangeInt(1, #temp + 1)]
-		-- else
-		-- 	if self.target["HP"] <= 0 then
-		-- 		self.target = nil
-		-- 	end
-		-- end
-	end)
-	self:addEvent("Dead", function(this, value)
-		utils.destroyObject(this.physics_object:GetInstanceID())
-	end)
+	-- 	-- if self.target == nil then
+	-- 	-- 	local temp = {}
+	-- 	-- 	for i, v in pairs(utils.getObjects()) do
+	-- 	-- 		if v ~= nil and v.kind == 0 and v ~= self and v["HP"] > 0 then
+	-- 	-- 			table.insert(temp, v)
+	-- 	-- 		end
+	-- 	-- 	end
+	-- 	-- 	self.target = temp[CS.Tools.Instance:RandomRangeInt(1, #temp + 1)]
+	-- 	-- else
+	-- 	-- 	if self.target["HP"] <= 0 then
+	-- 	-- 		self.target = nil
+	-- 	-- 	end
+	-- 	-- end
+	-- end)
+	-- self:addEvent("Dead", function(this, value)
+	-- 	utils.destroyObject(this.physics_object:GetInstanceID())
+	-- end)
 
-	self:addEvent("Flying", function(this, value)
-		if this.kind ~= 3 and this.kind ~= 5 and not this["isCatched"] then
-			this.velocity = this.velocity + 0.5 * CS.UnityEngine.Physics.gravity * 2 / 60
-			-- this.velocity.y = this.velocity.y + 0.5 * -9.81 * 2 / 60 / 3
-		end
-	end)
+	-- self:addEvent("Flying", function(this, value)
+	-- 	if this.kind ~= 3 and this.kind ~= 5 then
+	-- 		this.velocity = this.velocity + 0.5 * CS.UnityEngine.Physics.gravity * 2 / 60
+	-- 		-- this.velocity.y = this.velocity.y + 0.5 * -9.81 * 2 / 60 / 3
+	-- 	end
+	-- end)
 
-	self:addEvent("Ground", function(this, value)
-		-- if this.isOnGround ~= 1 then
-			local f = this.velocity * 0.2 -- ????
-			if this.velocity.x > 0 then
-				this.velocity.x = this.velocity.x - f.x
-				if this.velocity.x < 0 then
-					this.velocity.x = 0
-				end
-			elseif this.velocity.x < 0 then
-				this.velocity.x = this.velocity.x - f.x
-				if this.velocity.x > 0 then
-					this.velocity.x = 0
-				end
-			end
+	-- self:addEvent("Ground", function(this, value)
+	-- 	-- if this.isOnGround ~= 1 then
+	-- 		local f = this.velocity * 0.2 -- ????
+	-- 		if this.velocity.x > 0 then
+	-- 			this.velocity.x = this.velocity.x - f.x
+	-- 			if this.velocity.x < 0 then
+	-- 				this.velocity.x = 0
+	-- 			end
+	-- 		elseif this.velocity.x < 0 then
+	-- 			this.velocity.x = this.velocity.x - f.x
+	-- 			if this.velocity.x > 0 then
+	-- 				this.velocity.x = 0
+	-- 			end
+	-- 		end
 
-			if this.velocity.z > 0 then
-				this.velocity.z = this.velocity.z - f.z
-				if this.velocity.z < 0 then
-					this.velocity.z = 0
-				end
-			elseif this.velocity.z < 0 then
-				this.velocity.z = this.velocity.z - f.z
-				if this.velocity.z > 0 then
-					this.velocity.z = 0
-				end
-			end
-		-- end
-		if this.kind == 99 then
-			if this.rotation > 0 then
-				this.rotation_velocity = this.rotation_velocity / 2
-			else
-				this.rotation_velocity = this.rotation_velocity / 2
-			end
-			if this.velocity.magnitude <= 0.5 then
-				this.sleep = true
-			end
-		end
-	end)
+	-- 		if this.velocity.z > 0 then
+	-- 			this.velocity.z = this.velocity.z - f.z
+	-- 			if this.velocity.z < 0 then
+	-- 				this.velocity.z = 0
+	-- 			end
+	-- 		elseif this.velocity.z < 0 then
+	-- 			this.velocity.z = this.velocity.z - f.z
+	-- 			if this.velocity.z > 0 then
+	-- 				this.velocity.z = 0
+	-- 			end
+	-- 		end
+	-- 	-- end
+	-- 	if this.kind == 99 then
+	-- 		if this.rotation > 0 then
+	-- 			this.rotation_velocity = this.rotation_velocity / 2
+	-- 		else
+	-- 			this.rotation_velocity = this.rotation_velocity / 2
+	-- 		end
+	-- 		if this.velocity.magnitude <= 0.5 then
+	-- 			this.sleep = true
+	-- 		end
+	-- 	end
+	-- end)
 
-	self:addEvent("Sprite", function(this, value)
-		-- print(value)
-		this.spriteRenderer.sprite = this.database.sprites[value.sprite]
-		this.pic_object.transform.localPosition = CS.UnityEngine.Vector3(value.x / 100, -value.y / 100, 0)
-	end)
+	-- self:addEvent("Sprite", function(this, value)
+	-- 	-- print(value)
+	-- 	this.spriteRenderer.sprite = this.database.sprites[value.sprite]
+	-- 	this.pic_object.transform.localPosition = CS.UnityEngine.Vector3(value.x / 100, -value.y / 100, 0)
+	-- end)
 
-	self:addEvent("Image", function(this, value)
-		this.image.sprite = this.database.sprites[value.sprite]
-		this.image.rectTransform.anchoredPosition = CS.UnityEngine.Vector2(value.x, -value.y)
-		this.image.rectTransform.sizeDelta = CS.UnityEngine.Vector2(value.width, value.height)
-	end)
+	-- self:addEvent("Image", function(this, value)
+	-- 	if value.id == nil then
+	-- 		this.image.sprite = this.database.sprites[value.sprite]
+	-- 	else
+	-- 		this.image.sprite = this.database.sprites[value.id]
+	-- 	end
 
-	self:addEvent("Text", function(this, value)
-		this.text.text = value.text
-		this.text.rectTransform.anchoredPosition = CS.UnityEngine.Vector2(value.x, -value.y)
-		this.text.rectTransform.sizeDelta = CS.UnityEngine.Vector2(value.width, value.height)
-	end)
+	-- 	local position = CS.UnityEngine.Vector2(0, 0)
+	-- 	local size = CS.UnityEngine.Vector2(0, 0)
+	-- 	local min = CS.UnityEngine.Vector2(0, 0)
+	-- 	local max = CS.UnityEngine.Vector2(0, 0)
+	-- 	local pivot = CS.UnityEngine.Vector2(0, 0)
+	-- 	if value.horizontalAlignment == 0 then -- Left
+	-- 		min.x = 0
+	-- 		max.x = 0
+	-- 		pivot.x = 0
 
-	self:addEvent("Button", function(this, value)
-		this.image.sprite = this.database.sprites[value.sprite]
-		this.image.rectTransform.anchoredPosition = CS.UnityEngine.Vector2(value.x, -value.y)
-		this.image.rectTransform.sizeDelta = CS.UnityEngine.Vector2(value.width, value.height)
+	-- 		position.x = value.margin.left
+	-- 		size.x = value.width
+	-- 	elseif value.horizontalAlignment == 1 then -- Center
+	-- 		min.x = 0.5
+	-- 		max.x = 0.5
+	-- 		pivot.x = 0.5
 
-		this.text.text = value.text
-		-- this.text.rectTransform.anchoredPosition = CS.UnityEngine.Vector2(value.x, -value.y)
-		-- this.text.rectTransform.sizeDelta = CS.UnityEngine.Vector2(value.width, value.height)
-	end)
+	-- 		position.x = value.x
+	-- 		size.x = value.width
+	-- 	elseif value.horizontalAlignment == 2 then -- Right
+	-- 		min.x = 1
+	-- 		max.x = 1
+	-- 		pivot.x = 1
 
-	self:addEvent("Trace", function(this, value)
-		local s = this.oriPos2
-		local e = this.physics_object.transform.position
-		this.lineRenderer:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
-		this.lineRenderer:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
+	-- 		position.x = -value.margin.right
+	-- 		size.x = value.width
+	-- 	elseif value.horizontalAlignment == 3 then -- Stretch
+	-- 		min.x = 0
+	-- 		max.x = 1
+	-- 		pivot.x = 0.5
 
-		this.oriPos2 = this.physics_object.transform.position
-	end)
+	-- 		position.x = value.margin.left
+	-- 		size.x = position.x + value.margin.right
+	-- 	end
 
-	self:addEvent("Sound", function(this, value)
-		this.audioSource.clip = this.database.audioClips[value.sfx]
-		-- local r = math.random() / 2.5
-		-- this.audioSource.pitch = 1 + r - 0.2
-		this.audioSource:Play()
-	end)
+	-- 	if value.verticalAlignment == 0 then -- Top
+	-- 		min.y = 1
+	-- 		max.y = 1
+	-- 		pivot.y = 1
+
+	-- 		position.y = -value.margin.top
+	-- 		size.y = value.height
+	-- 	elseif value.verticalAlignment == 1 then -- Center
+	-- 		min.y = 0.5
+	-- 		max.y = 0.5
+	-- 		pivot.y = 0.5
+
+	-- 		position.y = -value.y
+	-- 		size.y = value.height
+	-- 	elseif value.verticalAlignment == 2 then -- Bottom
+	-- 		min.y = 0
+	-- 		max.y = 0
+	-- 		pivot.y = 0
+
+	-- 		position.y = value.margin.bottom
+	-- 		size.y = value.height
+	-- 	elseif value.verticalAlignment == 3 then -- Stretch
+	-- 		min.y = 0
+	-- 		max.y = 1
+	-- 		pivot.y = 0.5
+
+	-- 		position.y = value.margin.bottom
+	-- 		size.y = position.y + value.margin.top
+	-- 	end
+
+	-- 	this.rectTransform.anchorMin = min
+	-- 	this.rectTransform.anchorMax = max
+
+	-- 	this.rectTransform.pivot = pivot
+
+	-- 	this.rectTransform.sizeDelta = size
+	-- 	this.rectTransform.anchoredPosition = position
+
+	-- 	-- this.rectTransform.offsetMin = position
+	-- 	-- this.rectTransform.offsetMax = size
+
+	-- end)
+
+	-- self:addEvent("Text", function(this, value)
+	-- 	this.text.text = value.text
+	-- 	this.text.rectTransform.anchoredPosition = CS.UnityEngine.Vector2(value.x, -value.y)
+	-- 	this.text.rectTransform.sizeDelta = CS.UnityEngine.Vector2(value.width, value.height)
+	-- end)
+
+	-- self:addEvent("Button", function(this, value)
+	-- 	this.image.sprite = this.database.sprites[value.sprite]
+	-- 	this.image.rectTransform.anchoredPosition = CS.UnityEngine.Vector2(value.x, -value.y)
+	-- 	this.image.rectTransform.sizeDelta = CS.UnityEngine.Vector2(value.width, value.height)
+
+	-- 	this.text.text = value.text
+	-- 	-- this.text.rectTransform.anchoredPosition = CS.UnityEngine.Vector2(value.x, -value.y)
+	-- 	-- this.text.rectTransform.sizeDelta = CS.UnityEngine.Vector2(value.width, value.height)
+	-- end)
+
+	-- self:addEvent("Trace", function(this, value)
+	-- 	local s = this.oriPos2
+	-- 	local e = this.physics_object.transform.position
+	-- 	this.lineRenderer:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
+	-- 	this.lineRenderer:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
+
+	-- 	this.oriPos2 = this.physics_object.transform.position
+	-- end)
+
+	-- self:addEvent("Sound", function(this, value)
+	-- 	this.audioSource.clip = this.database.audioClips[value.sfx]
+	-- 	-- local r = math.random() / 2.5
+	-- 	-- this.audioSource.pitch = 1 + r - 0.2
+	-- 	this.audioSource:Play()
+	-- end)
+
+	-- -- self:addEvent("Object", function(this, value)
+	-- -- 	if value.isWorldPosition then
+	-- -- 		utils.createObject(nil, this.id, value.action,value.frame, value.x, value.y, 0, 0, value.kind)
+	-- -- 	else
+	-- -- 		utils.createObject(nil, this.id, value.action, value.frame, this.rigidbody.position.x + value.x, this.rigidbody.position.y + value.y, 0, 0, value.kind)
+	-- -- 	end
+	-- -- end)
+
+	-- self:addEvent("Body", function(this, value)
+	-- 	if this.bodyArray[value.id] == nil and not (value.width == 0 or value.height == 0) then
+	-- 		this.bodyArray[value.id] = LColliderBDY:new(this, this.bdy_object, value.id)
+	-- 		this.bodyArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.bodyFlags, value.layers)
+	-- 		-- this.bodyArray_InstanceID[this.bodyArray[value.id].collider2:GetInstanceID()] = this.bodyArray[value.id]
+	-- 		this.bodyArray_InstanceID[this.bodyArray[value.id].collider:GetInstanceID()] = this.bodyArray[value.id]
+
+	-- 		-- this.deubg_object.transform.localScale = CS.UnityEngine.Vector3(value.width / 100, value.height / 100, value.width / 100)
+	-- 		-- this.deubg_object.transform.localPosition = CS.UnityEngine.Vector3((value.x + value.width / 2) / 100, -(value.y + value.height / 2) / 100, 0)
+	-- 	else
+	-- 		if this.bodyArray[value.id] ~= nil then
+	-- 			if value.width == 0 or value.height == 0 then
+	-- 				local IID = this.bodyArray[value.id].collider:GetInstanceID()
+	-- 				this.bodyArray[value.id]:deleteCollider()
+	-- 				this.bodyArray[value.id] = nil
+	-- 				this.bodyArray_InstanceID[IID] = nil
+	-- 			else
+	-- 				-- this.bodyArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.bodyFlags, value.layers)
+	-- 			end
+	-- 		end
+	-- 	end
+	-- end)
+
+	-- self:addEvent("Attack", function(this, value)
+	-- 	if this.attckArray[value.id] == nil and not (value.width == 0 or value.height == 0) then
+	-- 		this.attckArray[value.id] = LColliderATK:new(this, this.atk_object, value.id)
+	-- 		this.attckArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.attackFlags,
+	-- 													value.damage, value.fall, value.defence, value.frequency, value.directionX, value.directionY, false, value.var,
+	-- 													value.action, value.frame)
+	-- 	else
+	-- 		if this.attckArray[value.id] ~= nil then
+	-- 			if value.width == 0 or value.height == 0 then
+	-- 				this.attckArray[value.id]:deleteCollider()
+	-- 				this.attckArray[value.id] = nil
+	-- 			else
+	-- 				-- this.attckArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.attackFlags,
+	-- 				-- 										value.damage, value.fall, value.defence, value.frequency, value.directionX, value.directionY, value.ignoreFlag, value.var,
+	-- 				-- 										value.action, value.frame)
+	-- 			end
+	-- 		end
+	-- 	end
+	-- end)
+
+	-- self:addEvent("Force", function(this, value)
+	-- 	-- this.velocity.x = this.velocity.x + value.x
+	-- 	-- this.velocity.y = this.velocity.y + value.y
+	-- 	-- this.velocity.z = this.velocity.z + value.z
+	-- 	local object = this.attckArray["0"].hitObject
+
+	-- 	local spd = this.attckArray["0"].direction * 40 / 100
+
+	-- 	object.velocity.x = object.velocity.x + spd.x
+	-- 	object.velocity.y = object.velocity.y + spd.y
+	-- 	object.velocity.z = object.velocity.z + spd.z
+	-- end)
+
+	-- self:addEvent("Hurt", function(this, value)
+	-- 	this.HP = this.HP - value.damage
+	-- end)
+
+	-- -- self:addEvent("TurnRight", function(this, value)
+	-- -- 	if this.direction.x == -1 and this.target ~= nil and this.physics_object.transform.position.x - this.target.physics_object.transform.position.x < 0 then
+	-- -- 		this.direction.x = 1
+	-- -- 	end
+	-- -- 	if this.direction.x == 1 and this.target ~= nil and this.physics_object.transform.position.x - this.target.physics_object.transform.position.x >= 0 then
+	-- -- 		this.direction.x = -1
+	-- -- 	end
+	-- -- end)
+
+	-- self:addEvent("Mouse", function(this, value)
+	-- 	local mousePos = CS.UnityEngine.Input.mousePosition
+	-- 	-- mousePos.z = v3.z
+	-- 	local worldPos = utils.CAMERA:ScreenToWorldPoint(mousePos)
+	-- 	this.physics_object.transform.position = CS.UnityEngine.Vector3(worldPos.x, 0, worldPos.y - utils.PLAYER.object.physics_object.transform.position.y)
+	-- end)
+	-- -- this:frameLoop() -- ????
+
+	-- -- this.animation:Play(this.action)
+	-- -- this.functions = CS.Tools.Instance:GetAnimationState(this.animation, this.action)
+
+	-- self:addEvent("State", function(this, value)
+	-- 	utils.changeState(this, value.state)
+	-- end)
+
+	-- self:addEvent("Animation", function(this, value)
+	-- 	utils.changeAnimation(this, value.animation)
+	-- end)
+
+	-- self:addEvent("Child", function(this, value)
+	-- 	local object = this.children[value.id]
+	-- 	if object ~= nil then
+	-- 		if value.rotation ~= nil then
+	-- 			object.rotation = value.rotation
+	-- 		end
+
+	-- 		if value.direction_x ~= nil then
+	-- 			object.direction.x = value.direction_x
+	-- 		end
+
+	-- 		-- local z = value.layer / 100
+	-- 		-- if this.root.direction.x == -1 then
+	-- 		-- 	z = -z
+	-- 		-- end
+	-- 		-- object.gameObject.transform.localPosition = CS.UnityEngine.Vector3(value.x / 100, value.y / 100, z)
+
+	-- 		object.physics_object.transform.localPosition = CS.UnityEngine.Vector3(this.direction.x * value.x / 100, value.y / 100, 0)
+
+	-- 		object.spriteRenderer.sortingOrder = -(value.layer * this.root.direction.z - this.spriteRenderer.sortingOrder)
+	-- 	end
+	-- end)
+
+	-- self:addEvent("MoveAC", function(this, value)
+	-- 	this.accvvvY = value.id
+	-- end)
+
+	-- self:addEvent("Move", function(this, value)
+	-- 	if value.x ~= nil then
+	-- 		this.velocity.x = value.x
+	-- 	end
+	-- 	if value.y ~= nil then
+	-- 		this.velocity.y = value.y
+	-- 	end
+	-- 	if value.z ~= nil then
+	-- 		this.velocity.z = value.z
+	-- 	end
+	-- 	-- this.rigidbody.position = this.rigidbody.position + CS.UnityEngine.Vector2(v.x, v.y) * CS.UnityEngine.Time.deltaTime
+	-- 	-- this.gameObject.transform.position = this.gameObject.transform.position + CS.UnityEngine.Vector3(v.x, v.y, 0) * CS.UnityEngine.Time.deltaTime
+	-- end)
+
+	-- self:addEvent("Set", function(this, value)
+	-- 	value.func(this)
+	-- end)
+
+	-- self:addEvent("TurnToTarget", function(this, value)
+	-- 	if this.root.target ~= nil then
+	-- 		local pos = this.root.target.physics_object.transform.position
+	-- 		if this.root.target.state == "cursor" then
+	-- 			local object = this.children[value.id]
+	-- 			if object ~= nil then
+	-- 				pos.z = pos.z - this.physics_object.transform.localPosition.y * 2 + value.y / 100 * 2
+	-- 			end
+	-- 		end
+	-- 		local rad = CS.UnityEngine.Mathf.Atan2(this.physics_object.transform.position.z - pos.z, this.physics_object.transform.position.x - pos.x)
+
+	-- 		local deg = rad * CS.UnityEngine.Mathf.Rad2Deg + 180
+
+	-- 		local root = this.root
+	-- 		if root ~= nil then
+
+	-- 			-- if root.direction.x == -1 then
+	-- 			-- 	deg = -(360 - rad * CS.UnityEngine.Mathf.Rad2Deg)
+	-- 			-- end
+	-- 			this.physics_object.transform.localEulerAngles = CS.UnityEngine.Vector3(0, -deg, 0)
+	-- 		end
+	-- 	end
+	-- end)
+
+	-- self:addEvent("Ray", function(this, value)
+	-- 	local hitinfo = nil
+	-- 	local s = nil
+	-- 	local e = nil
+
+	-- 	local first = nil
+	-- 	if this.physics_object.transform.childCount > 1 + 1 then
+	-- 		first = this.physics_object.transform:GetChild(2)
+	-- 	else
+	-- 		first = CS.UnityEngine.GameObject("debug_1")
+	-- 		first.transform.parent = this.physics_object.transform
+	-- 	end
+	-- 	if first ~= nil then
+	-- 		local flag, lr = first:TryGetComponent(typeof(CS.UnityEngine.LineRenderer))
+
+	-- 		if not flag then
+	-- 			lr = first:AddComponent(typeof(CS.UnityEngine.LineRenderer))
+
+	-- 			lr.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
+	-- 			lr.startWidth = 0.02
+	-- 			lr.endWidth = 0.02
+
+	-- 			-- local color = CS.UnityEngine.Color.green
+	-- 			local color = CS.UnityEngine.Color.red
+
+	-- 			lr.startColor = color
+	-- 			color.a = 0
+	-- 			lr.endColor = color
+	-- 			lr.numCapVertices = 90
+	-- 			lr.material = utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY
+
+	-- 			-- lr.useWorldSpace = false
+	-- 		end
+
+	-- 		if lr ~= nil then
+	-- 			local r = this.physics_object.transform.rotation
+	-- 			-- local r = CS.UnityEngine.Quaternion.Euler(r2.x, r2.z, r2.y)
+	-- 			-- pos = r * CS.UnityEngine.Vector3(v.x / 100 * 2, -v.y / 100 * 2, 0)
+
+	-- 			-- pos = CS.UnityEngine.Quaternion.Euler() * CS.UnityEngine.Vector3(v.x / 100 * 2, -v.y / 100 * 2, 0)
+
+	-- 			-- hitinfo = CS.Tools.Instance:PhysicsRaycastAll(pos + this.rigidbody.position, this.gameObject.transform.right, 25, 15)
+
+	-- 			-- local gen = pos + this.physics_object.transform.position
+	-- 			local gen = this.physics_object.transform:TransformPoint(CS.UnityEngine.Vector3(v.x / 100, -v.y / 100, 0))
+
+	-- 			hitinfo = CS.Tools.Instance:PhysicsRaycast(gen, this.physics_object.transform.right, 25, 1048575)
+	-- 			-- local t_pos = this.root.target.gameObject.transform.position
+	-- 			-- local offset = t_pos - (pos + this.rigidbody.position)
+	-- 			-- hitinfo = CS.Tools.Instance:PhysicsRaycast(pos + this.rigidbody.position, offset.normalized, offset.magnitude, 15)
+
+	-- 			if hitinfo.collider ~= nil then
+	-- 				s = gen
+	-- 				e = hitinfo.point
+	-- 				-- lr:SetPosition(0, s)
+	-- 				-- lr:SetPosition(1, e)
+	-- 				lr:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
+	-- 				lr:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
+	-- 			else
+	-- 				s = gen
+	-- 				e = gen + this.physics_object.transform.right * 25
+	-- 				-- lr:SetPosition(0, s)
+	-- 				-- lr:SetPosition(1, e)
+	-- 				lr:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
+	-- 				lr:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
+	-- 			end
+	-- 		end
+	-- 	end
+
+	-- 	-- local second = nil
+	-- 	-- if this.physics_object.transform.childCount > 2 + 1 then
+	-- 	-- 	second = this.physics_object.transform:GetChild(3)
+	-- 	-- else
+	-- 	-- 	second = CS.UnityEngine.GameObject("debug_2")
+	-- 	-- 	second.transform.parent = this.physics_object.transform
+	-- 	-- end
+	-- 	-- if second ~= nil then
+	-- 	-- 	local flag, lr = second:TryGetComponent(typeof(CS.UnityEngine.LineRenderer))
+
+	-- 	-- 	if not flag then
+	-- 	-- 		lr = second:AddComponent(typeof(CS.UnityEngine.LineRenderer))
+
+	-- 	-- 		lr.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
+	-- 	-- 		lr.startWidth = 0.02
+	-- 	-- 		lr.endWidth = 0.02
+
+	-- 	-- 		local color = CS.UnityEngine.Color.red
+
+	-- 	-- 		lr.startColor = color
+	-- 	-- 		color.a = 0
+	-- 	-- 		lr.endColor = color
+	-- 	-- 		lr.numCapVertices = 90
+	-- 	-- 		lr.material = utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY
+
+	-- 	-- 		-- lr.useWorldSpace = false
+	-- 	-- 	end
+
+	-- 	-- 	if lr ~= nil then
+	-- 	-- 		lr:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
+	-- 	-- 		lr:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
+	-- 	-- 	end
+	-- 	-- end
+	-- end)
 
 	-- self:addEvent("Object", function(this, value)
-	-- 	if value.isWorldPosition then
-	-- 		utils.createObject(nil, this.id, value.action,value.frame, value.x, value.y, 0, 0, value.kind)
-	-- 	else
-	-- 		utils.createObject(nil, this.id, value.action, value.frame, this.rigidbody.position.x + value.x, this.rigidbody.position.y + value.y, 0, 0, value.kind)
-	-- 	end
-	-- end)
 
-	self:addEvent("Body", function(this, value)
-		if this.bodyArray[value.id] == nil and not (value.width == 0 or value.height == 0) then
-			this.bodyArray[value.id] = LColliderBDY:new(this, this.bdy_object, value.id)
-			this.bodyArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.bodyFlags, value.layers)
-			-- this.bodyArray_InstanceID[this.bodyArray[value.id].collider2:GetInstanceID()] = this.bodyArray[value.id]
-			this.bodyArray_InstanceID[this.bodyArray[value.id].collider:GetInstanceID()] = this.bodyArray[value.id]
-
-			-- this.deubg_object.transform.localScale = CS.UnityEngine.Vector3(value.width / 100, value.height / 100, value.width / 100)
-			-- this.deubg_object.transform.localPosition = CS.UnityEngine.Vector3((value.x + value.width / 2) / 100, -(value.y + value.height / 2) / 100, 0)
-		else
-			if this.bodyArray[value.id] ~= nil then
-				if value.width == 0 or value.height == 0 then
-					local IID = this.bodyArray[value.id].collider:GetInstanceID()
-					this.bodyArray[value.id]:deleteCollider()
-					this.bodyArray[value.id] = nil
-					this.bodyArray_InstanceID[IID] = nil
-				else
-					-- this.bodyArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.bodyFlags, value.layers)
-				end
-			end
-		end
-	end)
-
-	self:addEvent("Attack", function(this, value)
-		if this.attckArray[value.id] == nil and not (value.width == 0 or value.height == 0) then
-			this.attckArray[value.id] = LColliderATK:new(this, this.atk_object, value.id)
-			this.attckArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.attackFlags,
-														value.damage, value.fall, value.defence, value.frequency, value.directionX, value.directionY, false, value.var,
-														value.action, value.frame)
-		else
-			if this.attckArray[value.id] ~= nil then
-				if value.width == 0 or value.height == 0 then
-					this.attckArray[value.id]:deleteCollider()
-					this.attckArray[value.id] = nil
-				else
-					-- this.attckArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.attackFlags,
-					-- 										value.damage, value.fall, value.defence, value.frequency, value.directionX, value.directionY, value.ignoreFlag, value.var,
-					-- 										value.action, value.frame)
-				end
-			end
-		end
-	end)
-
-	self:addEvent("Force", function(this, value)
-		-- this.velocity.x = this.velocity.x + value.x
-		-- this.velocity.y = this.velocity.y + value.y
-		-- this.velocity.z = this.velocity.z + value.z
-		local object = this.attckArray["0"].hitObject
-
-		local spd = this.attckArray["0"].direction * 40 / 100
-
-		object.velocity.x = object.velocity.x + spd.x
-		object.velocity.y = object.velocity.y + spd.y
-		object.velocity.z = object.velocity.z + spd.z
-	end)
-
-	self:addEvent("Hurt", function(this, value)
-		this.hp = this.hp - value.damage
-	end)
-
-	-- self:addEvent("TurnRight", function(this, value)
-	-- 	if this.direction.x == -1 and this.target ~= nil and this.physics_object.transform.position.x - this.target.physics_object.transform.position.x < 0 then
-	-- 		this.direction.x = 1
-	-- 	end
-	-- 	if this.direction.x == 1 and this.target ~= nil and this.physics_object.transform.position.x - this.target.physics_object.transform.position.x >= 0 then
-	-- 		this.direction.x = -1
-	-- 	end
-	-- end)
-
-	self:addEvent("Mouse", function(this, value)
-		local mousePos = CS.UnityEngine.Input.mousePosition
-		-- mousePos.z = v3.z
-		local worldPos = utils.CAMERA:ScreenToWorldPoint(mousePos)
-		this.physics_object.transform.position = CS.UnityEngine.Vector3(worldPos.x, 0, worldPos.y - utils.PLAYER.object.physics_object.transform.position.y)
-	end)
-	-- this:frameLoop() -- ????
-
-	-- this.animation:Play(this.action)
-	-- this.functions = CS.Tools.Instance:GetAnimationState(this.animation, this.action)
-
-	self:addEvent("State", function(this, value)
-		this:changeState(value.state)
-	end)
-
-	self:addEvent("Animation", function(this, value)
-		this:changeAnimation(value.animation)
-	end)
-
-	self:addEvent("Child", function(this, value)
-		local object = this.children[value.id]
-		if object ~= nil then
-			if value.rotation ~= nil then
-				object.rotation = value.rotation
-			end
-
-			if value.direction_x ~= nil then
-				object.direction.x = value.direction_x
-			end
-
-			-- local z = value.layer / 100
-			-- if this.root.direction.x == -1 then
-			-- 	z = -z
-			-- end
-			-- object.gameObject.transform.localPosition = CS.UnityEngine.Vector3(value.x / 100, value.y / 100, z)
-
-			object.physics_object.transform.localPosition = CS.UnityEngine.Vector3(this.direction.x * value.x / 100, value.y / 100, 0)
-
-			object.spriteRenderer.sortingOrder = -(value.layer * this.root.direction.z - this.spriteRenderer.sortingOrder)
-		end
-	end)
-
-	self:addEvent("MoveAC", function(this, value)
-		this.accvvvY = value.id
-	end)
-
-	self:addEvent("Move", function(this, value)
-		if value.x ~= nil then
-			this.velocity.x = value.x
-		end
-		if value.y ~= nil then
-			this.velocity.y = value.y
-		end
-		if value.z ~= nil then
-			this.velocity.z = value.z
-		end
-		-- this.rigidbody.position = this.rigidbody.position + CS.UnityEngine.Vector2(v.x, v.y) * CS.UnityEngine.Time.deltaTime
-		-- this.gameObject.transform.position = this.gameObject.transform.position + CS.UnityEngine.Vector3(v.x, v.y, 0) * CS.UnityEngine.Time.deltaTime
-	end)
-
-	self:addEvent("Set", function(this, value)
-		value.func(this)
-	end)
-
-	self:addEvent("TurnToTarget", function(this, value)
-		if this.root.target ~= nil then
-			local pos = this.root.target.physics_object.transform.position
-			if this.root.target.state == "cursor" then
-				local object = this.children[value.id]
-				if object ~= nil then
-					pos.z = pos.z - this.physics_object.transform.localPosition.y * 2 + value.y / 100 * 2
-				end
-			end
-			local rad = CS.UnityEngine.Mathf.Atan2(this.physics_object.transform.position.z - pos.z, this.physics_object.transform.position.x - pos.x)
-
-			local deg = rad * CS.UnityEngine.Mathf.Rad2Deg + 180
-
-			local root = this.root
-			if root ~= nil then
-
-				-- if root.direction.x == -1 then
-				-- 	deg = -(360 - rad * CS.UnityEngine.Mathf.Rad2Deg)
-				-- end
-				this.physics_object.transform.localEulerAngles = CS.UnityEngine.Vector3(0, -deg, 0)
-			end
-		end
-	end)
-
-	self:addEvent("Ray", function(this, value)
-		local hitinfo = nil
-		local s = nil
-		local e = nil
-
-		local first = nil
-		if this.physics_object.transform.childCount > 1 + 1 then
-			first = this.physics_object.transform:GetChild(2)
-		else
-			first = CS.UnityEngine.GameObject("debug_1")
-			first.transform.parent = this.physics_object.transform
-		end
-		if first ~= nil then
-			local flag, lr = first:TryGetComponent(typeof(CS.UnityEngine.LineRenderer))
-
-			if not flag then
-				lr = first:AddComponent(typeof(CS.UnityEngine.LineRenderer))
-
-				lr.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
-				lr.startWidth = 0.02
-				lr.endWidth = 0.02
-
-				-- local color = CS.UnityEngine.Color.green
-				local color = CS.UnityEngine.Color.red
-
-				lr.startColor = color
-				color.a = 0
-				lr.endColor = color
-				lr.numCapVertices = 90
-				lr.material = utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY
-
-				-- lr.useWorldSpace = false
-			end
-
-			if lr ~= nil then
-				local r = this.physics_object.transform.rotation
-				-- local r = CS.UnityEngine.Quaternion.Euler(r2.x, r2.z, r2.y)
-				-- pos = r * CS.UnityEngine.Vector3(v.x / 100 * 2, -v.y / 100 * 2, 0)
-
-				-- pos = CS.UnityEngine.Quaternion.Euler() * CS.UnityEngine.Vector3(v.x / 100 * 2, -v.y / 100 * 2, 0)
-
-				-- hitinfo = CS.Tools.Instance:PhysicsRaycastAll(pos + this.rigidbody.position, this.gameObject.transform.right, 25, 15)
-
-				-- local gen = pos + this.physics_object.transform.position
-				local gen = this.physics_object.transform:TransformPoint(CS.UnityEngine.Vector3(v.x / 100, -v.y / 100, 0))
-
-				hitinfo = CS.Tools.Instance:PhysicsRaycast(gen, this.physics_object.transform.right, 25, 1048575)
-				-- local t_pos = this.root.target.gameObject.transform.position
-				-- local offset = t_pos - (pos + this.rigidbody.position)
-				-- hitinfo = CS.Tools.Instance:PhysicsRaycast(pos + this.rigidbody.position, offset.normalized, offset.magnitude, 15)
-
-				if hitinfo.collider ~= nil then
-					s = gen
-					e = hitinfo.point
-					-- lr:SetPosition(0, s)
-					-- lr:SetPosition(1, e)
-					lr:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
-					lr:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
-				else
-					s = gen
-					e = gen + this.physics_object.transform.right * 25
-					-- lr:SetPosition(0, s)
-					-- lr:SetPosition(1, e)
-					lr:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
-					lr:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
-				end
-			end
-		end
-
-		-- local second = nil
-		-- if this.physics_object.transform.childCount > 2 + 1 then
-		-- 	second = this.physics_object.transform:GetChild(3)
-		-- else
-		-- 	second = CS.UnityEngine.GameObject("debug_2")
-		-- 	second.transform.parent = this.physics_object.transform
-		-- end
-		-- if second ~= nil then
-		-- 	local flag, lr = second:TryGetComponent(typeof(CS.UnityEngine.LineRenderer))
-
-		-- 	if not flag then
-		-- 		lr = second:AddComponent(typeof(CS.UnityEngine.LineRenderer))
-
-		-- 		lr.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
-		-- 		lr.startWidth = 0.02
-		-- 		lr.endWidth = 0.02
-
-		-- 		local color = CS.UnityEngine.Color.red
-
-		-- 		lr.startColor = color
-		-- 		color.a = 0
-		-- 		lr.endColor = color
-		-- 		lr.numCapVertices = 90
-		-- 		lr.material = utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY
-
-		-- 		-- lr.useWorldSpace = false
-		-- 	end
-
-		-- 	if lr ~= nil then
-		-- 		lr:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
-		-- 		lr:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
-		-- 	end
-		-- end
-	end)
-
-	self:addEvent("Object", function(this, value)
-
-		local d = this.root.direction.x
+	-- 	local d = this.root.direction.x
 		
-		for i2 = 1, value.amount, 1 do
+	-- 	for i2 = 1, value.amount, 1 do
 
-			local r = CS.Tools.Instance:RandomRangeInt(0, value.precise + 1) - value.precise / 2
+	-- 		local r = CS.Tools.Instance:RandomRangeInt(0, value.precise + 1) - value.precise / 2
 
-			local rot = nil
-			local velocityyy = nil
-			local offset = nil
-			if value.amount > 1 then
-				offset = CS.Tools.Instance:RandomRangeInt(0, value.precise)
-			else
-				offset = 0
-			end
+	-- 		local rot = nil
+	-- 		local velocityyy = nil
+	-- 		local offset = nil
+	-- 		-- if value.amount > 1 then
+	-- 		-- 	offset = CS.Tools.Instance:RandomRangeInt(0, value.precise)
+	-- 		-- else
+	-- 			offset = 0
+	-- 		-- end
 
-			local randomvector = CS.UnityEngine.Vector3(0, CS.Tools.Instance:RandomRangeFloat(0, 1), CS.Tools.Instance:RandomRangeFloat(0, 1)).normalized
+	-- 		local randomvector = CS.UnityEngine.Vector3(0, CS.Tools.Instance:RandomRangeFloat(0, 1), CS.Tools.Instance:RandomRangeFloat(0, 1)).normalized
 
-			rot = CS.UnityEngine.Quaternion.AngleAxis(r, randomvector) * this.physics_object.transform.rotation 
+	-- 		rot = CS.UnityEngine.Quaternion.AngleAxis(r, randomvector) * this.physics_object.transform.rotation 
 
-			velocityyy = rot * CS.UnityEngine.Vector3(value.x2 - offset, value.y2, value.z2)
+	-- 		velocityyy = rot * (CS.UnityEngine.Vector3(value.x2 - offset, value.y2, value.z2) * CS.Tools.Instance:RandomRangeFloat(0.9, 1))
 
-			local pos = this.physics_object.transform.rotation * CS.UnityEngine.Vector3(value.x / 100 * 2, -value.y / 100 * 2, 0)
+	-- 		local pos = this.physics_object.transform.rotation * CS.UnityEngine.Vector3(value.x / 100 * 2, -value.y / 100 * 2, 0)
 
-			local kk = nil
-			if value.animation == "shell1" or value.animation == "shell2" then
-				kk = 99
-			else
-				kk = 5
-			end
-			local object = utils.createObject(nil, tonumber(value.id), value.animation, 0, value.state, this.rigidbody.position.x + pos.x, this.rigidbody.position.y + pos.y, this.rigidbody.position.z + pos.z, velocityyy.x, velocityyy.y, velocityyy.z, kk)
-			object.team = this.team
-			-- local lr = object.pic_object:AddComponent(typeof(CS.UnityEngine.LineRenderer))
-			-- -- lr.enabled = false
-			-- lr.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
-			-- lr.startWidth = 0.01
-			-- lr.endWidth = 0.02
+	-- 		local kk = nil
+	-- 		if value.animation == "shell1" or value.animation == "shell2" then
+	-- 			kk = 99
+	-- 		else
+	-- 			kk = 5
+	-- 		end
+	-- 		local object = utils.createObject(nil, tonumber(value.id), value.animation, 0, value.state, this.rigidbody.position.x + pos.x, this.rigidbody.position.y + pos.y, this.rigidbody.position.z + pos.z, velocityyy.x, velocityyy.y, velocityyy.z, kk)
+	-- 		object.team = this.team
+	-- 		-- local lr = object.pic_object:AddComponent(typeof(CS.UnityEngine.LineRenderer))
+	-- 		-- -- lr.enabled = false
+	-- 		-- lr.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
+	-- 		-- lr.startWidth = 0.01
+	-- 		-- lr.endWidth = 0.02
 
-			-- local rc = CS.Tools.Instance:RandomRangeInt(0, #v.colors) + 1
-			-- local color = CS.Tools.Instance:ColorTryParseHtmlString("#" .. string.format("%X", v.colors[rc].color))
+	-- 		-- local rc = CS.Tools.Instance:RandomRangeInt(0, #v.colors) + 1
+	-- 		-- local color = CS.Tools.Instance:ColorTryParseHtmlString("#" .. string.format("%X", v.colors[rc].color))
 
-			-- lr.startColor = color
-			-- lr.endColor = color
-			-- lr.numCapVertices = 90
-			-- lr.material = utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY
+	-- 		-- lr.startColor = color
+	-- 		-- lr.endColor = color
+	-- 		-- lr.numCapVertices = 90
+	-- 		-- lr.material = utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY
 
-			object.direction.x = d
+	-- 		object.direction.x = d
 
-			object.physics_object.transform.rotation = rot
+	-- 		object.physics_object.transform.rotation = rot
 
-			-- object.rotation = rot.eulerAngles.z
+	-- 		-- object.rotation = rot.eulerAngles.z
 			
-		end
-	end)
+	-- 	end
+	-- end)
 
-	self:addEvent("Rotation", function(this, value)
-		if this.rotation_velocity == 0 then
-			this.rotation_velocity = value.y2
-		end
-	end)
+	-- self:addEvent("Rotation", function(this, value)
+	-- 	if this.rotation_velocity == 0 then
+	-- 		this.rotation_velocity = value.y2
+	-- 	end
+	-- end)
 
-	self:addEvent("Destory", function(this, value)
-		utils.destroyObject(this.physics_object:GetInstanceID())
-	end)
+	-- self:addEvent("Destory", function(this, value)
+	-- 	utils.destroyObject(this.physics_object:GetInstanceID())
+	-- end)
 
-	self:addEvent("OnClick", function(this, value)
-		utils.invokeEvent("OnClick", this)
-	end)
+	-- self:addEvent("OnClick", function(this, value)
+	-- 	utils.invokeEvent("OnClick", this)
+	-- end)
 end
 
 function LCastleDBCharacter:setState(from, to)
@@ -1002,13 +1166,12 @@ function LCastleDBCharacter:setState(from, to)
 						if type(str) == "string" and string.sub(v3, 1, 1) == "-" then
 							str = string.sub(v3, 2)
 							p = "-"
-							print(p)
 						end
-						if type(str) == "string" and tonumber(str) == nil and assert(load("return vars." .. str .." ~= nil", "vars", "t", self))() then
+						if type(str) == "string" and tonumber(str) == nil and assert(load("return vars." .. str .." == true", "vars", "t", self))() then
 							if s == nil then
 								s = {}
 							end
-							s[k] = p .. "this.database.vars." .. str
+							s[k] = p .. "this." .. str
 						end
 					end
 				end
@@ -1053,29 +1216,29 @@ function LCastleDBCharacter:setState(from, to)
 	end
 end
 
--- 添加事件
-function LCastleDBCharacter:addEvent(eventName, action)
-	if not self.eventManager[eventName] then
-		self.eventManager[eventName] = Delegate()
-	end
-	self.eventManager[eventName].add(action)
-end
+-- -- 添加事件
+-- function LCastleDBCharacter:addEvent(eventName, action)
+-- 	if not self.eventManager[eventName] then
+-- 		self.eventManager[eventName] = Delegate()
+-- 	end
+-- 	self.eventManager[eventName].add(action)
+-- end
 
--- 移除事件
-function LCastleDBCharacter:removeEvent(eventName, action)
-	self.eventManager[eventName].delete(action)
-end
+-- -- 移除事件
+-- function LCastleDBCharacter:removeEvent(eventName, action)
+-- 	self.eventManager[eventName].delete(action)
+-- end
 
--- 移除所有事件
-function LCastleDBCharacter:removeAllEvent()
-	self.eventManager = {}
-end
+-- -- 移除所有事件
+-- function LCastleDBCharacter:removeAllEvent()
+-- 	self.eventManager = {}
+-- end
 
--- 触发事件
-function LCastleDBCharacter:invokeEvent(eventName, ...)
-	if self.eventManager[eventName] then
-		self.eventManager[eventName].invoke(...)
-	end
-end
+-- -- 触发事件
+-- function LCastleDBCharacter:invokeEvent(eventName, ...)
+-- 	if self.eventManager[eventName] then
+-- 		self.eventManager[eventName].invoke(...)
+-- 	end
+-- end
 
 ---------------------------------------------------------------------------------------

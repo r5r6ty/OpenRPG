@@ -343,6 +343,16 @@ public class LuaUtil
         mObjs2.Add(id, go);
     }
 
+    public static void DeleteID(int id)
+    {
+        mObjs.Remove(id);
+    }
+
+    public static void DeleteID2(int id)
+    {
+        mObjs2.Remove(id);
+    }
+
     public static void SetPos2(int id, float x, float y, float z)
     {
         mObjs2[id].position = new Vector3(x, y, z);

@@ -277,7 +277,7 @@ function LColliderBDY:BDYFixedUpdate()
 
 	if self.isRayCast then
 		-- assert(self.collider == false, "self.collider must be nil with raycast")
-		local velocity = self.LObject.velocity * CS.UnityEngine.Time.deltaTime
+		local velocity = self.LObject.velocity * CS.UnityEngine.Time.deltaTime * self.LObject.speed
 
 		local rx, ry, rz = CS.LuaUtil.RigidbodyGetPosition(self.LObject.rigidbody)
 
@@ -334,26 +334,32 @@ function LColliderBDY:BDYFixedUpdate()
 					self.isHit = 1
 				elseif go.name ~= "test" then
 					local object2 = utils.getObject(go:GetInstanceID())
-					-- if self.LObject.team ~= object2.team then
-					-- local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
+					if object2 == nil then
+						print("what!?")
+						self.hitObject = nil
+						self.isHit = -1
+					else
+						if self.LObject.team ~= object2.team then
+						-- local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
 
-					-- if not string.find(LC.layers, string.match(self.collider.name, "%[(%d+)%]")) then
-						up = true
-						down = true
-						left = true
-						right = true
-					-- end
-					-- above = true
-					-- under = true
+						-- if not string.find(LC.layers, string.match(self.collider.name, "%[(%d+)%]")) then
+							up = true
+							down = true
+							left = true
+							right = true
+						-- end
+						-- above = true
+						-- under = true
 
-						self.hitObject = object
-						self.isHit = 16
+							self.hitObject = object
+							self.isHit = 16
 
-						-- print(object2.state)
-					-- else
-					-- 	self.hitObject = nil
-					-- 	self.isHit = -1
-					-- end
+							-- print(object2.state)
+						else
+							self.hitObject = nil
+							self.isHit = -1
+						end
+					end
 
 					-- local iId = hitinfo.collider.attachedRigidbody.gameObject:GetInstanceID()
 					-- local object = utils.getObject(iId)
@@ -461,6 +467,7 @@ function LColliderBDY:BDYFixedUpdate()
 							isGround = 1 << tonumber(0)
 						end
 					end
+					break
 				end
 			else
 				self.hitObject = nil
@@ -472,10 +479,11 @@ function LColliderBDY:BDYFixedUpdate()
 			self.isHit = -1
 		end
 
-		CS.LuaUtil.RigidbodyMovePosition(self.collider.attachedRigidbody, finalOffset_x, finalOffset_y, finalOffset_z)
+		local dt = 1
+		CS.LuaUtil.RigidbodyMovePosition(self.collider.attachedRigidbody, finalOffset_x * dt, finalOffset_y * dt, finalOffset_z * dt)
 	else
 
-	local velocity = self.LObject.velocity * CS.UnityEngine.Time.deltaTime
+	local velocity = self.LObject.velocity * CS.UnityEngine.Time.deltaTime * self.LObject.speed
 	
 
 	local contactColliders = CS.UnityEngine.Physics.OverlapBox(self.collider.bounds.center + velocity, self.collider.bounds.extents, self.LObject.physics_object.transform.rotation, self.filter.layerMask.value)
@@ -635,26 +643,23 @@ function LColliderBDY:BDYFixedUpdate()
 	-- 更新自身位置
 	-- self.collider.attachedRigidbody.position = self.collider.attachedRigidbody.position + CS.UnityEngine.Vector3(finalOffset_x, finalOffset_y, finalOffset_z)
 
-	
-	CS.LuaUtil.RigidbodyMovePosition(self.collider.attachedRigidbody, finalOffset_x, finalOffset_y, finalOffset_z)
+	local dt = 1
+	CS.LuaUtil.RigidbodyMovePosition(self.collider.attachedRigidbody, finalOffset_x * dt, finalOffset_y * dt, finalOffset_z * dt)
 
 	end
 
 	if self.bounciness > 0 then
 		if isWall_leftright == 1 then
 			self.LObject.velocity.x = -self.LObject.velocity.x * self.bounciness
-			self.LObject.rotation = -self.LObject.rotation
-			self.LObject.rotation_velocity = (CS.Tools.Instance:RandomRangeInt(0, 2) * 2 - 1) * -self.LObject.rotation_velocity
+			self.LObject.rotation_velocity = (CS.Tools.Instance:RandomRangeInt(0, 2) * 2 - 1) * self.LObject.rotation_velocity * self.bounciness
 		end
 		if isWall_updown == 1 then
 			self.LObject.velocity.z = -self.LObject.velocity.z * self.bounciness
-			self.LObject.rotation = -self.LObject.rotation
-			self.LObject.rotation_velocity = (CS.Tools.Instance:RandomRangeInt(0, 2) * 2 - 1) * -self.LObject.rotation_velocity
+			self.LObject.rotation_velocity = (CS.Tools.Instance:RandomRangeInt(0, 2) * 2 - 1) * self.LObject.rotation_velocity * self.bounciness
 		end
 		if isGround == 1 then
 			self.LObject.velocity.y = -self.LObject.velocity.y * self.bounciness
-			self.LObject.rotation = -self.LObject.rotation
-			self.LObject.rotation_velocity = (CS.Tools.Instance:RandomRangeInt(0, 2) * 2 - 1) * -self.LObject.rotation_velocity
+			self.LObject.rotation_velocity = (CS.Tools.Instance:RandomRangeInt(0, 2) * 2 - 1) * self.LObject.rotation_velocity * self.bounciness
 
 			-- self.LObject.velocity  = self.LObject.velocity * CS.Tools.Instance:RandomRangeFloat(0.9, 1)
 		end

@@ -34,6 +34,9 @@ local UI_bit
 
 local ecs = require "ecs"
 
+local volume
+local chromaticAberration
+
 function start()
 
     console = CS.ConsoleTestWindows.ConsoleWindow()
@@ -45,11 +48,13 @@ function start()
     print("lua start...")
     print("injected object", LMainCamera)
     print("injected object", LCanvas)
+    print("injected object", LPV)
 
     -- CS.UnityEngine.Screen.SetResolution(1920, 1080, false)
+    CS.UnityEngine.Screen.SetResolution(1280, 720, false)
     -- CS.UnityEngine.Screen.SetResolution(640, 360, false)
 
-    LMainCamera:GetComponent(typeof(CS.UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera)).enabled = false
+    -- LMainCamera:GetComponent(typeof(CS.UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera)).enabled = false
 
     camera = LMainCamera:GetComponent(typeof(CS.UnityEngine.Camera))
     camera.orthographicSize = CS.UnityEngine.Screen.height / 1 / 100 / zoom
@@ -58,15 +63,22 @@ function start()
     -- utils.LUABEHAVIOUR = self:GetComponent(typeof(CS.XLuaTest.LuaBehaviour))
 
     utils.setLCanvas(LCanvas)
-    utils.loadfont2()
-    -- 
 --    dataTable = utils.LoadTilesFromCSV(CS.UnityEngine.Application.dataPath .. "/StreamingAssets/1/Resource/" .. "tile_data.csv")
 
-    utils.loadfont2() -- TXHkWVLe
+    utils.loadfont2() -- 载入字体
+
+    volume = LPV:GetComponent(typeof(CS.UnityEngine.Rendering.Volume))
+
+    for i = 0, volume.profile.components.Count - 1, 1 do
+        if volume.profile.components[i]:GetType() == typeof(CS.UnityEngine.Rendering.Universal.ChromaticAberration) then
+            chromaticAberration = volume.profile.components[i]
+            break
+        end
+    end
 
     readCharacterData() -- TXHk=GI+J}>]
 
-    utils.createHPMP()
+    -- utils.createHPMP()
 
     -- CS.UnityEngine.Cursor.visible = false
 
@@ -271,7 +283,7 @@ function start()
         ecs.addComponent(id1, "SpriteRenderer")
         ecs.addComponent(id1, "Animation", "body_idle_front")
         ecs.addComponent(id1, "State", "aim")
-        ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0)
+        ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0, 0)
         ecs.addComponent(id1, "BDY")
         ecs.addComponent(id1, "Gravity")
 
@@ -286,7 +298,7 @@ function start()
         ecs.addComponent(id2, "SpriteRenderer")
         ecs.addComponent(id2, "Animation", "aim_right_hand")
         ecs.addComponent(id2, "State", "right_aim_hand")
-        ecs.addComponent(id2, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0)
+        ecs.addComponent(id2, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0, 1)
         ecs.addComponent(id2, "Parent", ppp, "1")
         local hand = ecs.applyEntity(id2)
 
@@ -296,9 +308,29 @@ function start()
         ecs.addComponent(id3, "SpriteRenderer")
         ecs.addComponent(id3, "Animation", "aim_weapon_HK416c")
         ecs.addComponent(id3, "State", "weapon_idle_HK416c")
-        ecs.addComponent(id3, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0)
+        ecs.addComponent(id3, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0, 1)
         ecs.addComponent(id3, "Parent", hand, "0")
         ecs.applyEntity(id3)
+
+        local id4 = ecs.newEntity()
+        ecs.addComponent(id4, "Active")
+        ecs.addComponent(id4, "DataBase", 9)
+        ecs.addComponent(id4, "SpriteRenderer")
+        ecs.addComponent(id4, "Animation", "aim_left_hand")
+        ecs.addComponent(id4, "State", "left_aim_hand")
+        ecs.addComponent(id4, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0, 1)
+        ecs.addComponent(id4, "Parent", ppp, "0")
+        local hand2 = ecs.applyEntity(id4)
+
+        local id5 = ecs.newEntity()
+        ecs.addComponent(id5, "Active")
+        ecs.addComponent(id5, "DataBase", 9)
+        ecs.addComponent(id5, "SpriteRenderer")
+        ecs.addComponent(id5, "Animation", "aim_weapon")
+        ecs.addComponent(id5, "State", "weapon_idle")
+        ecs.addComponent(id5, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0, 1)
+        ecs.addComponent(id5, "Parent", hand2, "0")
+        ecs.applyEntity(id5)
     end
 
     -- 创建一个实体
@@ -309,7 +341,7 @@ function start()
         ecs.addComponent(id1, "SpriteRenderer")
         ecs.addComponent(id1, "Animation", "body_idle_front")
         ecs.addComponent(id1, "State", "aim")
-        ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0)
+        ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0, 2)
         ecs.addComponent(id1, "BDY")
         ecs.addComponent(id1, "AI")
         ecs.addComponent(id1, "Target", ppp)
@@ -322,6 +354,8 @@ function start()
 
     -- dump(ecs.getCache())
 end
+
+local zidanshijian = 1
 
 function update()
     -- -- 5104W!Js1jSR<|5DJ1:r
@@ -377,6 +411,30 @@ function lateupdate()
 end
 
 function fixedupdate()
+
+	-- 子弹时间
+    if CS.UnityEngine.Input.GetMouseButton(2) then
+        if zidanshijian <= 1 then
+            zidanshijian = zidanshijian * 0.95
+            if zidanshijian < 0.05 then
+                zidanshijian = 0.05
+            end
+        end
+        ecs.processMultipleSystem("zidanshijianSystem", zidanshijian)
+        chromaticAberration.intensity.value = 1 - zidanshijian
+        -- CS.UnityEngine.Time.timeScale = zidanshijian
+    else
+        if zidanshijian < 1 then
+            zidanshijian = zidanshijian * 1.05
+            if zidanshijian > 1 then
+                zidanshijian = 1
+            end
+        end
+        ecs.processMultipleSystem("zidanshijianSystem", zidanshijian)
+        chromaticAberration.intensity.value = 1 - zidanshijian
+        -- CS.UnityEngine.Time.timeScale = zidanshijian
+    end
+
     -- mychar:runState()
 
     -- utils.runObjectsFixedupdate()
@@ -416,7 +474,7 @@ function ongui()
 		for i, v in pairs(utils.getObjects()) do
 			v.database = utils.getIDData(v.id)
 		end
-	end
+    end
 
     -- CS.UnityEngine.GUI.Label(CS.UnityEngine.Rect(10, CS.UnityEngine.Screen.height - 56, 200, 20), "LObjects: " .. ecs.total)
     -- utils.display()

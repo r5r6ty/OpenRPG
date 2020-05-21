@@ -366,10 +366,10 @@ function ecs.registerSingleSystem(newtype, func, bit)
     }
 end
 
-function ecs.processMultipleSystem(stype)
+function ecs.processMultipleSystem(stype, ...)
     local system = systems[stype]
     for _, v2 in pairs(system.matchedEntity) do
-        system.execute(v2)
+        system.execute(v2, ...)
     end
 end
 

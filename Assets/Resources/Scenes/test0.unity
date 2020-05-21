@@ -1181,6 +1181,8 @@ MonoBehaviour:
     value: {fileID: 711901635}
   - name: LCanvas
     value: {fileID: 308561530}
+  - name: LPV
+    value: {fileID: 617226362}
 --- !u!4 &968810522
 Transform:
   m_ObjectHideFlags: 0

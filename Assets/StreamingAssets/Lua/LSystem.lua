@@ -10,7 +10,7 @@ ecs.registerMultipleSystem("SpriteRenderSystem", function(self)
     local r_pos_x, r_pos_y, r_pos_z = CS.LuaUtil.GetPos(self.root.physics_object_id)
     CS.LuaUtil.SetPos(self.pic_offset_object_id, pos_x, pos_y + pos_z, r_pos_z)
 
-    self.rotation = self.rotation + self.rotation_velocity
+    self.rotation = self.rotation + self.rotation_velocity * self.speed
 
     local rrr_x, rrr_y, rrr_z = CS.LuaUtil.GetEulerAngles(self.physics_object_id)
     local rrr_length = utils.GetVector3Module(rrr_x, rrr_y, rrr_z)
@@ -131,7 +131,7 @@ ecs.registerMultipleSystem("BDYSystem", function(self)
         f = f + 1
     end
     if f == 0 then
-        local dt = CS.UnityEngine.Time.deltaTime
+        local dt = CS.UnityEngine.Time.deltaTime * self.speed
         CS.LuaUtil.RigidbodyMovePosition(self.rigidbody, self.velocity.x * dt, self.velocity.y * dt, self.velocity.z * dt)
     end
     if self.isOnGround ~= -1 then
@@ -199,6 +199,14 @@ ecs.registerMultipleSystem("ResetPlayerSystem", function(self)
     self.controller:resetCommands()
 end, ecs.allOf("Active", "DataBase", "Player"))
 
+-- 子弹时间1
+ecs.registerMultipleSystem("zidanshijianSystem", function(self, time)
+    self.speed = time
+    if self.audioSource ~= nil then
+        self.audioSource.pitch = time
+    end
+end, ecs.allOf("Active", "Animation"))
+
 
 ------------------------------------------------------------------------------------------------------------------------------------
 ecs.registerSingleSystem("Live", function(this, value)
@@ -226,7 +234,7 @@ ecs.registerSingleSystem("Dead", function(this, value)
 end)
 
 ecs.registerSingleSystem("Flying", function(this, value)
-    this.velocity = this.velocity + 0.5 * this.gravity * 2 / 60
+    this.velocity = this.velocity + 0.5 * this.gravity * 2 / 60 * this.speed
     -- this.velocity.y = this.velocity.y + 0.5 * -9.81 * 2 / 60 / 3
 end, ecs.allOf("Active", "Physics", "Gravity"))
 
@@ -258,11 +266,11 @@ ecs.registerSingleSystem("Ground", function(this, value)
         end
     -- end
     -- if this.kind == 99 then
-        if this.rotation > 0 then
-            this.rotation_velocity = this.rotation_velocity / 2
-        else
-            this.rotation_velocity = this.rotation_velocity / 2
-        end
+        -- if this.rotation > 0 then
+        --     this.rotation_velocity = this.rotation_velocity / 2
+        -- else
+        --     this.rotation_velocity = this.rotation_velocity / 2
+        -- end
     --     if this.velocity.magnitude <= 0.5 then
     --         this.sleep = true
     --     end
@@ -270,9 +278,15 @@ ecs.registerSingleSystem("Ground", function(this, value)
 end, ecs.allOf("Active", "SpriteRenderer"))
 
 ecs.registerSingleSystem("Sprite", function(this, value)
-    -- print(value)
-    this.spriteRenderer.sprite = this.database.sprites[value.sprite]
-    CS.LuaUtil.SetLocalPos(this.pic_object_id, value.x / 100, -value.y / 100, 0)
+    if value.sprite == nil and value.id ~= nil then
+        local ids = utils.split(value.id, ",")
+        local c = this.spriteRenderer.material:GetTexture("_Palette"):GetPixel(tonumber(ids[CS.Tools.Instance:RandomRangeInt(1, #ids + 1)]), 0)
+        this.trailRenderer.startColor = c
+        this.trailRenderer.endColor = c
+    else
+        this.spriteRenderer.sprite = this.database.sprites[value.sprite]
+        CS.LuaUtil.SetLocalPos(this.pic_object_id, value.x / 100, -value.y / 100, 0)
+    end
 end, ecs.allOf("Active", "DataBase", "SpriteRenderer"))
 
 ecs.registerSingleSystem("Image", function(this, value)
@@ -706,7 +720,7 @@ ecs.registerSingleSystem("Object", function(this, value)
         -- ecs.addComponent(id2, "BDY")
         -- ecs.addComponent(id2, "Sleep")
         -- local object = ecs.applyEntity(id2)
-        local object = this.database.groups[value.animation](this.rigidbody.position.x + pos.x, this.rigidbody.position.y + pos.y, this.rigidbody.position.z + pos.z, velocityyy.x, velocityyy.y, velocityyy.z)
+        local object = this.database.groups[value.animation](this.rigidbody.position.x + pos.x, this.rigidbody.position.y + pos.y, this.rigidbody.position.z + pos.z, velocityyy.x, velocityyy.y, velocityyy.z, this.team)
 
 
 

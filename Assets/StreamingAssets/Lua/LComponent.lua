@@ -164,7 +164,7 @@ end, function(self)
     self.state = nil
 end)
 
-ecs.registerComponent("Physics", 0, function(self, x, y, z, vx, vy, vz)
+ecs.registerComponent("Physics", 0, function(self, x, y, z, vx, vy, vz, t)
     self.physics_object = CS.UnityEngine.GameObject("physics")
     self.physics_object_id = self.physics_object:GetInstanceID()
     CS.LuaUtil.AddID(self.physics_object_id, self.physics_object)
@@ -184,7 +184,7 @@ ecs.registerComponent("Physics", 0, function(self, x, y, z, vx, vy, vz)
     self.velocity = CS.UnityEngine.Vector3(vx, vy, vz)
 
 
-    self.team = 0
+    self.team = t
 
     self.isOnGround = -1
 

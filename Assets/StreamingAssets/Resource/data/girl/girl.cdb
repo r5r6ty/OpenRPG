@@ -2299,7 +2299,8 @@
 							"wait": 600,
 							"x": 0,
 							"y": 0,
-							"category": "Sprite"
+							"category": "Sprite",
+							"id": "18,34,82,98"
 						}
 					]
 				},
@@ -3399,12 +3400,12 @@
 						},
 						{
 							"category": "Destory",
-							"active": false,
+							"active": true,
 							"trigger": "(this.bodyArray[\"0\"] ~= nil and this.bodyArray[\"0\"].isHit ~= -1) or this.timeLine >= 1"
 						},
 						{
 							"category": "Destory",
-							"active": true,
+							"active": false,
 							"trigger": "this.timeLine >= 1"
 						},
 						{
@@ -3665,7 +3666,7 @@
 							"json": {
 								"x": 21,
 								"y": -2,
-								"x2": 40,
+								"x2": 10,
 								"y2": 0,
 								"z2": 0,
 								"state": "bullet",

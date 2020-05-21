@@ -328,49 +328,76 @@ public class Tools
 
 public class LuaUtil
 {
-    private static Dictionary<int, GameObject> mObjs = new Dictionary<int, GameObject>();
-    private static Dictionary<int, Rigidbody> mObjs2 = new Dictionary<int, Rigidbody>();
+    private static Dictionary<int, GameObject> m_gameObjects = new Dictionary<int, GameObject>();
+    private static Dictionary<int, Rigidbody> m_rigidbodys = new Dictionary<int, Rigidbody>();
 
     private static RaycastHit[] m_RaycastHits = new RaycastHit[5];
 
     public static void AddID(int id, GameObject go)
     {
-        mObjs.Add(id, go);
-    }
-
-    public static void AddID2(int id, Rigidbody go)
-    {
-        mObjs2.Add(id, go);
+        m_gameObjects.Add(id, go);
     }
 
     public static void DeleteID(int id)
     {
-        mObjs.Remove(id);
-    }
-
-    public static void DeleteID2(int id)
-    {
-        mObjs2.Remove(id);
-    }
-
-    public static void SetPos2(int id, float x, float y, float z)
-    {
-        mObjs2[id].position = new Vector3(x, y, z);
+        m_gameObjects.Remove(id);
     }
 
     public static void SetPos(int id, float x, float y, float z)
     {
-        mObjs[id].transform.position = new Vector3(x, y, z);
+        m_gameObjects[id].transform.position = new Vector3(x, y, z);
+    }
+
+    public static void GetPos(int id, out float x, out float y, out float z)
+    {
+        Vector3 pos = m_gameObjects[id].transform.position;
+        x = pos.x;
+        y = pos.y;
+        z = pos.z;
     }
 
     public static void SetLocalPos(int id, float x, float y, float z)
     {
-        mObjs[id].transform.localPosition = new Vector3(x, y, z);
+        m_gameObjects[id].transform.localPosition = new Vector3(x, y, z);
     }
 
-    public static void SetRotationEuler(int id, float x, float y, float z)
+    public static void GetLocalPos(int id, out float x, out float y, out float z)
     {
-        mObjs[id].transform.rotation = Quaternion.Euler(x, y, z);
+        Vector3 pos = m_gameObjects[id].transform.localPosition;
+        x = pos.x;
+        y = pos.y;
+        z = pos.z;
+    }
+
+    public static void SetRotationByEuler(int id, float x, float y, float z)
+    {
+        m_gameObjects[id].transform.rotation = Quaternion.Euler(x, y, z);
+    }
+
+    public static void SetLocalRotationByEuler(int id, float x, float y, float z)
+    {
+        m_gameObjects[id].transform.localRotation = Quaternion.Euler(x, y, z);
+    }
+
+    public static void GetEulerAngles(int id, out float x, out float y, out float z)
+    {
+        Vector3 pos = m_gameObjects[id].transform.eulerAngles;
+        x = pos.x;
+        y = pos.y;
+        z = pos.z;
+    }
+
+    public static void RigidbodyMovePosition(Rigidbody rigidbody, float x, float y, float z)
+    {
+        rigidbody.MovePosition(new Vector3(rigidbody.position.x + x, rigidbody.position.y + y, rigidbody.position.z + z));
+    }
+
+    public static void RigidbodyGetPosition(Rigidbody rigidbody, out float x, out float y, out float z)
+    {
+        Vector3 pos = rigidbody.position;
+        x = pos.x;
+        y = pos.y;
+        z = pos.z;
     }
 
     public static RaycastHit[] PhysicsBoxCastNonAlloc(Vector3 center, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float maxDistance, int mask)

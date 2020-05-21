@@ -250,16 +250,16 @@ function start()
     _update = {"JudgePlayerSystem", "AnimationSystem1", "StateUpdateSystem", "AnimationSystem2", "SpriteRenderSystem", "LineRenderSystem", "JudgeAISystem"}
     _fixedUpdate = {"StateFxiedUpdateSystem", "BDYSystem", "ATKSystem", "ResetAISystem", "ResetPlayerSystem", "SleepSystem"} -- , "PhysicsSystem"
 
-    -- 创建一个实体
-    for i = 1, 1, 1 do
-        local id1 = ecs.newEntity()
-        ecs.addComponent(id1, "Active")
-        ecs.addComponent(id1, "DataBase", 9)
-        ecs.addComponent(id1, "Image", nil)
-        ecs.addComponent(id1, "Animation", "cursor_test")
-        ecs.addComponent(id1, "State", "cursor_test")
-        ecs.applyEntity(id1)
-    end
+    -- -- 创建一个实体
+    -- for i = 1, 1, 1 do
+    --     local id1 = ecs.newEntity()
+    --     ecs.addComponent(id1, "Active")
+    --     ecs.addComponent(id1, "DataBase", 9)
+    --     ecs.addComponent(id1, "Image", nil)
+    --     ecs.addComponent(id1, "Animation", "cursor_test")
+    --     ecs.addComponent(id1, "State", "cursor_test")
+    --     ecs.applyEntity(id1)
+    -- end
 
     local ppp
     -- 创建一个实体
@@ -294,8 +294,8 @@ function start()
         ecs.addComponent(id3, "Active")
         ecs.addComponent(id3, "DataBase", 9)
         ecs.addComponent(id3, "SpriteRenderer")
-        ecs.addComponent(id3, "Animation", "aim_weapon")
-        ecs.addComponent(id3, "State", "weapon_idle")
+        ecs.addComponent(id3, "Animation", "aim_weapon_HK416c")
+        ecs.addComponent(id3, "State", "weapon_idle_HK416c")
         ecs.addComponent(id3, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0)
         ecs.addComponent(id3, "Parent", hand, "0")
         ecs.applyEntity(id3)

@@ -4,7 +4,7 @@
 -- http://opensource.org/licenses/MIT
 -- Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
-LCollider = {LObject = nil, gameObject = nil, id = nil, collider = nil, filter = nil, isDefence = nil, layers = nil}
+LCollider = {LObject = nil, gameObject = nil, id = nil, collider = nil, filter = nil, isDefence = nil, layers = nil, isRayCast = nil}
 LCollider.__index = LCollider
 function LCollider:new(l, go, id)
 	local self = {}
@@ -24,6 +24,8 @@ function LCollider:new(l, go, id)
 
 	self.layers = nil
 
+	self.isRayCast = false
+
     return self
 end
 
@@ -38,9 +40,10 @@ end
 
 function LCollider:deleteCollider()
 	CS.UnityEngine.Object.Destroy(self.collider)
+	self.collider = nil
 end
 
-LColliderBDY = { bounciness = nil}
+LColliderBDY = {bounciness = nil, isHit = nil, hitObject = nil}
 setmetatable(LColliderBDY, LCollider)
 LColliderBDY.__index = LColliderBDY
 function LColliderBDY:new(l, go, id)
@@ -49,6 +52,10 @@ function LColliderBDY:new(l, go, id)
 	setmetatable(self, LColliderBDY)
 
 	self.collider = self.gameObject:AddComponent(typeof(CS.UnityEngine.BoxCollider))
+
+	self.bounciness = 0
+	self.isHit = -1
+	self.hitObject = nil
 	return self
 end
 
@@ -91,6 +98,12 @@ function LCollider:setCollider(dir, x, y, width, height, depth, flag, layers, bo
 	self.filter.layerMask = lll
 
 	self.bounciness = bounciness or 0
+
+	if width == 1 and height == 1 then
+		self.isRayCast = true
+		-- self:deleteCollider()
+		-- self.collider.enabled = false
+	end
 end
 
 -- -- 检测碰撞物，如果发生碰撞则进行位移
@@ -262,6 +275,206 @@ function LColliderBDY:BDYFixedUpdate()
 	local isWall_leftright = -1
 	local isWall_updown = -1
 
+	if self.isRayCast then
+		-- assert(self.collider == false, "self.collider must be nil with raycast")
+		local velocity = self.LObject.velocity * CS.UnityEngine.Time.deltaTime
+
+		local rx, ry, rz = CS.LuaUtil.RigidbodyGetPosition(self.LObject.rigidbody)
+
+		-- local offset = CS.UnityEngine.Vector3(rx - self.LObject.oriPos.x, ry - self.LObject.oriPos.y, rz - self.LObject.oriPos.z)
+
+		local length = velocity.magnitude -- 射线的长度
+		local direction = velocity.normalized -- 方向
+
+		-- local oriPos = CS.UnityEngine.Vector3(self.LObject.oriPos.x, self.LObject.oriPos.y, self.LObject.oriPos.z)
+
+		local rxyz = CS.UnityEngine.Vector3(rx, ry, rz)
+	
+		CS.UnityEngine.Debug.DrawLine(rxyz, CS.UnityEngine.zero, CS.UnityEngine.Color.red)
+		CS.UnityEngine.Debug.DrawLine(rxyz + direction * length, CS.UnityEngine.zero, CS.UnityEngine.Color.green)
+	
+
+		-- local hitinfo = CS.Tools.Instance:PhysicsRaycast(rxyz, direction, length, 1048575)
+		local hitinfos = CS.Tools.Instance:PhysicsRaycastAll(rxyz, direction, length, 1048575)
+
+			-- 最终位移坐标
+		local finalOffset_x = velocity.x
+		local finalOffset_z = velocity.z
+		local finalOffset_y = velocity.y
+		for i = 0, hitinfos.Length - 1, 1 do
+			local k = hitinfos[i].collider
+			if k ~= nil and k.attachedRigidbody ~= self.collider.attachedRigidbody then
+				-- print(k.name)
+				local up, down, left, right, above, under = false, false, false, false, false, false
+				local go = k.attachedRigidbody.gameObject
+				if go.name == "test" then -- 如果是地图块
+					local name = utils.split(k.name, ",")
+					local num = tonumber(name[#name]) -- 地图块最后一个数字作为bit
+
+					if num & 1 == 1 then --位操作，算出这个方块朝哪个方向进行碰撞，一个方块可以有多个碰撞方向，这部分随意设计，只需要能知道这个collider的判定方向，用layermask什么都行
+						up = true
+					end
+					if num & 2 == 2 then --位操作
+						down = true
+					end
+					if num & 4 == 4 then --位操作
+						left = true
+					end
+					if num & 8 == 8 then --位操作
+						right = true
+					end
+					if num & 16 == 16 then --位操作
+						above = true
+					end
+					if num & 32 == 32 then --位操作
+						under = true
+					end
+
+					self.hitObject = object
+					self.isHit = 1
+				elseif go.name ~= "test" then
+					local object2 = utils.getObject(go:GetInstanceID())
+					-- if self.LObject.team ~= object2.team then
+					-- local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
+
+					-- if not string.find(LC.layers, string.match(self.collider.name, "%[(%d+)%]")) then
+						up = true
+						down = true
+						left = true
+						right = true
+					-- end
+					-- above = true
+					-- under = true
+
+						self.hitObject = object
+						self.isHit = 16
+
+						-- print(object2.state)
+					-- else
+					-- 	self.hitObject = nil
+					-- 	self.isHit = -1
+					-- end
+
+					-- local iId = hitinfo.collider.attachedRigidbody.gameObject:GetInstanceID()
+					-- local object = utils.getObject(iId)
+
+					-- local LC = object.bodyArray_InstanceID[hitinfo.collider:GetInstanceID()]
+					-- if LC ~= nil and LC.isDefence then
+
+					-- 	self.hitObject = object
+					-- 	self.isHit = 1
+					-- else
+
+					-- 	self.hitObject = object
+					-- 	self.isHit = 16
+					-- end
+				else
+					print(go.name)
+					self.hitObject = nil
+					self.isHit = -1
+					-- return 1, false, false, 1, elseArray
+				end
+
+				if up or down or left or right or above or under then
+					local mmm = hitinfos[i].point - rxyz
+					local m = {x = math.abs(mmm.x), y = math.abs(mmm.y), z = math.abs(mmm.z)}
+
+					local offset_x = nil
+					local offset_z = nil
+					local offset_y = nil
+					if (left or right) and (up or down) then
+						if m.x > m.z then
+							m.x = 0
+						else
+							m.z = 0
+						end
+					end
+					if velocity.x > 0 then
+						offset_x = velocity.x - m.x
+					else
+						offset_x = velocity.x + m.x
+					end
+
+					if velocity.z > 0 then
+						offset_z = velocity.z - m.z
+					else
+						offset_z = velocity.z + m.z
+					end
+
+					if velocity.y > 0 then
+						offset_y = velocity.y - m.y
+					else
+						offset_y = velocity.y + m.y
+					end
+					-- 留下最小位移坐标
+					if left or right then
+						if velocity.x > 0 then
+							if offset_x < finalOffset_x then
+								finalOffset_x = offset_x
+							end
+						else
+							if offset_x > finalOffset_x then
+								finalOffset_x = offset_x
+							end
+						end
+
+						isWall_leftright = 1
+
+					end
+
+					if up or down then
+						if velocity.z > 0 then
+							if offset_z < finalOffset_z then
+								finalOffset_z = offset_z
+							end
+						else
+							if offset_z > finalOffset_z then
+								finalOffset_z = offset_z
+							end
+						end
+
+						isWall_updown = 1
+
+					end
+
+					if (left or right) and (up or down) then
+						if m.x > m.z then
+							isWall_leftright = -1
+						else
+							isWall_updown = -1
+						end
+					end
+
+					if above or under then
+
+						if velocity.y > 0 then
+							if offset_y < finalOffset_y then
+								finalOffset_y = offset_y
+							end
+						else
+							if offset_y > finalOffset_y then
+								finalOffset_y = offset_y
+							end
+						end
+
+						if isGround == -1 and m.y > 0 then
+							isGround = 1 << tonumber(0)
+						end
+					end
+				end
+			else
+				self.hitObject = nil
+				self.isHit = -1
+			end
+		end
+		if hitinfos.Length == 0 then
+			self.hitObject = nil
+			self.isHit = -1
+		end
+
+		CS.LuaUtil.RigidbodyMovePosition(self.collider.attachedRigidbody, finalOffset_x, finalOffset_y, finalOffset_z)
+	else
+
 	local velocity = self.LObject.velocity * CS.UnityEngine.Time.deltaTime
 	
 
@@ -346,6 +559,7 @@ function LColliderBDY:BDYFixedUpdate()
 					else
 						offset_x = velocity.x + m.x
 					end
+
 					if velocity.z > 0 then
 						offset_z = velocity.z - m.z
 					else
@@ -390,6 +604,14 @@ function LColliderBDY:BDYFixedUpdate()
 
 					end
 
+					if (left or right) and (up or down) then
+						if m.x > m.z then
+							isWall_leftright = -1
+						else
+							isWall_updown = -1
+						end
+					end
+
 					if above or under then
 
 						if velocity.y > 0 then
@@ -413,7 +635,10 @@ function LColliderBDY:BDYFixedUpdate()
 	-- 更新自身位置
 	-- self.collider.attachedRigidbody.position = self.collider.attachedRigidbody.position + CS.UnityEngine.Vector3(finalOffset_x, finalOffset_y, finalOffset_z)
 
-	CS.LuaUtil.SetPos2(self.LObject.rigidbody_id, self.collider.attachedRigidbody.position.x + finalOffset_x, self.collider.attachedRigidbody.position.y + finalOffset_y, self.collider.attachedRigidbody.position.z + finalOffset_z)
+	
+	CS.LuaUtil.RigidbodyMovePosition(self.collider.attachedRigidbody, finalOffset_x, finalOffset_y, finalOffset_z)
+
+	end
 
 	if self.bounciness > 0 then
 		if isWall_leftright == 1 then
@@ -431,490 +656,490 @@ function LColliderBDY:BDYFixedUpdate()
 			self.LObject.rotation = -self.LObject.rotation
 			self.LObject.rotation_velocity = (CS.Tools.Instance:RandomRangeInt(0, 2) * 2 - 1) * -self.LObject.rotation_velocity
 
-			self.LObject.velocity  = self.LObject.velocity * CS.Tools.Instance:RandomRangeFloat(0.9, 1)
+			-- self.LObject.velocity  = self.LObject.velocity * CS.Tools.Instance:RandomRangeFloat(0.9, 1)
 		end
 	end
 	return isGround
 end
 
-function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
-	local isGround = nil
-	local isCeiling = false
-	local isWall = false
-	local isElse = 1
-	local elseArray = {}
+-- function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
+-- 	local isGround = nil
+-- 	local isCeiling = false
+-- 	local isWall = false
+-- 	local isElse = 1
+-- 	local elseArray = {}
 
-	-- local contactColliders = CS.UnityEngine.Physics.OverlapBox(self.collider.bounds.center, self.collider.bounds.extents, self.gameObject.transform.rotation, self.filter.layerMask.value)
+-- 	-- local contactColliders = CS.UnityEngine.Physics.OverlapBox(self.collider.bounds.center, self.collider.bounds.extents, self.gameObject.transform.rotation, self.filter.layerMask.value)
 
-	-- -- 最终位移坐标
-	-- local finalOffset_y = 0
-	-- for i = 0, contactColliders.Length - 1, 1 do
-	-- 	local k = contactColliders[i]
-	-- 	if k.attachedRigidbody ~= self.collider.attachedRigidbody then
-	-- 		-- print(k.name)
-	-- 		local above, under = false, false
+-- 	-- -- 最终位移坐标
+-- 	-- local finalOffset_y = 0
+-- 	-- for i = 0, contactColliders.Length - 1, 1 do
+-- 	-- 	local k = contactColliders[i]
+-- 	-- 	if k.attachedRigidbody ~= self.collider.attachedRigidbody then
+-- 	-- 		-- print(k.name)
+-- 	-- 		local above, under = false, false
 
-	-- 		local go = k.attachedRigidbody.gameObject
-	-- 		if go.name == "test" then -- 如果是地图块
-	-- 			local name = utils.split(k.name, ",")
-	-- 			local num = tonumber(name[#name]) -- 地图块最后一个数字作为bit
+-- 	-- 		local go = k.attachedRigidbody.gameObject
+-- 	-- 		if go.name == "test" then -- 如果是地图块
+-- 	-- 			local name = utils.split(k.name, ",")
+-- 	-- 			local num = tonumber(name[#name]) -- 地图块最后一个数字作为bit
 
-	-- 			if num & 16 == 16 then --位操作
-	-- 				above = true
-	-- 			end
-	-- 			if num & 32 == 32 then --位操作
-	-- 				under = true
-	-- 			end
-	-- 		else
-	-- 			-- return 1, false, false, 1, elseArray
-	-- 		end
+-- 	-- 			if num & 16 == 16 then --位操作
+-- 	-- 				above = true
+-- 	-- 			end
+-- 	-- 			if num & 32 == 32 then --位操作
+-- 	-- 				under = true
+-- 	-- 			end
+-- 	-- 		else
+-- 	-- 			-- return 1, false, false, 1, elseArray
+-- 	-- 		end
 
-	-- 		if above or under then
+-- 	-- 		if above or under then
 
-	-- 			local menseki, normal = utils.getBoundsIntersectsArea3D(self.collider.bounds, k.bounds)
-	-- 			if menseki.magnitude > 0 then -- 无视多少面积设置
+-- 	-- 			local menseki, normal = utils.getBoundsIntersectsArea3D(self.collider.bounds, k.bounds)
+-- 	-- 			if menseki.magnitude > 0 then -- 无视多少面积设置
 
-	-- 				-- 算2个collider之间距离，主要是为了法线
-	-- 				-- local cd2d = self.collider:Distance(k)
+-- 	-- 				-- 算2个collider之间距离，主要是为了法线
+-- 	-- 				-- local cd2d = self.collider:Distance(k)
 
-	-- -- ~ 				local a =  CS.UnityEngine.Vector3(cd2d.pointA.x, cd2d.pointA.y, 0)
-	-- -- ~ 				local b =  CS.UnityEngine.Vector3(cd2d.pointB.x, cd2d.pointB.y, 0)
-	-- 				-- local a = self.collider.gameObject.transform.position
-	-- 				-- local b = k.gameObject.transform.position
-	-- 				-- local normal =  -CS.UnityEngine.Vector3(cd2d.normal.x, cd2d.normal.y, 0)
-	-- 				-- local normal = -menseki.normalized
-	-- 				-- local c = a +  normal
-	-- 				-- local d = b +  normal
-	--  				-- CS.UnityEngine.Debug.DrawLine(a, c, CS.UnityEngine.Color.red)
-	-- 				-- CS.UnityEngine.Debug.DrawLine(b, d, CS.UnityEngine.Color.yellow)
-	-- 				-- print(normal)
+-- 	-- -- ~ 				local a =  CS.UnityEngine.Vector3(cd2d.pointA.x, cd2d.pointA.y, 0)
+-- 	-- -- ~ 				local b =  CS.UnityEngine.Vector3(cd2d.pointB.x, cd2d.pointB.y, 0)
+-- 	-- 				-- local a = self.collider.gameObject.transform.position
+-- 	-- 				-- local b = k.gameObject.transform.position
+-- 	-- 				-- local normal =  -CS.UnityEngine.Vector3(cd2d.normal.x, cd2d.normal.y, 0)
+-- 	-- 				-- local normal = -menseki.normalized
+-- 	-- 				-- local c = a +  normal
+-- 	-- 				-- local d = b +  normal
+-- 	--  				-- CS.UnityEngine.Debug.DrawLine(a, c, CS.UnityEngine.Color.red)
+-- 	-- 				-- CS.UnityEngine.Debug.DrawLine(b, d, CS.UnityEngine.Color.yellow)
+-- 	-- 				-- print(normal)
 
-	-- 				-- 做碰撞法线与行进方向的点积
-	-- 				-- local projection = CS.UnityEngine.Vector2.Dot(velocity.normalized, normal) -- 没用到，有需要可以自己看情况加
+-- 	-- 				-- 做碰撞法线与行进方向的点积
+-- 	-- 				-- local projection = CS.UnityEngine.Vector2.Dot(velocity.normalized, normal) -- 没用到，有需要可以自己看情况加
 
-	-- 				local offset_y = 0
+-- 	-- 				local offset_y = 0
 
-	-- 				local velo_nor2 = CS.UnityEngine.Vector2(velocity.x, velocity.y).normalized
+-- 	-- 				local velo_nor2 = CS.UnityEngine.Vector2(velocity.x, velocity.y).normalized
 
-	-- 				if self.collider.bounds.center.y > k.bounds.center.y then
-	-- 					if above and CS.UnityEngine.Vector2.Dot(velo_nor2, CS.UnityEngine.Vector2(0, 1)) <= 0 then
-	-- 						offset_y = menseki.y
-	-- 					end
-	-- 				else
-	-- 					if under and CS.UnityEngine.Vector2.Dot(velo_nor2, CS.UnityEngine.Vector2(0, -1)) <= 0 then
-	-- 						offset_y = -menseki.y
-	-- 					end
-	-- 				end
+-- 	-- 				if self.collider.bounds.center.y > k.bounds.center.y then
+-- 	-- 					if above and CS.UnityEngine.Vector2.Dot(velo_nor2, CS.UnityEngine.Vector2(0, 1)) <= 0 then
+-- 	-- 						offset_y = menseki.y
+-- 	-- 					end
+-- 	-- 				else
+-- 	-- 					if under and CS.UnityEngine.Vector2.Dot(velo_nor2, CS.UnityEngine.Vector2(0, -1)) <= 0 then
+-- 	-- 						offset_y = -menseki.y
+-- 	-- 					end
+-- 	-- 				end
 
-	-- 				-- 留下最小位移坐标
+-- 	-- 				-- 留下最小位移坐标
 
-	-- 				if velocity.y > 0 then
-	-- 					if offset_y < finalOffset_y then
-	-- 						finalOffset_y = offset_y
-	-- 					end
-	-- 				else
-	-- 					if offset_y > finalOffset_y then
-	-- 						finalOffset_y = offset_y
-	-- 					end
-	-- 				end
-
-
-	-- -- 				if velocity.x ~= 0 and object2 ~= nil and offset_x ~= 0 and object2.isWall == false then
-	-- -- 					local rate = weight / object2["weight"] / 2
-	-- -- 					if rate > 1 then
-	-- -- 						rate = 1
-	-- -- 					end
-	-- -- 					local vOffset = (object2.velocity.x - velocity.x) * rate
-	-- -- --~ 					object2.velocity.x = object2.velocity.x - vOffset
-	-- -- 					-- print(object2)
-	-- -- 					object2:invokeEvent("onForce", {velocity = CS.UnityEngine.Vector2(-vOffset, 0), compute = 1})
-	-- -- 				end
-
-	-- 				if go.name == "test" then -- 判断是不是撞到地面，这样写不好，以后再优化
-	-- 					-- if finalOffset_x ~= 0 and (normal.x == -1 or normal.x == 1) then
-	-- 					-- 	isWall = true
-	-- 					-- end
-	-- 					if finalOffset_y > 0 then
-	-- 						local id = string.match(k.name, "%[(%d+)%]")
-
-	-- 						if id then
-	-- 							if isGround ~= nil then
-	-- 								isGround = isGround | 1 << tonumber(id)
-	-- 							else
-	-- 								isGround = 1 << tonumber(id)
-	-- 							end
-	-- 						end
-
-	-- 					-- elseif finalOffset_y < 0 then
-	-- 					-- 	isCeiling = true
-	-- 					end
-	-- 				end
-	-- 			end
-	-- 		else
-	-- 			local id = string.match(k.name, "%[(%d+)%]")
-	-- 			if id then
-	-- 				isElse = isElse | 1 << tonumber(id)
-	-- 			end
-	-- 			if elseArray[id] == nil then
-	-- 				elseArray[id] = {}
-	-- 			end
-	-- 			elseArray[id][k:GetInstanceID()] = k
-	-- 		end
-	-- 	end
-	-- end
-
-	-- -- 更新自身位置
-	-- -- self.collider.attachedRigidbody.position = self.collider.attachedRigidbody.position + CS.UnityEngine.Vector3(0, finalOffset_y, 0)
-
-	local contactColliders = CS.UnityEngine.Physics.OverlapBox(self.collider2.bounds.center, self.collider2.bounds.extents, self.gameObject.transform.rotation, self.filter.layerMask.value)
-
-	-- 最终位移坐标
-	local finalOffset_x = 0
-	local finalOffset_z = 0
-	for i = 0, contactColliders.Length - 1, 1 do
-		local k = contactColliders[i]
-		if k.attachedRigidbody ~= self.collider2.attachedRigidbody then
-			-- print(k.name)
-			local up, down, left, right = false, false, false, false
-
-			local go = k.attachedRigidbody.gameObject
-			local object2 = utils.getObject(go:GetInstanceID())
-			if go.name == "test" then -- 如果是地图块
-				local name = utils.split(k.transform.parent.name, ",")
-				local num = tonumber(name[#name]) -- 地图块最后一个数字作为bit
-				if num ~= nil then
-					if num & 1 == 1 then --位操作，算出这个方块朝哪个方向进行碰撞，一个方块可以有多个碰撞方向，这部分随意设计，只需要能知道这个collider的判定方向，用layermask什么都行
-						up = true
-					end
-					if num & 2 == 2 then --位操作
-						down = true
-					end
-					if num & 4 == 4 then --位操作
-						left = true
-					end
-					if num & 8 == 8 then --位操作
-						right = true
-					end
-				end
-			-- elseif go.name ~= "test" and object2 ~= nil and not object2["isCatched"] and self.collider2.attachedRigidbody.gameObject ~= go then -- 是游戏object，则只允许左右进行碰撞
-
-			-- 	local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
-
-			-- 	if not string.find(LC.layers, string.match(self.collider2.name, "%[(%d+)%]")) then
-			-- 		up = true
-			-- 		down = true
-			-- 		left = true
-			-- 		right = true
-			-- 	end
-			-- else
-				-- return 1, false, false, 1, elseArray
-			end
-
-			if up or down or left or right then
-
-				local menseki, normal = utils.getBoundsIntersectsArea3D(self.collider2.bounds, k.bounds)
-				if menseki.magnitude > 0 then -- 无视多少面积设置
-
-					-- 算2个collider之间距离，主要是为了法线
-					-- local cd2d = self.collider:Distance(k)
-
-	-- ~ 				local a =  CS.UnityEngine.Vector3(cd2d.pointA.x, cd2d.pointA.y, 0)
-	-- ~ 				local b =  CS.UnityEngine.Vector3(cd2d.pointB.x, cd2d.pointB.y, 0)
-					-- local a = self.collider.gameObject.transform.position
-					-- local b = k.gameObject.transform.position
-					-- local normal =  -CS.UnityEngine.Vector3(cd2d.normal.x, cd2d.normal.y, 0)
-					-- local normal = -menseki.normalized
-					-- local c = a +  normal
-					-- local d = b +  normal
-	 				-- CS.UnityEngine.Debug.DrawLine(a, c, CS.UnityEngine.Color.red)
-					-- CS.UnityEngine.Debug.DrawLine(b, d, CS.UnityEngine.Color.yellow)
-					-- print(normal)
-
-					-- 做碰撞法线与行进方向的点积
-					-- local projection = CS.UnityEngine.Vector2.Dot(velocity.normalized, normal) -- 没用到，有需要可以自己看情况加
-
-					local offset_x = 0
-					local offset_z = 0
-
-					local velo_nor = CS.UnityEngine.Vector2(velocity.x, velocity.z).normalized
-
-					-- 左移，右移
-					if self.collider2.bounds.center.x < k.bounds.center.x then
-						if left and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(-1, 0)) <= 0 then -- 如果碰撞朝向与行进方向相反，则求出位移坐标
-							offset_x = -menseki.x
-						end
-					else
-						if right and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(1, 0)) <= 0 then
-							offset_x = menseki.x
-						end
-					end
-					-- 上移，下移
-					if self.collider2.bounds.center.y > k.bounds.center.y then
-						if up and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(0, 1)) <= 0 then
-							-- offset_z = menseki.y - (self.collider2.bounds.center.z - k.bounds.center.z)
-							offset_z = menseki.y
-						end
-					else
-						if down and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(0, -1)) <= 0 then
-							-- offset_z = -(menseki.y + (self.collider2.bounds.center.z - k.bounds.center.z))
-							offset_z = -menseki.y
-						end
-					end
-
-					-- if (left or right) and (up or down) then
-					-- 	local a_x = math.abs(normal.x)
-					-- 	local a_z = math.abs(normal.y)
-					-- 	if a_x > a_z then
-					-- 		offset_x = 0
-					-- 	else
-					-- 		offset_z = 0
-					-- 	end
-					-- end
-
-					if (left or right) and (up or down) then
-						if menseki.x > menseki.y then
-							offset_x = 0
-						else
-							offset_z = 0
-						end
-					end
+-- 	-- 				if velocity.y > 0 then
+-- 	-- 					if offset_y < finalOffset_y then
+-- 	-- 						finalOffset_y = offset_y
+-- 	-- 					end
+-- 	-- 				else
+-- 	-- 					if offset_y > finalOffset_y then
+-- 	-- 						finalOffset_y = offset_y
+-- 	-- 					end
+-- 	-- 				end
 
 
-					-- 留下最小位移坐标
-					if velocity.x > 0 then
-						if offset_x < finalOffset_x then
-							finalOffset_x = offset_x
-						end
-					else
-						if offset_x > finalOffset_x then
-							finalOffset_x = offset_x
-						end
-					end
+-- 	-- -- 				if velocity.x ~= 0 and object2 ~= nil and offset_x ~= 0 and object2.isWall == false then
+-- 	-- -- 					local rate = weight / object2["weight"] / 2
+-- 	-- -- 					if rate > 1 then
+-- 	-- -- 						rate = 1
+-- 	-- -- 					end
+-- 	-- -- 					local vOffset = (object2.velocity.x - velocity.x) * rate
+-- 	-- -- --~ 					object2.velocity.x = object2.velocity.x - vOffset
+-- 	-- -- 					-- print(object2)
+-- 	-- -- 					object2:invokeEvent("onForce", {velocity = CS.UnityEngine.Vector2(-vOffset, 0), compute = 1})
+-- 	-- -- 				end
 
-					if velocity.z > 0 then
-						if offset_z < finalOffset_z then
-							finalOffset_z = offset_z
-						end
-					else
-						if offset_z > finalOffset_z then
-							finalOffset_z = offset_z
-						end
-					end
+-- 	-- 				if go.name == "test" then -- 判断是不是撞到地面，这样写不好，以后再优化
+-- 	-- 					-- if finalOffset_x ~= 0 and (normal.x == -1 or normal.x == 1) then
+-- 	-- 					-- 	isWall = true
+-- 	-- 					-- end
+-- 	-- 					if finalOffset_y > 0 then
+-- 	-- 						local id = string.match(k.name, "%[(%d+)%]")
 
-	-- 				if velocity.x ~= 0 and object2 ~= nil and offset_x ~= 0 and object2.isWall == false then
-	-- 					local rate = weight / object2["weight"] / 2
-	-- 					if rate > 1 then
-	-- 						rate = 1
-	-- 					end
-	-- 					local vOffset = (object2.velocity.x - velocity.x) * rate
-	-- --~ 					object2.velocity.x = object2.velocity.x - vOffset
-	-- 					-- print(object2)
-	-- 					object2:invokeEvent("onForce", {velocity = CS.UnityEngine.Vector2(-vOffset, 0), compute = 1})
-	-- 				end
+-- 	-- 						if id then
+-- 	-- 							if isGround ~= nil then
+-- 	-- 								isGround = isGround | 1 << tonumber(id)
+-- 	-- 							else
+-- 	-- 								isGround = 1 << tonumber(id)
+-- 	-- 							end
+-- 	-- 						end
 
-					-- if go.name == "test" then -- 判断是不是撞到地面，这样写不好，以后再优化
-					-- 	-- if finalOffset_x ~= 0 and (normal.x == -1 or normal.x == 1) then
-					-- 	-- 	isWall = true
-					-- 	-- end
-					-- 	if finalOffset_y > 0 then
-					-- 		local id = string.match(k.name, "%[(%d+)%]")
+-- 	-- 					-- elseif finalOffset_y < 0 then
+-- 	-- 					-- 	isCeiling = true
+-- 	-- 					end
+-- 	-- 				end
+-- 	-- 			end
+-- 	-- 		else
+-- 	-- 			local id = string.match(k.name, "%[(%d+)%]")
+-- 	-- 			if id then
+-- 	-- 				isElse = isElse | 1 << tonumber(id)
+-- 	-- 			end
+-- 	-- 			if elseArray[id] == nil then
+-- 	-- 				elseArray[id] = {}
+-- 	-- 			end
+-- 	-- 			elseArray[id][k:GetInstanceID()] = k
+-- 	-- 		end
+-- 	-- 	end
+-- 	-- end
 
-					-- 		if id then
-					-- 			if isGround ~= nil then
-					-- 				isGround = isGround | 1 << tonumber(id)
-					-- 			else
-					-- 				isGround = 1 << tonumber(id)
-					-- 			end
-					-- 		end
+-- 	-- -- 更新自身位置
+-- 	-- -- self.collider.attachedRigidbody.position = self.collider.attachedRigidbody.position + CS.UnityEngine.Vector3(0, finalOffset_y, 0)
 
-					-- 	-- elseif finalOffset_y < 0 then
-					-- 	-- 	isCeiling = true
-					-- 	end
-					-- end
-				end
-			else
-				-- local id = string.match(k.name, "%[(%d+)%]")
-				-- if id then
-				-- 	isElse = isElse | 1 << tonumber(id)
-				-- end
-				-- if elseArray[id] == nil then
-				-- 	elseArray[id] = {}
-				-- end
-				-- elseArray[id][k:GetInstanceID()] = k
-			end
-		end
-	end
+-- 	local contactColliders = CS.UnityEngine.Physics.OverlapBox(self.collider2.bounds.center, self.collider2.bounds.extents, self.gameObject.transform.rotation, self.filter.layerMask.value)
+
+-- 	-- 最终位移坐标
+-- 	local finalOffset_x = 0
+-- 	local finalOffset_z = 0
+-- 	for i = 0, contactColliders.Length - 1, 1 do
+-- 		local k = contactColliders[i]
+-- 		if k.attachedRigidbody ~= self.collider2.attachedRigidbody then
+-- 			-- print(k.name)
+-- 			local up, down, left, right = false, false, false, false
+
+-- 			local go = k.attachedRigidbody.gameObject
+-- 			local object2 = utils.getObject(go:GetInstanceID())
+-- 			if go.name == "test" then -- 如果是地图块
+-- 				local name = utils.split(k.transform.parent.name, ",")
+-- 				local num = tonumber(name[#name]) -- 地图块最后一个数字作为bit
+-- 				if num ~= nil then
+-- 					if num & 1 == 1 then --位操作，算出这个方块朝哪个方向进行碰撞，一个方块可以有多个碰撞方向，这部分随意设计，只需要能知道这个collider的判定方向，用layermask什么都行
+-- 						up = true
+-- 					end
+-- 					if num & 2 == 2 then --位操作
+-- 						down = true
+-- 					end
+-- 					if num & 4 == 4 then --位操作
+-- 						left = true
+-- 					end
+-- 					if num & 8 == 8 then --位操作
+-- 						right = true
+-- 					end
+-- 				end
+-- 			-- elseif go.name ~= "test" and object2 ~= nil and not object2["isCatched"] and self.collider2.attachedRigidbody.gameObject ~= go then -- 是游戏object，则只允许左右进行碰撞
+
+-- 			-- 	local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
+
+-- 			-- 	if not string.find(LC.layers, string.match(self.collider2.name, "%[(%d+)%]")) then
+-- 			-- 		up = true
+-- 			-- 		down = true
+-- 			-- 		left = true
+-- 			-- 		right = true
+-- 			-- 	end
+-- 			-- else
+-- 				-- return 1, false, false, 1, elseArray
+-- 			end
+
+-- 			if up or down or left or right then
+
+-- 				local menseki, normal = utils.getBoundsIntersectsArea3D(self.collider2.bounds, k.bounds)
+-- 				if menseki.magnitude > 0 then -- 无视多少面积设置
+
+-- 					-- 算2个collider之间距离，主要是为了法线
+-- 					-- local cd2d = self.collider:Distance(k)
+
+-- 	-- ~ 				local a =  CS.UnityEngine.Vector3(cd2d.pointA.x, cd2d.pointA.y, 0)
+-- 	-- ~ 				local b =  CS.UnityEngine.Vector3(cd2d.pointB.x, cd2d.pointB.y, 0)
+-- 					-- local a = self.collider.gameObject.transform.position
+-- 					-- local b = k.gameObject.transform.position
+-- 					-- local normal =  -CS.UnityEngine.Vector3(cd2d.normal.x, cd2d.normal.y, 0)
+-- 					-- local normal = -menseki.normalized
+-- 					-- local c = a +  normal
+-- 					-- local d = b +  normal
+-- 	 				-- CS.UnityEngine.Debug.DrawLine(a, c, CS.UnityEngine.Color.red)
+-- 					-- CS.UnityEngine.Debug.DrawLine(b, d, CS.UnityEngine.Color.yellow)
+-- 					-- print(normal)
+
+-- 					-- 做碰撞法线与行进方向的点积
+-- 					-- local projection = CS.UnityEngine.Vector2.Dot(velocity.normalized, normal) -- 没用到，有需要可以自己看情况加
+
+-- 					local offset_x = 0
+-- 					local offset_z = 0
+
+-- 					local velo_nor = CS.UnityEngine.Vector2(velocity.x, velocity.z).normalized
+
+-- 					-- 左移，右移
+-- 					if self.collider2.bounds.center.x < k.bounds.center.x then
+-- 						if left and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(-1, 0)) <= 0 then -- 如果碰撞朝向与行进方向相反，则求出位移坐标
+-- 							offset_x = -menseki.x
+-- 						end
+-- 					else
+-- 						if right and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(1, 0)) <= 0 then
+-- 							offset_x = menseki.x
+-- 						end
+-- 					end
+-- 					-- 上移，下移
+-- 					if self.collider2.bounds.center.y > k.bounds.center.y then
+-- 						if up and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(0, 1)) <= 0 then
+-- 							-- offset_z = menseki.y - (self.collider2.bounds.center.z - k.bounds.center.z)
+-- 							offset_z = menseki.y
+-- 						end
+-- 					else
+-- 						if down and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(0, -1)) <= 0 then
+-- 							-- offset_z = -(menseki.y + (self.collider2.bounds.center.z - k.bounds.center.z))
+-- 							offset_z = -menseki.y
+-- 						end
+-- 					end
+
+-- 					-- if (left or right) and (up or down) then
+-- 					-- 	local a_x = math.abs(normal.x)
+-- 					-- 	local a_z = math.abs(normal.y)
+-- 					-- 	if a_x > a_z then
+-- 					-- 		offset_x = 0
+-- 					-- 	else
+-- 					-- 		offset_z = 0
+-- 					-- 	end
+-- 					-- end
+
+-- 					if (left or right) and (up or down) then
+-- 						if menseki.x > menseki.y then
+-- 							offset_x = 0
+-- 						else
+-- 							offset_z = 0
+-- 						end
+-- 					end
+
+
+-- 					-- 留下最小位移坐标
+-- 					if velocity.x > 0 then
+-- 						if offset_x < finalOffset_x then
+-- 							finalOffset_x = offset_x
+-- 						end
+-- 					else
+-- 						if offset_x > finalOffset_x then
+-- 							finalOffset_x = offset_x
+-- 						end
+-- 					end
+
+-- 					if velocity.z > 0 then
+-- 						if offset_z < finalOffset_z then
+-- 							finalOffset_z = offset_z
+-- 						end
+-- 					else
+-- 						if offset_z > finalOffset_z then
+-- 							finalOffset_z = offset_z
+-- 						end
+-- 					end
+
+-- 	-- 				if velocity.x ~= 0 and object2 ~= nil and offset_x ~= 0 and object2.isWall == false then
+-- 	-- 					local rate = weight / object2["weight"] / 2
+-- 	-- 					if rate > 1 then
+-- 	-- 						rate = 1
+-- 	-- 					end
+-- 	-- 					local vOffset = (object2.velocity.x - velocity.x) * rate
+-- 	-- --~ 					object2.velocity.x = object2.velocity.x - vOffset
+-- 	-- 					-- print(object2)
+-- 	-- 					object2:invokeEvent("onForce", {velocity = CS.UnityEngine.Vector2(-vOffset, 0), compute = 1})
+-- 	-- 				end
+
+-- 					-- if go.name == "test" then -- 判断是不是撞到地面，这样写不好，以后再优化
+-- 					-- 	-- if finalOffset_x ~= 0 and (normal.x == -1 or normal.x == 1) then
+-- 					-- 	-- 	isWall = true
+-- 					-- 	-- end
+-- 					-- 	if finalOffset_y > 0 then
+-- 					-- 		local id = string.match(k.name, "%[(%d+)%]")
+
+-- 					-- 		if id then
+-- 					-- 			if isGround ~= nil then
+-- 					-- 				isGround = isGround | 1 << tonumber(id)
+-- 					-- 			else
+-- 					-- 				isGround = 1 << tonumber(id)
+-- 					-- 			end
+-- 					-- 		end
+
+-- 					-- 	-- elseif finalOffset_y < 0 then
+-- 					-- 	-- 	isCeiling = true
+-- 					-- 	end
+-- 					-- end
+-- 				end
+-- 			else
+-- 				-- local id = string.match(k.name, "%[(%d+)%]")
+-- 				-- if id then
+-- 				-- 	isElse = isElse | 1 << tonumber(id)
+-- 				-- end
+-- 				-- if elseArray[id] == nil then
+-- 				-- 	elseArray[id] = {}
+-- 				-- end
+-- 				-- elseArray[id][k:GetInstanceID()] = k
+-- 			end
+-- 		end
+-- 	end
 
 	
-	-- -- 检测和什么碰，2d碰撞范围一般比实际要大，因为AABB要大一点，为了精确碰撞，需要自己实现
-	-- local contactColliders = CS.Tools.Instance:Collider2DOverlapCollider(self.collider2, self.filter) -- 这个函数其实Collider2D.OverlapCollider，用来手动检测碰撞，这边因为lua的缘故封装了一下
+-- 	-- -- 检测和什么碰，2d碰撞范围一般比实际要大，因为AABB要大一点，为了精确碰撞，需要自己实现
+-- 	-- local contactColliders = CS.Tools.Instance:Collider2DOverlapCollider(self.collider2, self.filter) -- 这个函数其实Collider2D.OverlapCollider，用来手动检测碰撞，这边因为lua的缘故封装了一下
 
-	-- -- 最终位移坐标
-	-- local finalOffset_x = 0
-	-- local finalOffset_z = 0
-	-- for p, k in pairs(contactColliders) do
+-- 	-- -- 最终位移坐标
+-- 	-- local finalOffset_x = 0
+-- 	-- local finalOffset_z = 0
+-- 	-- for p, k in pairs(contactColliders) do
 
-	-- 	if self.collider2.bounds:Intersects(k.bounds) then
+-- 	-- 	if self.collider2.bounds:Intersects(k.bounds) then
 
-	-- 		local up, down, left, right = false, false, false, false
+-- 	-- 		local up, down, left, right = false, false, false, false
 
-	-- 		-- local go = k.attachedRigidbody.gameObject
-	-- 		local go = k.gameObject.transform.parent.gameObject
-	-- 		local object2 = utils.getObject(go:GetInstanceID())
-	-- 		-- if go.name == "test" then -- 如果是地图块
-	-- 		if string.find(go.name, "block") ~= nil then
-	-- 			-- print(go.name)
-	-- 			local name = utils.split(go.name, ",")
-	-- 			local num = tonumber(name[#name]) -- 地图块最后一个数字作为bit
-
-
-	-- 			if num & 1 == 1 then --位操作，算出这个方块朝哪个方向进行碰撞，一个方块可以有多个碰撞方向，这部分随意设计，只需要能知道这个collider的判定方向，用layermask什么都行
-	-- 				up = true
-	-- 			end
-	-- 			if num & 2 == 2 then --位操作
-	-- 				down = true
-	-- 			end
-	-- 			if num & 4 == 4 then --位操作
-	-- 				left = true
-	-- 			end
-	-- 			if num & 8 == 8 then --位操作
-	-- 				right = true
-	-- 			end
-	-- 			-- print("aaa")
-	-- 		elseif not string.find(go.name, "block") ~= nil and object2 ~= nil and not object2["isCatched"] and self.collider.attachedRigidbody.gameObject ~= go then -- 是游戏object，则只允许左右进行碰撞
-
-	-- 			-- local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
-
-	-- 			-- print(LC.layers)
-	-- 			-- if not string.find(LC.layers, string.match(self.collider2.name, "%[(%d+)%]")) then
-	-- 				up = true
-	-- 				down = true
-	-- 				left = true
-	-- 				right = true
-	-- 			-- end
-
-	-- 		else
-	-- 			-- return 1, false, false, 1, elseArray
-	-- 		end
-
-	-- 		if up or down or left or right then
+-- 	-- 		-- local go = k.attachedRigidbody.gameObject
+-- 	-- 		local go = k.gameObject.transform.parent.gameObject
+-- 	-- 		local object2 = utils.getObject(go:GetInstanceID())
+-- 	-- 		-- if go.name == "test" then -- 如果是地图块
+-- 	-- 		if string.find(go.name, "block") ~= nil then
+-- 	-- 			-- print(go.name)
+-- 	-- 			local name = utils.split(go.name, ",")
+-- 	-- 			local num = tonumber(name[#name]) -- 地图块最后一个数字作为bit
 
 
-	-- 			local menseki, normal = utils.getBoundsIntersectsArea3D(self.collider2.bounds, k.bounds)
-	-- 			if menseki.magnitude > 0 then -- 无视多少面积设置
+-- 	-- 			if num & 1 == 1 then --位操作，算出这个方块朝哪个方向进行碰撞，一个方块可以有多个碰撞方向，这部分随意设计，只需要能知道这个collider的判定方向，用layermask什么都行
+-- 	-- 				up = true
+-- 	-- 			end
+-- 	-- 			if num & 2 == 2 then --位操作
+-- 	-- 				down = true
+-- 	-- 			end
+-- 	-- 			if num & 4 == 4 then --位操作
+-- 	-- 				left = true
+-- 	-- 			end
+-- 	-- 			if num & 8 == 8 then --位操作
+-- 	-- 				right = true
+-- 	-- 			end
+-- 	-- 			-- print("aaa")
+-- 	-- 		elseif not string.find(go.name, "block") ~= nil and object2 ~= nil and not object2["isCatched"] and self.collider.attachedRigidbody.gameObject ~= go then -- 是游戏object，则只允许左右进行碰撞
 
-	-- 				-- 算2个collider之间距离，主要是为了法线
-	-- 				-- local cd2d = self.collider2:Distance(k)
+-- 	-- 			-- local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
 
-	-- --~ 				local a =  CS.UnityEngine.Vector3(cd2d.pointA.x, cd2d.pointA.y, 0)
-	-- --~ 				local b =  CS.UnityEngine.Vector3(cd2d.pointB.x, cd2d.pointB.y, 0)
-	-- 				-- local normal =  -CS.UnityEngine.Vector3(cd2d.normal.x, cd2d.normal.y, 0)
-	-- --~ 				CS.UnityEngine.Debug.DrawLine(a, a + normal, CS.UnityEngine.Color.red)
-	-- --~ 				CS.UnityEngine.Debug.DrawLine(b, b + normal, CS.UnityEngine.Color.yellow)
+-- 	-- 			-- print(LC.layers)
+-- 	-- 			-- if not string.find(LC.layers, string.match(self.collider2.name, "%[(%d+)%]")) then
+-- 	-- 				up = true
+-- 	-- 				down = true
+-- 	-- 				left = true
+-- 	-- 				right = true
+-- 	-- 			-- end
 
-	-- 				-- 做碰撞法线与行进方向的点积
-	-- 				-- local projection = CS.UnityEngine.Vector2.Dot(velocity.normalized, normal) -- 没用到，有需要可以自己看情况加
+-- 	-- 		else
+-- 	-- 			-- return 1, false, false, 1, elseArray
+-- 	-- 		end
 
-	-- 				local offset_x = 0
-	-- 				local offset_z = 0
-
-	-- 				local velo_nor = CS.UnityEngine.Vector2(velocity.x, velocity.z).normalized
-
-	-- 				-- 左移，右移
-	-- 				if self.collider2.bounds.center.x < k.bounds.center.x then
-	-- 					if left and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(-1, 0)) <= 0 then -- 如果碰撞朝向与行进方向相反，则求出位移坐标
-	-- 						offset_x = -menseki.x
-	-- 					end
-	-- 				else
-	-- 					if right and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(1, 0)) <= 0 then
-	-- 						offset_x = menseki.x
-	-- 					end
-	-- 				end
-	-- 				-- 上移，下移
-	-- 				if self.collider2.bounds.center.y > k.bounds.center.y then
-	-- 					if up and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(0, 1)) <= 0 then
-	-- 						offset_z = menseki.y
-	-- 					end
-	-- 				else
-	-- 					if down and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(0, -1)) <= 0 then
-	-- 						offset_z = -menseki.y
-	-- 					end
-	-- 				end
+-- 	-- 		if up or down or left or right then
 
 
+-- 	-- 			local menseki, normal = utils.getBoundsIntersectsArea3D(self.collider2.bounds, k.bounds)
+-- 	-- 			if menseki.magnitude > 0 then -- 无视多少面积设置
 
-	-- 				-- if (up or down) and (left or right) then -- 如果同时满足上下和左右方向同时存在的情况，则根据碰撞方向来筛选掉另一个轴的位移
-	-- 				-- 	offset_x = offset_x * math.abs(normal.x)
-	-- 				-- 	offset_z = offset_z * math.abs(normal.z)
-	-- 				-- end
+-- 	-- 				-- 算2个collider之间距离，主要是为了法线
+-- 	-- 				-- local cd2d = self.collider2:Distance(k)
 
-	-- 				if (left or right) and (up or down) then
-	-- 					local a_x = math.abs(normal.x)
-	-- 					local a_z = math.abs(normal.y)
-	-- 					if a_x < a_z then
-	-- 						offset_x = 0
-	-- 					else
-	-- 						offset_z = 0
-	-- 					end
-	-- 				end
+-- 	-- --~ 				local a =  CS.UnityEngine.Vector3(cd2d.pointA.x, cd2d.pointA.y, 0)
+-- 	-- --~ 				local b =  CS.UnityEngine.Vector3(cd2d.pointB.x, cd2d.pointB.y, 0)
+-- 	-- 				-- local normal =  -CS.UnityEngine.Vector3(cd2d.normal.x, cd2d.normal.y, 0)
+-- 	-- --~ 				CS.UnityEngine.Debug.DrawLine(a, a + normal, CS.UnityEngine.Color.red)
+-- 	-- --~ 				CS.UnityEngine.Debug.DrawLine(b, b + normal, CS.UnityEngine.Color.yellow)
+
+-- 	-- 				-- 做碰撞法线与行进方向的点积
+-- 	-- 				-- local projection = CS.UnityEngine.Vector2.Dot(velocity.normalized, normal) -- 没用到，有需要可以自己看情况加
+
+-- 	-- 				local offset_x = 0
+-- 	-- 				local offset_z = 0
+
+-- 	-- 				local velo_nor = CS.UnityEngine.Vector2(velocity.x, velocity.z).normalized
+
+-- 	-- 				-- 左移，右移
+-- 	-- 				if self.collider2.bounds.center.x < k.bounds.center.x then
+-- 	-- 					if left and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(-1, 0)) <= 0 then -- 如果碰撞朝向与行进方向相反，则求出位移坐标
+-- 	-- 						offset_x = -menseki.x
+-- 	-- 					end
+-- 	-- 				else
+-- 	-- 					if right and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(1, 0)) <= 0 then
+-- 	-- 						offset_x = menseki.x
+-- 	-- 					end
+-- 	-- 				end
+-- 	-- 				-- 上移，下移
+-- 	-- 				if self.collider2.bounds.center.y > k.bounds.center.y then
+-- 	-- 					if up and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(0, 1)) <= 0 then
+-- 	-- 						offset_z = menseki.y
+-- 	-- 					end
+-- 	-- 				else
+-- 	-- 					if down and CS.UnityEngine.Vector2.Dot(velo_nor, CS.UnityEngine.Vector2(0, -1)) <= 0 then
+-- 	-- 						offset_z = -menseki.y
+-- 	-- 					end
+-- 	-- 				end
 
 
 
-	-- 				-- 留下最小位移坐标
-	-- 				if velocity.x > 0 then
-	-- 					if offset_x < finalOffset_x then
-	-- 						finalOffset_x = offset_x
-	-- 					end
-	-- 				else
-	-- 					if offset_x > finalOffset_x then
-	-- 						finalOffset_x = offset_x
-	-- 					end
-	-- 				end
+-- 	-- 				-- if (up or down) and (left or right) then -- 如果同时满足上下和左右方向同时存在的情况，则根据碰撞方向来筛选掉另一个轴的位移
+-- 	-- 				-- 	offset_x = offset_x * math.abs(normal.x)
+-- 	-- 				-- 	offset_z = offset_z * math.abs(normal.z)
+-- 	-- 				-- end
 
-	-- 				if velocity.z > 0 then
-	-- 					if offset_z < finalOffset_z then
-	-- 						finalOffset_z = offset_z
-	-- 					end
-	-- 				else
-	-- 					if offset_z > finalOffset_z then
-	-- 						finalOffset_z = offset_z
-	-- 					end
-	-- 				end
+-- 	-- 				if (left or right) and (up or down) then
+-- 	-- 					local a_x = math.abs(normal.x)
+-- 	-- 					local a_z = math.abs(normal.y)
+-- 	-- 					if a_x < a_z then
+-- 	-- 						offset_x = 0
+-- 	-- 					else
+-- 	-- 						offset_z = 0
+-- 	-- 					end
+-- 	-- 				end
 
-	-- 				-- print(finalOffset_x, finalOffset_z)
 
-	-- -- 				if velocity.x ~= 0 and object2 ~= nil and offset_x ~= 0 and object2.isWall == false then
-	-- -- 					local rate = weight / object2["weight"] / 2
-	-- -- 					if rate > 1 then
-	-- -- 						rate = 1
-	-- -- 					end
-	-- -- 					local vOffset = (object2.velocity.x - velocity.x) * rate
-	-- -- --~ 					object2.velocity.x = object2.velocity.x - vOffset
-	-- -- 					-- print(object2)
-	-- -- 					object2:invokeEvent("onForce", {velocity = CS.UnityEngine.Vector2(-vOffset, 0), compute = 1})
-	-- -- 				end
-	-- 			end
-	-- 		else
-	-- 			-- local id = string.match(k.name, "%[(%d+)%]")
-	-- 			-- if id then
-	-- 			-- 	isElse = isElse | 1 << tonumber(id)
-	-- 			-- end
-	-- 			-- if elseArray[id] == nil then
-	-- 			-- 	elseArray[id] = {}
-	-- 			-- end
-	-- 			-- elseArray[id][k:GetInstanceID()] = k
-	-- 		end
-	-- 	end
-	-- end
 
-	-- 更新自身位置
-	-- self.collider2.attachedRigidbody.position = self.collider2.attachedRigidbody.position + CS.UnityEngine.Vector3(finalOffset_x, 0, finalOffset_z)
-	-- self.collider2.attachedRigidbody.position = self.collider2.attachedRigidbody.position + CS.UnityEngine.Vector3(finalOffset_x, 0, finalOffset_z)
+-- 	-- 				-- 留下最小位移坐标
+-- 	-- 				if velocity.x > 0 then
+-- 	-- 					if offset_x < finalOffset_x then
+-- 	-- 						finalOffset_x = offset_x
+-- 	-- 					end
+-- 	-- 				else
+-- 	-- 					if offset_x > finalOffset_x then
+-- 	-- 						finalOffset_x = offset_x
+-- 	-- 					end
+-- 	-- 				end
 
-	return isGround, isCeiling, isWall, isElse, elseArray, CS.UnityEngine.Vector3(finalOffset_x, 0, finalOffset_z)
-end
+-- 	-- 				if velocity.z > 0 then
+-- 	-- 					if offset_z < finalOffset_z then
+-- 	-- 						finalOffset_z = offset_z
+-- 	-- 					end
+-- 	-- 				else
+-- 	-- 					if offset_z > finalOffset_z then
+-- 	-- 						finalOffset_z = offset_z
+-- 	-- 					end
+-- 	-- 				end
 
-LColliderATK = {damage = nil, frequency = nil, velocity = nil, fall = nil, defence = nil, ignoreObjects = nil, var = nil, isCatch = nil, action = nil, frame = nil, isRayCast = nil, isHit = nil, hitObject = nil, length = nil, direction = nil}
+-- 	-- 				-- print(finalOffset_x, finalOffset_z)
+
+-- 	-- -- 				if velocity.x ~= 0 and object2 ~= nil and offset_x ~= 0 and object2.isWall == false then
+-- 	-- -- 					local rate = weight / object2["weight"] / 2
+-- 	-- -- 					if rate > 1 then
+-- 	-- -- 						rate = 1
+-- 	-- -- 					end
+-- 	-- -- 					local vOffset = (object2.velocity.x - velocity.x) * rate
+-- 	-- -- --~ 					object2.velocity.x = object2.velocity.x - vOffset
+-- 	-- -- 					-- print(object2)
+-- 	-- -- 					object2:invokeEvent("onForce", {velocity = CS.UnityEngine.Vector2(-vOffset, 0), compute = 1})
+-- 	-- -- 				end
+-- 	-- 			end
+-- 	-- 		else
+-- 	-- 			-- local id = string.match(k.name, "%[(%d+)%]")
+-- 	-- 			-- if id then
+-- 	-- 			-- 	isElse = isElse | 1 << tonumber(id)
+-- 	-- 			-- end
+-- 	-- 			-- if elseArray[id] == nil then
+-- 	-- 			-- 	elseArray[id] = {}
+-- 	-- 			-- end
+-- 	-- 			-- elseArray[id][k:GetInstanceID()] = k
+-- 	-- 		end
+-- 	-- 	end
+-- 	-- end
+
+-- 	-- 更新自身位置
+-- 	-- self.collider2.attachedRigidbody.position = self.collider2.attachedRigidbody.position + CS.UnityEngine.Vector3(finalOffset_x, 0, finalOffset_z)
+-- 	-- self.collider2.attachedRigidbody.position = self.collider2.attachedRigidbody.position + CS.UnityEngine.Vector3(finalOffset_x, 0, finalOffset_z)
+
+-- 	return isGround, isCeiling, isWall, isElse, elseArray, CS.UnityEngine.Vector3(finalOffset_x, 0, finalOffset_z)
+-- end
+
+LColliderATK = {damage = nil, frequency = nil, velocity = nil, fall = nil, defence = nil, ignoreObjects = nil, var = nil, isCatch = nil, action = nil, frame = nil, isHit = nil, hitObject = nil}
 setmetatable(LColliderATK, LCollider)
 LColliderATK.__index = LColliderATK
 function LColliderATK:new(l, go, id)
@@ -935,12 +1160,9 @@ function LColliderATK:new(l, go, id)
 	self.isCatch = nil
 	self.action = nil
 	self.frame = nil
-	self.isRayCast = false
 
 	self.isHit = -1
 	self.hitObject = nil
-	self.length = 0
-	self.direction = nil
 	return self
 end
 
@@ -1120,15 +1342,26 @@ function LColliderATK:ATKFixedUpdate()
 	-- 	end
 	-- end
 
-	self.length = (self.LObject.rigidbody.position - self.LObject.oriPos).magnitude -- 射线的长度
-	self.direction = (self.LObject.rigidbody.position - self.LObject.oriPos).normalized -- 方向
+	local rx, ry, rz = CS.LuaUtil.RigidbodyGetPosition(self.LObject.rigidbody)
+
+	local offset = CS.UnityEngine.Vector3(rx - self.LObject.oriPos.x, ry - self.LObject.oriPos.y, rz - self.LObject.oriPos.z)
+
+	-- print(offset)
+
+	local length = offset.magnitude -- 射线的长度
+	local direction = offset.normalized -- 方向
 	-- RaycastHit2D[] hitinfo;
 	-- local hitinfo = CS.UnityEngine.Physics2D.RaycastAll(CS.UnityEngine.Vector2(self.oriPos.x, self.oriPos.y), CS.UnityEngine.Vector2(direction.x, direction.y), length) -- 在两个位置之间发起一条射线，然后通过这条射线去检测有没有发生碰撞
 
 	-- local hitinfo = CS.Tools.Instance:PhysicsRaycastAll(self.oriPos, direction, self.length, 15)
 	-- -- print(hitinfo.Length)
 
-	local hitinfo = CS.Tools.Instance:PhysicsRaycast(self.LObject.oriPos, self.direction, self.length, 1048575)
+	local oriPos = CS.UnityEngine.Vector3(self.LObject.oriPos.x, self.LObject.oriPos.y, self.LObject.oriPos.z)
+
+	-- CS.UnityEngine.Debug.DrawLine(oriPos, CS.UnityEngine.zero, CS.UnityEngine.Color.red)
+	-- CS.UnityEngine.Debug.DrawLine(CS.UnityEngine.Vector3(rx, ry, rz), CS.UnityEngine.zero, CS.UnityEngine.Color.green)
+
+	local hitinfo = CS.Tools.Instance:PhysicsRaycast(oriPos, direction, length, 1048575)
 	-- if lr.positionCount > 2 then
 	-- 	lr.positionCount = 2
 	-- end

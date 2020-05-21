@@ -401,9 +401,6 @@
 						},
 						{
 							"component": "BDY"
-						},
-						{
-							"component": "ATK"
 						}
 					],
 					"active": true
@@ -2288,13 +2285,15 @@
 					"name": "bullet",
 					"clips": [
 						{
-							"category": "Attack",
+							"category": "Body",
 							"wait": 600,
 							"id": "0",
 							"x": 0,
 							"y": 0,
 							"width": 1,
-							"height": 1
+							"height": 1,
+							"bodyFlags": 1,
+							"bounciness": 0.7
 						},
 						{
 							"wait": 600,
@@ -3384,6 +3383,33 @@
 						{
 							"category": "Object",
 							"active": true,
+							"trigger": "this.bodyArray[\"0\"] ~= nil and this.bodyArray[\"0\"].isHit == 16",
+							"json": {
+								"x": 0,
+								"y": 0,
+								"x2": 0,
+								"y2": 0,
+								"z2": 0,
+								"state": "fire_effect",
+								"animation": "blood_effect",
+								"id": "9",
+								"amount": 1,
+								"precise": 0
+							}
+						},
+						{
+							"category": "Destory",
+							"active": false,
+							"trigger": "(this.bodyArray[\"0\"] ~= nil and this.bodyArray[\"0\"].isHit ~= -1) or this.timeLine >= 1"
+						},
+						{
+							"category": "Destory",
+							"active": true,
+							"trigger": "this.timeLine >= 1"
+						},
+						{
+							"category": "Object",
+							"active": false,
 							"trigger": "this.attckArray[\"0\"] ~= nil and this.attckArray[\"0\"].isHit == 16",
 							"json": {
 								"x": 0,
@@ -3417,7 +3443,7 @@
 						},
 						{
 							"category": "Destory",
-							"active": true,
+							"active": false,
 							"trigger": "(this.attckArray[\"0\"] ~= nil and this.attckArray[\"0\"].isHit ~= -1) or this.timeLine >= 1"
 						}
 					],

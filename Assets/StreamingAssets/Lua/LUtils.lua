@@ -894,8 +894,6 @@ function utils.fixedupdate(self)
 
 	-- self.rigidbody.position = self.rigidbody.position + self.velocity * CS.UnityEngine.Time.deltaTime
 
-	-- CS.LuaUtil.SetPos2(self.rigidbody_id, self.rigidbody.position.x + self.velocity.x * CS.UnityEngine.Time.deltaTime, self.rigidbody.position.y + self.velocity.y * CS.UnityEngine.Time.deltaTime, self.rigidbody.position.z + self.velocity.z * CS.UnityEngine.Time.deltaTime)
-
 	if self.root ~= self then
 		return
 	end
@@ -1457,6 +1455,16 @@ end
 -- 向量的模
 function utils.GetVector3Module(v)
     return math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z)
+end
+
+function utils.GetVector3Module(x, y, z)
+    return math.sqrt(x * x + y * y + z * z)
+end
+
+-- 归一化
+function utils.GetVector3Normalize(x, y, z)
+	local length = math.sqrt(x * x + y * y + z * z)
+    return x / length, y / length, z / length
 end
 
 -- 求两向量间夹角

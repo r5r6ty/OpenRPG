@@ -166,6 +166,8 @@ end)
 
 ecs.registerComponent("Physics", 0, function(self, x, y, z, vx, vy, vz)
     self.physics_object = CS.UnityEngine.GameObject("physics")
+    self.physics_object_id = self.physics_object:GetInstanceID()
+    CS.LuaUtil.AddID(self.physics_object_id, self.physics_object)
     -- self.physics_object.transform:SetParent(self.gameObject.transform)
     self.physics_object.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
     self.physics_object.transform.position = CS.UnityEngine.Vector3(x, y, z)
@@ -178,12 +180,6 @@ ecs.registerComponent("Physics", 0, function(self, x, y, z, vx, vy, vz)
     -- self.rigidbody.detectCollisions = false
     self.rigidbody.freezeRotation = true
 
-    self.rigidbody_id = self.rigidbody:GetInstanceID()
-    CS.LuaUtil.AddID2(self.rigidbody_id, self.rigidbody)
-
-
-
-
     -- self.velocity = {x = vx, y = vy, z = vz}
     self.velocity = CS.UnityEngine.Vector3(vx, vy, vz)
 
@@ -192,7 +188,9 @@ ecs.registerComponent("Physics", 0, function(self, x, y, z, vx, vy, vz)
 
     self.isOnGround = -1
 
-    self.oriPos = self.rigidbody.position
+    self.oriPos = {}
+    self.oriPos.x, self.oriPos.y, self.oriPos.z = CS.LuaUtil.RigidbodyGetPosition(self.rigidbody)
+
 
     utils.addObject(self.physics_object:GetInstanceID(), self)
     utils.addObject(self, self.physics_object:GetInstanceID())
@@ -203,12 +201,17 @@ end, function(self)
 
     CS.UnityEngine.GameObject.Destroy(self.physics_object)
     self.physics_object = nil
+    CS.LuaUtil.DeleteID(self.physics_object_id)
+    self.physics_object_id = nil
+
     CS.UnityEngine.GameObject.Destroy(self.rigidbody)
     self.rigidbody = nil
-    CS.LuaUtil.DeleteID2(self.rigidbody_id)
-    self.rigidbody_id = nil
     self.velocity = nil
     self.team = nil
+
+    self.isOnGround = nil
+
+    self.oriPos = nil
 end)
 
 ecs.registerComponent("ATK", ecs.allOf("Physics"), function(self)

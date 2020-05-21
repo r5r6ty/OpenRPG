@@ -6,23 +6,25 @@ local ecs = require "ecs"
 -- 渲染sprite
 ecs.registerMultipleSystem("SpriteRenderSystem", function(self)
 
-    local pos = self.physics_object.transform.position
-    CS.LuaUtil.SetPos(self.pic_offset_object_id, pos.x, pos.y + pos.z, self.root.physics_object.transform.position.z)
+    local pos_x, pos_y, pos_z = CS.LuaUtil.GetPos(self.physics_object_id)
+    local r_pos_x, r_pos_y, r_pos_z = CS.LuaUtil.GetPos(self.root.physics_object_id)
+    CS.LuaUtil.SetPos(self.pic_offset_object_id, pos_x, pos_y + pos_z, r_pos_z)
 
     self.rotation = self.rotation + self.rotation_velocity
 
-    local rrr = self.physics_object.transform.eulerAngles
+    local rrr_x, rrr_y, rrr_z = CS.LuaUtil.GetEulerAngles(self.physics_object_id)
+    local rrr_length = utils.GetVector3Module(rrr_x, rrr_y, rrr_z)
     if (self.root == self and self.direction.x == 1) or (self.root ~= self and self.root.direction.x * self.direction.x == 1) then
-        if rrr.magnitude > 0 then
-            CS.LuaUtil.SetRotationEuler(self.pic_offset_object_id, 0, 0, 360 - rrr.y + self.rotation)
+        if rrr_length > 0 then
+            CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, 0, 360 - rrr_y + self.rotation)
         else
-            CS.LuaUtil.SetRotationEuler(self.pic_offset_object_id, 0, 0, 0 + self.rotation)
+            CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, 0, 0 + self.rotation)
         end
     else
-        if rrr.magnitude > 0 then
-            CS.LuaUtil.SetRotationEuler(self.pic_offset_object_id, 0, 180, rrr.y + 180 + self.rotation)
+        if rrr_length > 0 then
+            CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, 180, rrr_y + 180 + self.rotation)
         else
-            CS.LuaUtil.SetRotationEuler(self.pic_offset_object_id, 0, 180, 0 + self.rotation)
+            CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, 180, 0 + self.rotation)
         end
     end
 end, ecs.allOf("Active", "DataBase", "SpriteRenderer", "Physics"))
@@ -116,9 +118,6 @@ end, ecs.allOf("Active", "DataBase", "State"))
 
 -- 碰撞盒
 ecs.registerMultipleSystem("BDYSystem", function(self)
-
-    self.oriPos = self.rigidbody.position
-
     local f = 0
     for _, v in pairs(self.bodyArray) do
         self.isOnGround = v:BDYFixedUpdate()
@@ -132,7 +131,8 @@ ecs.registerMultipleSystem("BDYSystem", function(self)
         f = f + 1
     end
     if f == 0 then
-        self.rigidbody.position = self.rigidbody.position + self.velocity * CS.UnityEngine.Time.deltaTime
+        local dt = CS.UnityEngine.Time.deltaTime
+        CS.LuaUtil.RigidbodyMovePosition(self.rigidbody, self.velocity.x * dt, self.velocity.y * dt, self.velocity.z * dt)
     end
     if self.isOnGround ~= -1 then
         ecs.processSingleSystem("Ground", self)
@@ -161,6 +161,7 @@ ecs.registerMultipleSystem("ATKSystem", function(self)
     -- 		self.database:invokeEvent("Dead", self, nil)
     -- 	end
     -- end
+    self.oriPos.x, self.oriPos.y, self.oriPos.z = CS.LuaUtil.RigidbodyGetPosition(self.rigidbody)
 end, ecs.allOf("Active", "Physics", "ATK"))
 
 -- 休眠
@@ -271,7 +272,7 @@ end, ecs.allOf("Active", "SpriteRenderer"))
 ecs.registerSingleSystem("Sprite", function(this, value)
     -- print(value)
     this.spriteRenderer.sprite = this.database.sprites[value.sprite]
-    this.pic_object.transform.localPosition = CS.UnityEngine.Vector3(value.x / 100, -value.y / 100, 0)
+    CS.LuaUtil.SetLocalPos(this.pic_object_id, value.x / 100, -value.y / 100, 0)
 end, ecs.allOf("Active", "DataBase", "SpriteRenderer"))
 
 ecs.registerSingleSystem("Image", function(this, value)
@@ -504,7 +505,7 @@ ecs.registerSingleSystem("Child", function(this, value)
         -- end
         -- object.gameObject.transform.localPosition = CS.UnityEngine.Vector3(value.x / 100, value.y / 100, z)
 
-        object.physics_object.transform.localPosition = CS.UnityEngine.Vector3(this.direction.x * value.x / 100, value.y / 100, 0)
+        CS.LuaUtil.SetLocalPos(object.physics_object_id, this.direction.x * value.x / 100, value.y / 100, 0)
 
         object.spriteRenderer.sortingOrder = -(value.layer * this.root.direction.z - this.spriteRenderer.sortingOrder)
     end
@@ -534,14 +535,17 @@ end)
 
 ecs.registerSingleSystem("TurnToTarget", function(this, value)
     if this.root.target ~= nil then
-        local pos = this.root.target.physics_object.transform.position
+        local r_pos_x, r_pos_y, r_pos_z = CS.LuaUtil.GetPos(this.root.target.physics_object_id)
+        -- 如果目标是指针，就要减去枪的高度
         if this.root.target.state == "cursor" then
             local object = this.children[value.id]
             if object ~= nil then
-                pos.z = pos.z - this.physics_object.transform.localPosition.y * 2 + value.y / 100 * 2
+                local lopos_x, lopos_y, lopos_z = CS.LuaUtil.GetLocalPos(this.physics_object_id)
+                r_pos_z = r_pos_z - lopos_y * 2 + value.y / 100 * 2
             end
         end
-        local rad = CS.UnityEngine.Mathf.Atan2(this.physics_object.transform.position.z - pos.z, this.physics_object.transform.position.x - pos.x)
+        local pos_x, pos_y, pos_z = CS.LuaUtil.GetPos(this.physics_object_id)
+        local rad = CS.UnityEngine.Mathf.Atan2(pos_z - r_pos_z, pos_x - r_pos_x)
 
         local deg = rad * CS.UnityEngine.Mathf.Rad2Deg + 180
 
@@ -551,10 +555,10 @@ ecs.registerSingleSystem("TurnToTarget", function(this, value)
             -- if root.direction.x == -1 then
             -- 	deg = -(360 - rad * CS.UnityEngine.Mathf.Rad2Deg)
             -- end
-            this.physics_object.transform.localEulerAngles = CS.UnityEngine.Vector3(0, -deg, 0)
+            CS.LuaUtil.SetLocalRotationByEuler(this.physics_object_id, 0, -deg, 0)
         end
     end
-end)
+end, ecs.allOf("Active", "Physics"))
 
 ecs.registerSingleSystem("Ray", function(this, value)
     local hitinfo = nil

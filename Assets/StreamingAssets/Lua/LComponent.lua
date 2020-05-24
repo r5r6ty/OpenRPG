@@ -47,19 +47,13 @@ end)
 ecs.registerComponent("SpriteRenderer", ecs.allOf("DataBase"), function(self)
     self.pic_offset_object = CS.UnityEngine.GameObject("pic_offset")
     self.pic_offset_object_id = self.pic_offset_object:GetInstanceID()
-    CS.LuaUtil.AddID(self.pic_offset_object_id, self.pic_offset_object)
-    -- self.pic_offset_object.transform:SetParent(self.gameObject.transform)
-    self.pic_offset_object.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
-    self.pic_offset_object.transform.localPosition = CS.UnityEngine.Vector3.zero
-    -- self.pic_offset_object.transform.localScale = CS.UnityEngine.Vector3.one
-    self.pic_offset_object.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
+    CS.LuaUtil.AddGameObjectID(self.pic_offset_object_id, self.pic_offset_object)
+    CS.LuaUtil.SetlocalScale(self.pic_offset_object_id, 2, 2, 2)
 
     self.pic_object = CS.UnityEngine.GameObject("pic")
     self.pic_object_id = self.pic_object:GetInstanceID()
-    CS.LuaUtil.AddID(self.pic_object_id, self.pic_object)
-    self.pic_object.transform:SetParent(self.pic_offset_object.transform)
-    self.pic_object.transform.localPosition = CS.UnityEngine.Vector3.zero
-    self.pic_object.transform.localScale = CS.UnityEngine.Vector3.one
+    CS.LuaUtil.AddGameObjectID(self.pic_object_id, self.pic_object)
+    self.pic_object.transform:SetParent(self.pic_offset_object.transform, false)
     self.spriteRenderer = self.pic_object:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
     self.spriteRenderer.material = self.database.palettes[1]
 
@@ -68,11 +62,11 @@ ecs.registerComponent("SpriteRenderer", ecs.allOf("DataBase"), function(self)
 end, function (self)
     CS.UnityEngine.GameObject.Destroy(self.pic_offset_object)
     self.pic_offset_object = nil
-    CS.LuaUtil.DeleteID(self.pic_offset_object_id)
+    CS.LuaUtil.RemoveGameObjectID(self.pic_offset_object_id)
     self.pic_offset_object_id = nil
     CS.UnityEngine.GameObject.Destroy(self.pic_object)
     self.pic_object = nil
-    CS.LuaUtil.DeleteID(self.pic_object_id)
+    CS.LuaUtil.RemoveGameObjectID(self.pic_object_id)
     self.pic_object_id = nil
     self.spriteRenderer = nil
 
@@ -99,8 +93,8 @@ end)
 ecs.registerComponent("Image", ecs.allOf("DataBase"), function(this, parent)
     this.image_object = CS.UnityEngine.GameObject("image")
     -- this.image_object.transform:SetParent(this.UI_object.transform)
-    this.image_object.transform.localPosition = CS.UnityEngine.Vector3.zero
-    this.image_object.transform.localScale = CS.UnityEngine.Vector3.one
+    -- this.image_object.transform.localPosition = CS.UnityEngine.Vector3.zero
+    -- this.image_object.transform.localScale = CS.UnityEngine.Vector3.one
 
     -- local rectTransform = this.image_object:AddComponent(typeof(CS.UnityEngine.RectTransform))
     -- -- rectTransform.anchoredPosition = CS.UnityEngine.Vector2(x, y)
@@ -118,10 +112,10 @@ ecs.registerComponent("Image", ecs.allOf("DataBase"), function(this, parent)
     this.UI_object = this.image_object
     
     if parent == nil then
-        this.UI_object.transform:SetParent(utils.getLCanvas().transform)
+        this.UI_object.transform:SetParent(utils.getLCanvas().transform, false)
     else
         -- this.UI_object.transform:SetParent(p.transform)
-        this.UI_object.transform:SetParent(parent.rectTransform)
+        this.UI_object.transform:SetParent(parent.rectTransform, false)
 
         this.team = parent.team
         if this.image ~= nil then
@@ -167,10 +161,10 @@ end)
 ecs.registerComponent("Physics", 0, function(self, x, y, z, vx, vy, vz, t)
     self.physics_object = CS.UnityEngine.GameObject("physics")
     self.physics_object_id = self.physics_object:GetInstanceID()
-    CS.LuaUtil.AddID(self.physics_object_id, self.physics_object)
+    CS.LuaUtil.AddGameObjectID(self.physics_object_id, self.physics_object)
     -- self.physics_object.transform:SetParent(self.gameObject.transform)
-    self.physics_object.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
-    self.physics_object.transform.position = CS.UnityEngine.Vector3(x, y, z)
+    CS.LuaUtil.SetlocalScale(self.physics_object_id, 2, 2, 2)
+    CS.LuaUtil.SetPos(self.physics_object_id, x, y, z)
     -- self.physics_object.transform.localPosition = CS.UnityEngine.Vector3.zero
     -- self.physics_object.transform.localScale = CS.UnityEngine.Vector3.one
 
@@ -180,8 +174,8 @@ ecs.registerComponent("Physics", 0, function(self, x, y, z, vx, vy, vz, t)
     -- self.rigidbody.detectCollisions = false
     self.rigidbody.freezeRotation = true
 
-    -- self.velocity = {x = vx, y = vy, z = vz}
-    self.velocity = CS.UnityEngine.Vector3(vx, vy, vz)
+    self.velocity = {x = vx, y = vy, z = vz}
+    -- self.velocity = CS.UnityEngine.Vector3(vx, vy, vz)
 
 
     self.team = t
@@ -201,7 +195,7 @@ end, function(self)
 
     CS.UnityEngine.GameObject.Destroy(self.physics_object)
     self.physics_object = nil
-    CS.LuaUtil.DeleteID(self.physics_object_id)
+    CS.LuaUtil.RemoveGameObjectID(self.physics_object_id)
     self.physics_object_id = nil
 
     CS.UnityEngine.GameObject.Destroy(self.rigidbody)
@@ -217,9 +211,7 @@ end)
 ecs.registerComponent("ATK", ecs.allOf("Physics"), function(self)
     self.attckArray = {}
     self.atk_object = CS.UnityEngine.GameObject("atk")
-    self.atk_object.transform:SetParent(self.physics_object.transform)
-    self.atk_object.transform.localPosition = CS.UnityEngine.Vector3.zero
-    self.atk_object.transform.localScale = CS.UnityEngine.Vector3.one
+    self.atk_object.transform:SetParent(self.physics_object.transform, false)
 end, function(self)
     self.attckArray = nil
     CS.UnityEngine.GameObject.Destroy(self.attckArray)
@@ -230,9 +222,7 @@ ecs.registerComponent("BDY", ecs.allOf("Physics"), function(self)
     self.bodyArray_InstanceID = {}
 
     self.bdy_object = CS.UnityEngine.GameObject("bdy[16]")
-    self.bdy_object.transform:SetParent(self.physics_object.transform)
-    self.bdy_object.transform.localPosition = CS.UnityEngine.Vector3.zero
-    self.bdy_object.transform.localScale = CS.UnityEngine.Vector3.one
+    self.bdy_object.transform:SetParent(self.physics_object.transform, false)
     self.bdy_object.layer = 16 -- bdy的layer暂定16
 end, function(self)
     self.bodyArray = nil
@@ -250,8 +240,6 @@ ecs.registerComponent("LineRenderer", ecs.allOf("Physics"), function(self)
 	-- self.lineRenderer.endColor = color
 	self.lineRenderer.numCapVertices = 90
     self.lineRenderer.material = utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY
-    
-    self.oriPos2 = self.physics_object.transform.position
 end, function (self)
     CS.UnityEngine.GameObject.Destroy(self.line_object)
     self.lineRenderer = nil
@@ -283,7 +271,8 @@ ecs.registerComponent("Target", 0, function(self, t)
 end, nil)
 
 ecs.registerComponent("Gravity", 0, function(self)
-    self.gravity = CS.UnityEngine.Physics.gravity
+    local x, y, z = CS.LuaUtil.GetPhysicsGravity()
+    self.gravity = {x = x, y = y, z = z}
 end, function(self)
     self.gravity = nil
 end)

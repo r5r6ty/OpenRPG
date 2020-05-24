@@ -429,6 +429,9 @@ function LPlayer:new(o, c)
 	setmetatable(self, LPlayer)
 
 	self.camera = c
+	self.camera_id = c:GetInstanceID()
+	CS.LuaUtil.AddGameObjectID(self.camera_id, self.camera)
+	-- TODO:记得Remove
 
 
 	self:createKey("a", {CS.UnityEngine.KeyCode.Mouse0}) -- 攻击键
@@ -474,8 +477,11 @@ end
 -- 摄像机跟随主角，比较简陋
 function LPlayer:followCharacter()
 	-- if self.object.kind == 0 then
-		local charPos = self.object.physics_object.transform.position
-		self.camera.transform.position = CS.UnityEngine.Vector3(charPos.x, charPos.y + charPos.z, self.camera.transform.position.z)
+		-- local charPos = self.object.physics_object.transform.position
+		local char_x, char_y, char_z = CS.LuaUtil.GetPos(self.object.physics_object_id)
+		-- self.camera.transform.position = CS.UnityEngine.Vector3(charPos.x, charPos.y + charPos.z, self.camera.transform.position.z)
+
+		CS.LuaUtil.SetPos(self.camera_id, char_x, char_y + char_z, char_z - 10)
 	-- end
 end
 

@@ -166,7 +166,7 @@ end, ecs.allOf("Active", "Physics", "ATK"))
 
 -- 休眠
 ecs.registerMultipleSystem("SleepSystem", function(self)
-    if self.velocity.magnitude <= 0.3 then
+    if utils.GetVector3Module(self.velocity.x, self.velocity.y, self.velocity.z) <= 0.3 then
         self.sleep = true
         ecs.removeComponent(self._eid, "Active")
         ecs.applyEntity(self._eid)
@@ -201,10 +201,16 @@ end, ecs.allOf("Active", "DataBase", "Player"))
 
 -- 子弹时间1
 ecs.registerMultipleSystem("zidanshijianSystem", function(self, time)
-    self.speed = time
-    if self.audioSource ~= nil then
-        self.audioSource.pitch = time
-    end
+    -- if self.team ~= nil and self.team == 1 and self == utils.PLAYER.object then
+
+    -- elseif self.team ~= nil and self.team == 1 and self.root ~= nil and self.root == utils.PLAYER.object then
+
+    -- else
+        self.speed = time
+        if self.audioSource ~= nil then
+            self.audioSource.pitch = time
+        end
+    -- end
 end, ecs.allOf("Active", "Animation"))
 
 
@@ -234,32 +240,36 @@ ecs.registerSingleSystem("Dead", function(this, value)
 end)
 
 ecs.registerSingleSystem("Flying", function(this, value)
-    this.velocity = this.velocity + 0.5 * this.gravity * 2 / 60 * this.speed
+    this.velocity.x = this.velocity.x + 0.5 * this.gravity.x * 2 / 60 * this.speed
+    this.velocity.y = this.velocity.y + 0.5 * this.gravity.y * 2 / 60 * this.speed
+    this.velocity.z = this.velocity.z + 0.5 * this.gravity.z * 2 / 60 * this.speed
     -- this.velocity.y = this.velocity.y + 0.5 * -9.81 * 2 / 60 / 3
 end, ecs.allOf("Active", "Physics", "Gravity"))
 
 ecs.registerSingleSystem("Ground", function(this, value)
     -- if this.isOnGround ~= 1 then
-        local f = this.velocity * 0.2 -- 摩擦系数
+        local f_x = this.velocity.x * 0.2 -- 摩擦系数
+        -- local f_y = this.velocity.y * 0.2 -- 摩擦系数
+        local f_z = this.velocity.z * 0.2 -- 摩擦系数
         if this.velocity.x > 0 then
-            this.velocity.x = this.velocity.x - f.x
+            this.velocity.x = this.velocity.x - f_x
             if this.velocity.x < 0 then
                 this.velocity.x = 0
             end
         elseif this.velocity.x < 0 then
-            this.velocity.x = this.velocity.x - f.x
+            this.velocity.x = this.velocity.x - f_x
             if this.velocity.x > 0 then
                 this.velocity.x = 0
             end
         end
 
         if this.velocity.z > 0 then
-            this.velocity.z = this.velocity.z - f.z
+            this.velocity.z = this.velocity.z - f_z
             if this.velocity.z < 0 then
                 this.velocity.z = 0
             end
         elseif this.velocity.z < 0 then
-            this.velocity.z = this.velocity.z - f.z
+            this.velocity.z = this.velocity.z - f_z
             if this.velocity.z > 0 then
                 this.velocity.z = 0
             end
@@ -391,12 +401,12 @@ ecs.registerSingleSystem("Button", function(this, value)
 end)
 
 ecs.registerSingleSystem("Trace", function(this, value)
-    local s = this.oriPos2
-    local e = this.physics_object.transform.position
-    this.lineRenderer:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
-    this.lineRenderer:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
+    -- local s = this.oriPos2
+    -- local e = this.physics_object.transform.position
+    -- this.lineRenderer:SetPosition(0, CS.UnityEngine.Vector3(s.x, s.y + s.z, s.z))
+    -- this.lineRenderer:SetPosition(1, CS.UnityEngine.Vector3(e.x, e.y + e.z, e.z))
 
-    this.oriPos2 = this.physics_object.transform.position
+    -- this.oriPos2 = this.physics_object.transform.position
 end, ecs.allOf("Active", "DataBase", "LineRenderer"))
 
 ecs.registerSingleSystem("Sound", function(this, value)
@@ -574,6 +584,27 @@ ecs.registerSingleSystem("TurnToTarget", function(this, value)
     end
 end, ecs.allOf("Active", "Physics"))
 
+ecs.registerSingleSystem("MoveToTarget", function(this, value)
+    if this.target ~= nil then
+
+        local r_pos_x, r_pos_y, r_pos_z = CS.LuaUtil.GetPos(this.target.physics_object_id)
+        local pos_x, pos_y, pos_z = CS.LuaUtil.GetPos(this.physics_object_id)
+
+        local x = r_pos_x - pos_x
+        local y = r_pos_y - pos_y
+        local z = r_pos_z - pos_z
+        
+		local length = utils.GetVector3Module(x, y, z) -- 射线的长度
+		local dx = x / length -- 方向
+		local dy = y / length -- 方向
+        local dz = z / length -- 方向
+
+        this.velocity.x = this.velocity.x + dx * value.speed * this.speed
+        this.velocity.y = this.velocity.y + dy * value.speed
+        this.velocity.z = this.velocity.z + dz * value.speed * this.speed
+    end
+end, ecs.allOf("Active", "Physics"))
+
 ecs.registerSingleSystem("Ray", function(this, value)
     local hitinfo = nil
     local s = nil
@@ -720,12 +751,12 @@ ecs.registerSingleSystem("Object", function(this, value)
         -- ecs.addComponent(id2, "BDY")
         -- ecs.addComponent(id2, "Sleep")
         -- local object = ecs.applyEntity(id2)
-        local object = this.database.groups[value.animation](this.rigidbody.position.x + pos.x, this.rigidbody.position.y + pos.y, this.rigidbody.position.z + pos.z, velocityyy.x, velocityyy.y, velocityyy.z, this.team)
+        local object = this.database.groups[value.animation](this.rigidbody.position.x + pos.x, this.rigidbody.position.y + pos.y, this.rigidbody.position.z + pos.z, velocityyy.x, velocityyy.y, velocityyy.z, this.team, this.root.target)
+        object.spriteRenderer.material = this.spriteRenderer.material
 
 
 
-
-        object.team = this.team
+        -- object.team = this.team
         -- local lr = object.pic_object:AddComponent(typeof(CS.UnityEngine.LineRenderer))
         -- -- lr.enabled = false
         -- lr.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.Off
@@ -747,6 +778,11 @@ ecs.registerSingleSystem("Object", function(this, value)
         -- object.rotation = rot.eulerAngles.z
         
     end
+end, ecs.allOf("Active", "DataBase"))
+
+ecs.registerSingleSystem("Object2", function(this, value)
+    local object = this.database.groups[value.animation](this.rigidbody.position.x + value.x, this.rigidbody.position.y + value.y, this.rigidbody.position.z + 0, value.x2, value.y2, value.z2, this.team, this.root.target)
+    object.spriteRenderer.material = this.spriteRenderer.material
 end, ecs.allOf("Active", "DataBase"))
 
 ecs.registerSingleSystem("Rotation", function(this, value)

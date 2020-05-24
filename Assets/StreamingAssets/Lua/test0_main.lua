@@ -13,7 +13,7 @@ local curve = nil
 local moveSpeed = 32
 local camera = nil
 
-local zoom = 1
+local zoom = 2
 local dataTable = nil
 
 local mychar = nil
@@ -51,10 +51,10 @@ function start()
     print("injected object", LPV)
 
     -- CS.UnityEngine.Screen.SetResolution(1920, 1080, false)
-    CS.UnityEngine.Screen.SetResolution(1280, 720, false)
-    -- CS.UnityEngine.Screen.SetResolution(640, 360, false)
+    -- CS.UnityEngine.Screen.SetResolution(1280, 720, false)
+    CS.UnityEngine.Screen.SetResolution(640 * zoom, 360 * zoom, false)
 
-    -- LMainCamera:GetComponent(typeof(CS.UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera)).enabled = false
+    LMainCamera:GetComponent(typeof(CS.UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera)).enabled = false
 
     camera = LMainCamera:GetComponent(typeof(CS.UnityEngine.Camera))
     camera.orthographicSize = CS.UnityEngine.Screen.height / 1 / 100 / zoom
@@ -275,7 +275,7 @@ function start()
 
     local ppp
     -- 创建一个实体
-    for i = 1, 1, 1 do
+    for i = 10, 10, 1 do
         local id1 = ecs.newEntity()
         ecs.addComponent(id1, "Active")
         ecs.addComponent(id1, "DataBase", 9)
@@ -283,13 +283,14 @@ function start()
         ecs.addComponent(id1, "SpriteRenderer")
         ecs.addComponent(id1, "Animation", "body_idle_front")
         ecs.addComponent(id1, "State", "aim")
-        ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0, 0)
+        ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 - 10, 0, 0, 0, 1)
         ecs.addComponent(id1, "BDY")
         ecs.addComponent(id1, "Gravity")
 
         utils.PLAYER = LPlayer:new(ecs.entities[id1], LMainCamera) -- LMainCamera:GetComponent(typeof(CS.UnityEngine.Camera))
         ecs.addComponent(id1, "Player")
         ppp = ecs.applyEntity(id1)
+        ppp.spriteRenderer.material = ppp.database.palettes[1]
 
 
         local id2 = ecs.newEntity()
@@ -334,22 +335,63 @@ function start()
     end
 
     -- 创建一个实体
-    for i = 2, 2, 1 do
+    for i = 15, 15, 1 do
         local id1 = ecs.newEntity()
         ecs.addComponent(id1, "Active")
         ecs.addComponent(id1, "DataBase", 9)
         ecs.addComponent(id1, "SpriteRenderer")
         ecs.addComponent(id1, "Animation", "body_idle_front")
         ecs.addComponent(id1, "State", "aim")
-        ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0, 2)
+        ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 - 10, 0, 0, 0, 2)
         ecs.addComponent(id1, "BDY")
         ecs.addComponent(id1, "AI")
         ecs.addComponent(id1, "Target", ppp)
         ecs.addComponent(id1, "Gravity")
         local eee = ecs.applyEntity(id1)
+        eee.spriteRenderer.material = eee.database.palettes[2]
 
         ecs.addComponent(ppp._eid, "Target", eee)
         ecs.applyEntity(ppp._eid)
+
+        local id2 = ecs.newEntity()
+        ecs.addComponent(id2, "Active")
+        ecs.addComponent(id2, "DataBase", 9)
+        ecs.addComponent(id2, "SpriteRenderer")
+        ecs.addComponent(id2, "Animation", "aim_right_hand")
+        ecs.addComponent(id2, "State", "right_aim_hand")
+        ecs.addComponent(id2, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0, 2)
+        ecs.addComponent(id2, "Parent", eee, "1")
+        local hand = ecs.applyEntity(id2)
+
+        local id3 = ecs.newEntity()
+        ecs.addComponent(id3, "Active")
+        ecs.addComponent(id3, "DataBase", 9)
+        ecs.addComponent(id3, "SpriteRenderer")
+        ecs.addComponent(id3, "Animation", "aim_weapon_HK416c")
+        ecs.addComponent(id3, "State", "weapon_idle_HK416c")
+        ecs.addComponent(id3, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0, 2)
+        ecs.addComponent(id3, "Parent", hand, "0")
+        ecs.applyEntity(id3)
+
+        local id4 = ecs.newEntity()
+        ecs.addComponent(id4, "Active")
+        ecs.addComponent(id4, "DataBase", 9)
+        ecs.addComponent(id4, "SpriteRenderer")
+        ecs.addComponent(id4, "Animation", "aim_left_hand")
+        ecs.addComponent(id4, "State", "left_aim_hand")
+        ecs.addComponent(id4, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0, 2)
+        ecs.addComponent(id4, "Parent", eee, "0")
+        local hand2 = ecs.applyEntity(id4)
+
+        local id5 = ecs.newEntity()
+        ecs.addComponent(id5, "Active")
+        ecs.addComponent(id5, "DataBase", 9)
+        ecs.addComponent(id5, "SpriteRenderer")
+        ecs.addComponent(id5, "Animation", "aim_weapon")
+        ecs.addComponent(id5, "State", "weapon_idle")
+        ecs.addComponent(id5, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 + 0, 0, 0, 0, 2)
+        ecs.addComponent(id5, "Parent", hand2, "0")
+        ecs.applyEntity(id5)
     end
 
     -- dump(ecs.getCache())
@@ -413,11 +455,11 @@ end
 function fixedupdate()
 
 	-- 子弹时间
-    if CS.UnityEngine.Input.GetMouseButton(2) then
+    if CS.UnityEngine.Input.GetKey(CS.UnityEngine.KeyCode.Space) then
         if zidanshijian <= 1 then
             zidanshijian = zidanshijian * 0.95
-            if zidanshijian < 0.05 then
-                zidanshijian = 0.05
+            if zidanshijian < 0.1 / 2 then
+                zidanshijian = 0.1 / 2
             end
         end
         ecs.processMultipleSystem("zidanshijianSystem", zidanshijian)

@@ -346,13 +346,13 @@
 							"component": "SpriteRenderer"
 						},
 						{
+							"component": "Sound"
+						},
+						{
 							"component": "Animation",
 							"value": [
 								"blood_effect"
 							]
-						},
-						{
-							"component": "Sound"
 						},
 						{
 							"component": "State",
@@ -406,6 +406,48 @@
 					"active": true
 				},
 				{
+					"name": "chase_bullet",
+					"group": [
+						{
+							"component": "Active"
+						},
+						{
+							"component": "DataBase",
+							"value": [
+								9
+							]
+						},
+						{
+							"component": "SpriteRenderer"
+						},
+						{
+							"component": "TrailRenderer"
+						},
+						{
+							"component": "Animation",
+							"value": [
+								"bullet"
+							]
+						},
+						{
+							"component": "State",
+							"value": [
+								"chase_bullet"
+							]
+						},
+						{
+							"component": "Physics"
+						},
+						{
+							"component": "BDY"
+						},
+						{
+							"component": "Target"
+						}
+					],
+					"active": true
+				},
+				{
 					"name": "bullet",
 					"group": [
 						{
@@ -440,6 +482,45 @@
 						}
 					],
 					"active": false
+				},
+				{
+					"name": "hong_effect",
+					"group": [
+						{
+							"component": "Active"
+						},
+						{
+							"component": "DataBase",
+							"value": [
+								9
+							]
+						},
+						{
+							"component": "SpriteRenderer"
+						},
+						{
+							"component": "Animation",
+							"value": [
+								"hong_effect"
+							]
+						},
+						{
+							"component": "Sound"
+						},
+						{
+							"component": "State",
+							"value": [
+								"hong_effect"
+							]
+						},
+						{
+							"component": "Physics"
+						},
+						{
+							"component": "BDY"
+						}
+					],
+					"active": true
 				}
 			],
 			"separators": [],
@@ -999,6 +1080,26 @@
 					"mp": 0,
 					"active": true,
 					"level": 1
+				},
+				{
+					"name": "shoot_right_l",
+					"command": "/b",
+					"time": 1,
+					"action": "punching_l",
+					"frame": 0,
+					"mp": 25,
+					"active": true,
+					"level": 30
+				},
+				{
+					"name": "shoot_right_h",
+					"command": "b",
+					"time": 1,
+					"action": "punching_l",
+					"frame": 0,
+					"mp": 50,
+					"active": true,
+					"level": 30
 				}
 			],
 			"props": [],
@@ -1061,6 +1162,26 @@
 					"distanceRange": "0~110",
 					"x": 1,
 					"z": 0
+				},
+				{
+					"name": "shoot_right_l",
+					"command": "shoot_right_l",
+					"x": 1,
+					"z": 0,
+					"distanceRange": "-300~300",
+					"probability": 0.075,
+					"canTurnAround": true,
+					"active": true
+				},
+				{
+					"name": "shoot_right_h",
+					"command": "shoot_right_h",
+					"x": 1,
+					"z": 0,
+					"distanceRange": "0~110",
+					"probability": 0.05,
+					"canTurnAround": true,
+					"active": true
 				},
 				{
 					"name": "punch_f_h",
@@ -1478,6 +1599,34 @@
 					"optional": []
 				},
 				{
+					"id": "Object2",
+					"color": 8257536,
+					"comment": "",
+					"necessary": [
+						{
+							"name": "x",
+							"default": 0
+						},
+						{
+							"name": "y",
+							"default": 0
+						},
+						{
+							"name": "id",
+							"default": 0
+						},
+						{
+							"name": "action",
+							"default": "which action?"
+						},
+						{
+							"name": "frame",
+							"default": 0
+						}
+					],
+					"optional": []
+				},
+				{
 					" optional ": [],
 					"id": "Command",
 					"necessary": [
@@ -1674,11 +1823,18 @@
 					"comment": "",
 					"necessary": [],
 					"optional": []
+				},
+				{
+					"id": "MoveToTarget",
+					"color": 0,
+					"comment": "",
+					"necessary": [],
+					"optional": []
 				}
 			],
 			"props": [],
 			"separators": [
-				32
+				34
 			],
 			"name": "frameType",
 			"columns": [
@@ -1847,6 +2003,10 @@
 				{
 					"id": "hit_shield",
 					"file": "sounds/ric3.wav"
+				},
+				{
+					"id": "exp1",
+					"file": "sounds/explosion1.wav"
 				}
 			],
 			"props": [],
@@ -2286,14 +2446,14 @@
 					"clips": [
 						{
 							"category": "Body",
-							"wait": 600,
 							"id": "0",
-							"x": 0,
-							"y": 0,
+							"x": -0.5,
+							"y": -0.5,
 							"width": 1,
 							"height": 1,
 							"bodyFlags": 1,
-							"bounciness": 0.7
+							"bounciness": 0.7,
+							"wait": 600
 						},
 						{
 							"wait": 600,
@@ -2316,7 +2476,8 @@
 							"height": 2,
 							"id": "0",
 							"bodyFlags": 1,
-							"bounciness": 0.7
+							"bounciness": 0.7,
+							"layers": "16"
 						},
 						{
 							"sprite": "52c3a3ff78f2d5ee224f9e794be9d923",
@@ -2339,7 +2500,8 @@
 							"height": 2,
 							"id": "0",
 							"bodyFlags": 1,
-							"bounciness": 0.7
+							"bounciness": 0.7,
+							"layers": "16"
 						},
 						{
 							"sprite": "952ff89bc127d28b14479be282e68ed3",
@@ -2355,8 +2517,7 @@
 					"clips": [
 						{
 							"category": "Sound",
-							"sfx": "shot2",
-							"wait": 3
+							"sfx": "shot2"
 						},
 						{
 							"category": "Sprite",
@@ -2389,6 +2550,123 @@
 						{
 							"category": "Sprite",
 							"wait": 10,
+							"x": 0,
+							"y": 0
+						}
+					]
+				},
+				{
+					"name": "hong_effect",
+					"clips": [
+						{
+							"category": "Sound",
+							"sfx": "exp1"
+						},
+						{
+							"category": "Body",
+							"x": -52,
+							"y": -91,
+							"width": 104,
+							"height": 120,
+							"id": "0",
+							"bodyFlags": 1,
+							"bounciness": 999
+						},
+						{
+							"category": "Sprite",
+							"sprite": "639911aa21e15f1a3204cc73e4a5821e",
+							"x": -147,
+							"y": -219,
+							"wait": 6
+						},
+						{
+							"category": "Body",
+							"x": 0,
+							"y": 0,
+							"width": 0,
+							"height": 0,
+							"id": "0"
+						},
+						{
+							"category": "Sprite",
+							"sprite": "79597e16910eaafd5a6263dab5835cc3",
+							"wait": 6,
+							"x": -147,
+							"y": -219
+						},
+						{
+							"category": "Sprite",
+							"sprite": "73912308e345c3c7a8eb7b62d372512c",
+							"wait": 6,
+							"x": -147,
+							"y": -219
+						},
+						{
+							"category": "Sprite",
+							"sprite": "196c25fcfd09cf5e97d632246c17a0bd",
+							"wait": 6,
+							"x": -147,
+							"y": -219
+						},
+						{
+							"category": "Sprite",
+							"sprite": "945db3c83e76381ead2a6a238c9cd7dc",
+							"wait": 6,
+							"x": -147,
+							"y": -219
+						},
+						{
+							"category": "Sprite",
+							"sprite": "8945a5d4e58a39d68c452bed60098761",
+							"wait": 6,
+							"x": -147,
+							"y": -219
+						},
+						{
+							"category": "Sprite",
+							"sprite": "3d67cf6228c589896558c334ffbddb35",
+							"wait": 6,
+							"x": -147,
+							"y": -219
+						},
+						{
+							"category": "Sprite",
+							"sprite": "1d2b4f3715e48e6106da8e04fc73affe",
+							"wait": 6,
+							"x": -147,
+							"y": -219
+						},
+						{
+							"category": "Sprite",
+							"sprite": "77b54e2377d5e656f0297c3954794c31",
+							"wait": 6,
+							"x": -147,
+							"y": -219
+						},
+						{
+							"category": "Sprite",
+							"sprite": "9a28fda6e393a74b2a1897323316d275",
+							"wait": 6,
+							"x": -147,
+							"y": -219
+						},
+						{
+							"category": "Sprite",
+							"sprite": "bbeb0f8dbb73d7483928882830c1848a",
+							"wait": 6,
+							"x": -147,
+							"y": -219
+						},
+						{
+							"category": "Sprite",
+							"sprite": "ae5b66564bc051a377d80b633d473287",
+							"wait": 6,
+							"x": -147,
+							"y": -219
+						},
+						{
+							"category": "Sprite",
+							"wait": 100,
 							"x": 0,
 							"y": 0
 						}
@@ -2475,8 +2753,7 @@
 					"clips": [
 						{
 							"category": "Sound",
-							"sfx": "A9mm",
-							"wait": 3
+							"sfx": "A9mm"
 						},
 						{
 							"category": "Sprite",
@@ -2859,10 +3136,10 @@
 						{
 							"category": "Animation",
 							"active": true,
-							"trigger": "this.action == \"body_idle_front\" and this.target ~= nil and this.target.physics_object.transform.position.z >= this.physics_object.transform.position.z",
 							"json": {
 								"animation": "body_idle_back"
-							}
+							},
+							"trigger": "this.action == \"body_idle_front\" and this.target ~= nil and getPosZ(this.target.physics_object_id) >= getPosZ(this.physics_object_id)"
 						},
 						{
 							"category": "Set",
@@ -2873,10 +3150,10 @@
 						{
 							"category": "Animation",
 							"active": true,
-							"trigger": "this.action == \"body_idle_back\" and this.target ~= nil and this.target.physics_object.transform.position.z < this.physics_object.transform.position.z",
 							"json": {
 								"animation": "body_idle_front"
-							}
+							},
+							"trigger": "this.action == \"body_idle_back\" and this.target ~= nil and getPosZ(this.target.physics_object_id) < getPosZ(this.physics_object_id)"
 						},
 						{
 							"category": "Set",
@@ -2887,14 +3164,14 @@
 						{
 							"category": "Set",
 							"active": true,
-							"trigger": "this.direction.x == -1 and this.target ~= nil and this.physics_object.transform.position.x - this.target.physics_object.transform.position.x < 0",
-							"json": "this.direction.x = 1"
+							"json": "this.direction.x = 1",
+							"trigger": "this.direction.x == -1 and this.target ~= nil and getPosX(this.physics_object_id) - getPosX(this.target.physics_object_id) < 0"
 						},
 						{
 							"category": "Set",
 							"active": true,
-							"trigger": "this.direction.x == 1 and this.target ~= nil and this.physics_object.transform.position.x - this.target.physics_object.transform.position.x >= 0",
-							"json": "this.direction.x = -1"
+							"json": "this.direction.x = -1",
+							"trigger": "this.direction.x == 1 and this.target ~= nil and getPosX(this.physics_object_id) - getPosX(this.target.physics_object_id) >= 0"
 						},
 						{
 							"category": "Child",
@@ -2995,7 +3272,7 @@
 						{
 							"category": "Animation",
 							"active": true,
-							"trigger": "this.action == \"body_run_front\" and this.target ~= nil and this.target.physics_object.transform.position.z >= this.physics_object.transform.position.z",
+							"trigger": "this.action == \"body_run_front\" and this.target ~= nil and getPosZ(this.target.physics_object_id) >= getPosZ(this.physics_object_id)",
 							"json": {
 								"animation": "body_run_back"
 							}
@@ -3009,7 +3286,7 @@
 						{
 							"category": "Animation",
 							"active": true,
-							"trigger": "this.action == \"body_run_back\" and this.target ~= nil and this.target.physics_object.transform.position.z < this.physics_object.transform.position.z",
+							"trigger": "this.action == \"body_run_back\" and this.target ~= nil and getPosZ(this.target.physics_object_id) < getPosZ(this.physics_object_id)",
 							"json": {
 								"animation": "body_run_front"
 							}
@@ -3023,13 +3300,13 @@
 						{
 							"category": "Set",
 							"active": true,
-							"trigger": "this.direction.x == -1 and this.target ~= nil and this.physics_object.transform.position.x - this.target.physics_object.transform.position.x < 0",
+							"trigger": "this.direction.x == -1 and this.target ~= nil and getPosX(this.physics_object_id) - getPosX(this.target.physics_object_id) < 0",
 							"json": "this.direction.x = 1"
 						},
 						{
 							"category": "Set",
 							"active": true,
-							"trigger": "this.direction.x == 1 and this.target ~= nil and this.physics_object.transform.position.x - this.target.physics_object.transform.position.x >= 0",
+							"trigger": "this.direction.x == 1 and this.target ~= nil and getPosX(this.physics_object_id) - getPosX(this.target.physics_object_id) >= 0",
 							"json": "this.direction.x = -1"
 						},
 						{
@@ -3292,7 +3569,7 @@
 						{
 							"category": "State",
 							"active": true,
-							"trigger": "this.root.controller ~= nil and this.root.controller.commands[\"punch_h\"].UIActive ~= nil and (this.parent.state == \"right_aim_hand\" or this.parent.state == \"left_aim_hand\")",
+							"trigger": "this.root.controller ~= nil and this.root.controller.commands[\"shoot_right_h\"].UIActive ~= nil and (this.parent.state == \"right_aim_hand\" or this.parent.state == \"left_aim_hand\")",
 							"json": {
 								"state": "weapon_shoot"
 							}
@@ -3324,10 +3601,10 @@
 								"y2": 0,
 								"z2": 0,
 								"state": "bullet",
-								"animation": "bullet",
+								"animation": "chase_bullet",
 								"id": "9",
 								"amount": 12,
-								"precise": 30
+								"precise": 180
 							}
 						},
 						{
@@ -3400,13 +3677,13 @@
 						},
 						{
 							"category": "Destory",
-							"active": true,
+							"active": false,
 							"trigger": "(this.bodyArray[\"0\"] ~= nil and this.bodyArray[\"0\"].isHit ~= -1) or this.timeLine >= 1"
 						},
 						{
 							"category": "Destory",
-							"active": false,
-							"trigger": "this.timeLine >= 1"
+							"active": true,
+							"trigger": "(this.bodyArray[\"0\"] ~= nil and this.bodyArray[\"0\"].isHit == 16) or this.timeLine >= 10"
 						},
 						{
 							"category": "Object",
@@ -3453,6 +3730,105 @@
 					"entry": []
 				},
 				{
+					"name": "chase_bullet",
+					"entry": [],
+					"Exit": [],
+					"update": [],
+					"fixedUpdate": [
+						{
+							"category": "MoveToTarget",
+							"active": true,
+							"json": {
+								"speed": 1
+							}
+						},
+						{
+							"category": "Object",
+							"active": true,
+							"trigger": "this.bodyArray[\"0\"] ~= nil and this.bodyArray[\"0\"].isHit == 16",
+							"json": {
+								"x": 0,
+								"y": 0,
+								"x2": 0,
+								"y2": 0,
+								"z2": 0,
+								"state": "fire_effect",
+								"animation": "blood_effect",
+								"id": "9",
+								"amount": 1,
+								"precise": 0
+							}
+						},
+						{
+							"category": "Object2",
+							"active": true,
+							"trigger": "this.bodyArray[\"0\"] ~= nil and this.bodyArray[\"0\"].isHit == 1",
+							"json": {
+								"x": 0,
+								"y": 0,
+								"x2": 0,
+								"y2": 0,
+								"z2": 0,
+								"state": "hong_effect",
+								"animation": "hong_effect",
+								"id": "9",
+								"amount": 1,
+								"precise": 0
+							}
+						},
+						{
+							"category": "Destory",
+							"active": false,
+							"trigger": "(this.bodyArray[\"0\"] ~= nil and this.bodyArray[\"0\"].isHit ~= -1) or this.timeLine >= 1"
+						},
+						{
+							"category": "Destory",
+							"active": true,
+							"trigger": "(this.bodyArray[\"0\"] ~= nil and this.bodyArray[\"0\"].isHit ~= -1) or this.timeLine >= 10"
+						},
+						{
+							"category": "Object",
+							"active": false,
+							"trigger": "this.attckArray[\"0\"] ~= nil and this.attckArray[\"0\"].isHit == 16",
+							"json": {
+								"x": 0,
+								"y": 0,
+								"x2": 0,
+								"y2": 0,
+								"z2": 0,
+								"state": "fire_effect",
+								"animation": "blood_effect",
+								"id": "9",
+								"amount": 1,
+								"precise": 0
+							}
+						},
+						{
+							"category": "Force",
+							"active": false,
+							"trigger": "1",
+							"json": {
+								"id": "0",
+								"x": 1,
+								"y": 0,
+								"z": 0
+							}
+						},
+						{
+							"category": "Set",
+							"active": false,
+							"trigger": "1",
+							"json": "this.attckArray['0'].hitObject.HP = this.attckArray['0'].hitObject.HP - 3"
+						},
+						{
+							"category": "Destory",
+							"active": false,
+							"trigger": "(this.attckArray[\"0\"] ~= nil and this.attckArray[\"0\"].isHit ~= -1) or this.timeLine >= 1"
+						}
+					],
+					"animation": "bullet"
+				},
+				{
 					"name": "fire_effect2",
 					"update": [
 						{
@@ -3464,6 +3840,19 @@
 					"fixedUpdate": [],
 					"Exit": [],
 					"entry": []
+				},
+				{
+					"name": "hong_effect",
+					"entry": [],
+					"Exit": [],
+					"update": [],
+					"fixedUpdate": [
+						{
+							"category": "Destory",
+							"active": true,
+							"trigger": "this.delayCounter == 13"
+						}
+					]
 				},
 				{
 					"name": "shell1",
@@ -3666,11 +4055,11 @@
 							"json": {
 								"x": 21,
 								"y": -2,
-								"x2": 10,
-								"y2": 0,
+								"x2": 5,
+								"y2": 5,
 								"z2": 0,
 								"state": "bullet",
-								"animation": "bullet",
+								"animation": "chase_bullet",
 								"id": "9",
 								"amount": 1,
 								"precise": 5

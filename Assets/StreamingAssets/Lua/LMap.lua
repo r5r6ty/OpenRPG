@@ -874,6 +874,7 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 						-- boxCollider2D.size = CS.UnityEngine.Vector2(ts.size / 100, ts.size / 100)
 
 						local boxCollider = unityobject_child:AddComponent(typeof(CS.UnityEngine.BoxCollider))
+						CS.LuaUtil.AddColliderID(boxCollider:GetInstanceID(), boxCollider)
 						boxCollider.center = CS.UnityEngine.Vector3(boxCollider.center.x, boxCollider.center.y + ts.size / 100 * 10 / 2, boxCollider.center.z) --  - ts.size / 100
 						boxCollider.size = CS.UnityEngine.Vector3(ts.size / 100, ts.size / 100 * 10, ts.size / 100)
 
@@ -918,6 +919,7 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 	rigidbody.constraints = CS.UnityEngine.RigidbodyConstraints.FreezeAll
 
 	local boxCollider_p = unityobject:AddComponent(typeof(CS.UnityEngine.BoxCollider))
+	CS.LuaUtil.AddColliderID(boxCollider_p:GetInstanceID(), boxCollider_p)
 
 	local b = 0
 	b = b | 1

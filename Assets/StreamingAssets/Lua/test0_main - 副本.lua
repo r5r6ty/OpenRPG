@@ -139,7 +139,7 @@ function start()
         local self = {}
     	self.pic_offset_object = CS.UnityEngine.GameObject("pic_offset")
     	self.pic_offset_object_id = self.pic_offset_object:GetInstanceID()
-    	CS.LuaUtil.AddID(self.pic_offset_object_id, self.pic_offset_object)
+    	CS.LuaUtil.AddGameObjectID(self.pic_offset_object_id, self.pic_offset_object)
     	-- self.pic_offset_object.transform:SetParent(self.gameObject.transform)
     	self.pic_offset_object.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
     	self.pic_offset_object.transform.localPosition = CS.UnityEngine.Vector3.zero
@@ -151,7 +151,7 @@ function start()
 
     	self.pic_object = CS.UnityEngine.GameObject("pic")
     	self.pic_object_id = self.pic_object:GetInstanceID()
-    	CS.LuaUtil.AddID(self.pic_object_id, self.pic_object)
+    	CS.LuaUtil.AddGameObjectID(self.pic_object_id, self.pic_object)
     	self.pic_object.transform:SetParent(self.pic_offset_object.transform)
     	self.pic_object.transform.localPosition = CS.UnityEngine.Vector3.zero
     	self.pic_object.transform.localScale = CS.UnityEngine.Vector3.one

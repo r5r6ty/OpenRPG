@@ -4,6 +4,8 @@
 -- http://opensource.org/licenses/MIT
 -- Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
+local ecs = require "ecs"
+
 LCollider = {LObject = nil, gameObject = nil, id = nil, collider = nil, filter = nil, isDefence = nil, layers = nil, isRayCast = nil}
 LCollider.__index = LCollider
 function LCollider:new(l, go, id)
@@ -24,7 +26,7 @@ function LCollider:new(l, go, id)
 
 	self.layers = nil
 
-	self.isRayCast = false
+	self.isRayCast = 0
 
     return self
 end
@@ -41,6 +43,8 @@ end
 function LCollider:deleteCollider()
 	CS.UnityEngine.Object.Destroy(self.collider)
 	self.collider = nil
+	CS.LuaUtil.RemoveColliderID(self.collider_id)
+	self.collider_id = nil
 end
 
 LColliderBDY = {bounciness = nil, isHit = nil, hitObject = nil}
@@ -52,6 +56,8 @@ function LColliderBDY:new(l, go, id)
 	setmetatable(self, LColliderBDY)
 
 	self.collider = self.gameObject:AddComponent(typeof(CS.UnityEngine.BoxCollider))
+	self.collider_id = self.collider:GetInstanceID()
+	CS.LuaUtil.AddColliderID(self.collider_id, self.collider)
 
 	self.bounciness = 0
 	self.isHit = -1
@@ -100,7 +106,7 @@ function LCollider:setCollider(dir, x, y, width, height, depth, flag, layers, bo
 	self.bounciness = bounciness or 0
 
 	if width == 1 and height == 1 then
-		self.isRayCast = true
+		self.isRayCast = 2
 		-- self:deleteCollider()
 		-- self.collider.enabled = false
 	end
@@ -275,227 +281,334 @@ function LColliderBDY:BDYFixedUpdate()
 	local isWall_leftright = -1
 	local isWall_updown = -1
 
-	if self.isRayCast then
+	if self.isRayCast ~= 0 then
 		-- assert(self.collider == false, "self.collider must be nil with raycast")
-		local velocity = self.LObject.velocity * CS.UnityEngine.Time.deltaTime * self.LObject.speed
+		local velocity_x = self.LObject.velocity.x * CS.UnityEngine.Time.deltaTime * self.LObject.speed
+		local velocity_z = self.LObject.velocity.z * CS.UnityEngine.Time.deltaTime * self.LObject.speed
+		local velocity_y = self.LObject.velocity.y * CS.UnityEngine.Time.deltaTime * self.LObject.speed
 
 		local rx, ry, rz = CS.LuaUtil.RigidbodyGetPosition(self.LObject.rigidbody)
 
 		-- local offset = CS.UnityEngine.Vector3(rx - self.LObject.oriPos.x, ry - self.LObject.oriPos.y, rz - self.LObject.oriPos.z)
 
-		local length = velocity.magnitude -- 射线的长度
-		local direction = velocity.normalized -- 方向
+		local length = utils.GetVector3Module(velocity_x, velocity_y, velocity_z) -- 射线的长度
+		local dx = velocity_x / length -- 方向
+		local dy = velocity_y / length -- 方向
+		local dz = velocity_z / length -- 方向
 
 		-- local oriPos = CS.UnityEngine.Vector3(self.LObject.oriPos.x, self.LObject.oriPos.y, self.LObject.oriPos.z)
 
-		local rxyz = CS.UnityEngine.Vector3(rx, ry, rz)
+		-- CS.LuaUtil.DrawLine(rx, ry, rz, 0, 0, 0, 1, 0, 0, 1)
+		CS.LuaUtil.DrawLine(rx, ry, rz, rx + velocity_x, ry + velocity_y, rz + velocity_z, 0, 0, 1, 1)
+		-- CS.LuaUtil.DrawLine(rx + velocity_x, ry + velocity_y, rz + velocity_z, 0, 0, 0, 0, 1, 0, 1)
 	
-		CS.UnityEngine.Debug.DrawLine(rxyz, CS.UnityEngine.zero, CS.UnityEngine.Color.red)
-		CS.UnityEngine.Debug.DrawLine(rxyz + direction * length, CS.UnityEngine.zero, CS.UnityEngine.Color.green)
+		-- CS.LuaUtil.DrawLine(rx, ry + rz, rz, 0, 0, 0, 1, 0, 0, 1)
+		CS.LuaUtil.DrawLine(rx, ry + rz, rz, rx + velocity_x, ry + velocity_y + rz + velocity_z, rz + velocity_z, 0, 0, 1, 1)
+		-- CS.LuaUtil.DrawLine(rx + velocity_x, ry + velocity_y + rz + velocity_z, rz + velocity_z, 0, 0, 0, 0, 1, 0, 1)
 	
 
 		-- local hitinfo = CS.Tools.Instance:PhysicsRaycast(rxyz, direction, length, 1048575)
-		local hitinfos = CS.Tools.Instance:PhysicsRaycastAll(rxyz, direction, length, 1048575)
+		local hitinfos = CS.LuaUtil.PhysicsRaycastAll(rx, ry, rz, dx, dy, dz, length, 1048575)
+		-- local hitinfos = CS.Tools.Instance:PhysicsRaycastAll(CS.UnityEngine.Vector3(rx, ry, rz), CS.UnityEngine.Vector3(dx, dy, dz), length, 1048575)
 
-			-- 最终位移坐标
-		local finalOffset_x = velocity.x
-		local finalOffset_z = velocity.z
-		local finalOffset_y = velocity.y
-		for i = 0, hitinfos.Length - 1, 1 do
-			local k = hitinfos[i].collider
-			if k ~= nil and k.attachedRigidbody ~= self.collider.attachedRigidbody then
-				-- print(k.name)
-				local up, down, left, right, above, under = false, false, false, false, false, false
-				local go = k.attachedRigidbody.gameObject
-				if go.name == "test" then -- 如果是地图块
-					local name = utils.split(k.name, ",")
-					local num = tonumber(name[#name]) -- 地图块最后一个数字作为bit
+		-- 最终位移坐标
+		local finalOffset_x = velocity_x
+		local finalOffset_z = velocity_z
+		local finalOffset_y = velocity_y
+		if self.isRayCast == 1 then
+			for i = 0, hitinfos.Length - 1, 1 do
+				local k = hitinfos[i].collider
+				if k ~= nil and k.attachedRigidbody ~= self.collider.attachedRigidbody then
+					-- print(k.name)
+					local up, down, left, right, above, under = false, false, false, false, false, false
+					local go = k.attachedRigidbody.gameObject
+					if go.name == "test" then -- 如果是地图块
+						local name = utils.split(k.name, ",")
+						local num = tonumber(name[#name]) -- 地图块最后一个数字作为bit
 
-					if num & 1 == 1 then --位操作，算出这个方块朝哪个方向进行碰撞，一个方块可以有多个碰撞方向，这部分随意设计，只需要能知道这个collider的判定方向，用layermask什么都行
-						up = true
-					end
-					if num & 2 == 2 then --位操作
-						down = true
-					end
-					if num & 4 == 4 then --位操作
-						left = true
-					end
-					if num & 8 == 8 then --位操作
-						right = true
-					end
-					if num & 16 == 16 then --位操作
-						above = true
-					end
-					if num & 32 == 32 then --位操作
-						under = true
-					end
-
-					self.hitObject = object
-					self.isHit = 1
-				elseif go.name ~= "test" then
-					local object2 = utils.getObject(go:GetInstanceID())
-					if object2 == nil then
-						print("what!?")
-						self.hitObject = nil
-						self.isHit = -1
-					else
-						if self.LObject.team ~= object2.team then
-						-- local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
-
-						-- if not string.find(LC.layers, string.match(self.collider.name, "%[(%d+)%]")) then
+						if num & 1 == 1 then --位操作，算出这个方块朝哪个方向进行碰撞，一个方块可以有多个碰撞方向，这部分随意设计，只需要能知道这个collider的判定方向，用layermask什么都行
 							up = true
+						end
+						if num & 2 == 2 then --位操作
 							down = true
+						end
+						if num & 4 == 4 then --位操作
 							left = true
+						end
+						if num & 8 == 8 then --位操作
 							right = true
-						-- end
-						-- above = true
-						-- under = true
+						end
+						if num & 16 == 16 then --位操作
+							above = true
+						end
+						if num & 32 == 32 then --位操作
+							under = true
+						end
 
-							self.hitObject = object
-							self.isHit = 16
-
-							-- print(object2.state)
-						else
+						self.hitObject = object
+						self.isHit = 1
+					elseif go.name ~= "test" then
+						local object2 = utils.getObject(go:GetInstanceID())
+						if object2 == nil then
+							print("what1!?")
 							self.hitObject = nil
 							self.isHit = -1
+						else
+							if self.LObject.team ~= object2.team then
+							-- local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
+
+							-- if not string.find(LC.layers, string.match(self.collider.name, "%[(%d+)%]")) then
+								up = true
+								down = true
+								left = true
+								right = true
+							-- end
+							-- above = true
+							-- under = true
+
+								self.hitObject = object
+								self.isHit = 16
+
+								-- print(object2.state)
+							else
+								self.hitObject = nil
+								self.isHit = -1
+							end
 						end
+
+						-- local iId = hitinfo.collider.attachedRigidbody.gameObject:GetInstanceID()
+						-- local object = utils.getObject(iId)
+
+						-- local LC = object.bodyArray_InstanceID[hitinfo.collider:GetInstanceID()]
+						-- if LC ~= nil and LC.isDefence then
+
+						-- 	self.hitObject = object
+						-- 	self.isHit = 1
+						-- else
+
+						-- 	self.hitObject = object
+						-- 	self.isHit = 16
+						-- end
+					else
+						print(go.name)
+						self.hitObject = nil
+						self.isHit = -1
+						-- return 1, false, false, 1, elseArray
 					end
 
-					-- local iId = hitinfo.collider.attachedRigidbody.gameObject:GetInstanceID()
-					-- local object = utils.getObject(iId)
+					if up or down or left or right or above or under then
+						local mmm_x, mmm_y, mmm_z = CS.LuaUtil.RaycastHitGetPoint(hitinfos[i])
+						local m_x = math.abs(mmm_x - rx)
+						local m_y = math.abs(mmm_y - ry)
+						local m_z = math.abs(mmm_z - rz)
 
-					-- local LC = object.bodyArray_InstanceID[hitinfo.collider:GetInstanceID()]
-					-- if LC ~= nil and LC.isDefence then
+						local offset_x = nil
+						local offset_z = nil
+						local offset_y = nil
+						if (left or right) and (up or down) then
+							if m_x > m_z then
+								m_x = 0
+							else
+								m_z = 0
+							end
+						end
+						if velocity_x > 0 then
+							offset_x = velocity_x - m_x
+						else
+							offset_x = velocity_x + m_x
+						end
 
-					-- 	self.hitObject = object
-					-- 	self.isHit = 1
-					-- else
+						if velocity_z > 0 then
+							offset_z = velocity_z - m_z
+						else
+							offset_z = velocity_z + m_z
+						end
 
-					-- 	self.hitObject = object
-					-- 	self.isHit = 16
-					-- end
+						if velocity_y > 0 then
+							offset_y = velocity_y - m_y
+						else
+							offset_y = velocity_y + m_y
+						end
+						-- 留下最小位移坐标
+						if left or right then
+							if velocity_x > 0 then
+								if offset_x < finalOffset_x then
+									finalOffset_x = offset_x
+								end
+							else
+								if offset_x > finalOffset_x then
+									finalOffset_x = offset_x
+								end
+							end
+
+							isWall_leftright = 1
+
+						end
+
+						if up or down then
+							if velocity_z > 0 then
+								if offset_z < finalOffset_z then
+									finalOffset_z = offset_z
+								end
+							else
+								if offset_z > finalOffset_z then
+									finalOffset_z = offset_z
+								end
+							end
+
+							isWall_updown = 1
+
+						end
+
+						if (left or right) and (up or down) then
+							if m_x > m_z then
+								isWall_leftright = -1
+							else
+								isWall_updown = -1
+							end
+						end
+
+						if above or under then
+
+							if velocity_y > 0 then
+								if offset_y < finalOffset_y then
+									finalOffset_y = offset_y
+								end
+							else
+								if offset_y > finalOffset_y then
+									finalOffset_y = offset_y
+								end
+							end
+
+							if isGround == -1 and m_y > 0 then
+								isGround = 1 << tonumber(0)
+							end
+						end
+						break
+					end
 				else
-					print(go.name)
 					self.hitObject = nil
 					self.isHit = -1
-					-- return 1, false, false, 1, elseArray
 				end
-
-				if up or down or left or right or above or under then
-					local mmm = hitinfos[i].point - rxyz
-					local m = {x = math.abs(mmm.x), y = math.abs(mmm.y), z = math.abs(mmm.z)}
-
-					local offset_x = nil
-					local offset_z = nil
-					local offset_y = nil
-					if (left or right) and (up or down) then
-						if m.x > m.z then
-							m.x = 0
-						else
-							m.z = 0
-						end
-					end
-					if velocity.x > 0 then
-						offset_x = velocity.x - m.x
-					else
-						offset_x = velocity.x + m.x
-					end
-
-					if velocity.z > 0 then
-						offset_z = velocity.z - m.z
-					else
-						offset_z = velocity.z + m.z
-					end
-
-					if velocity.y > 0 then
-						offset_y = velocity.y - m.y
-					else
-						offset_y = velocity.y + m.y
-					end
-					-- 留下最小位移坐标
-					if left or right then
-						if velocity.x > 0 then
-							if offset_x < finalOffset_x then
-								finalOffset_x = offset_x
-							end
-						else
-							if offset_x > finalOffset_x then
-								finalOffset_x = offset_x
-							end
-						end
-
-						isWall_leftright = 1
-
-					end
-
-					if up or down then
-						if velocity.z > 0 then
-							if offset_z < finalOffset_z then
-								finalOffset_z = offset_z
-							end
-						else
-							if offset_z > finalOffset_z then
-								finalOffset_z = offset_z
-							end
-						end
-
-						isWall_updown = 1
-
-					end
-
-					if (left or right) and (up or down) then
-						if m.x > m.z then
-							isWall_leftright = -1
-						else
-							isWall_updown = -1
-						end
-					end
-
-					if above or under then
-
-						if velocity.y > 0 then
-							if offset_y < finalOffset_y then
-								finalOffset_y = offset_y
-							end
-						else
-							if offset_y > finalOffset_y then
-								finalOffset_y = offset_y
-							end
-						end
-
-						if isGround == -1 and m.y > 0 then
-							isGround = 1 << tonumber(0)
-						end
-					end
-					break
-				end
-			else
+			end
+			if hitinfos.Length == 0 then
 				self.hitObject = nil
 				self.isHit = -1
 			end
-		end
-		if hitinfos.Length == 0 then
-			self.hitObject = nil
-			self.isHit = -1
+
+			if self.bounciness > 0 then
+				if isWall_leftright == 1 then
+					self.LObject.velocity.x = -self.LObject.velocity.x * self.bounciness
+				end
+				if isWall_updown == 1 then
+					self.LObject.velocity.z = -self.LObject.velocity.z * self.bounciness
+				end
+				if isGround == 1 then
+					self.LObject.velocity.y = -self.LObject.velocity.y * self.bounciness
+				end
+				if isWall_leftright == 1 or isWall_updown == 1 or isGround == 1 then
+					self.LObject.rotation_velocity = (CS.Tools.Instance:RandomRangeInt(0, 2) * 2 - 1) * self.LObject.rotation_velocity * self.bounciness
+				end
+			end
+		elseif self.isRayCast == 2 then
+			for i = 0, hitinfos.Length - 1, 1 do
+				local k = hitinfos[i].collider
+				if k ~= nil and k.attachedRigidbody ~= self.collider.attachedRigidbody then
+					local go = k.attachedRigidbody.gameObject
+					if go.name == "test" then -- 如果是地图块
+						self.hitObject = nil
+						self.isHit = 1
+						local dis = hitinfos[i].distance
+						finalOffset_x = dx * dis
+						finalOffset_z = dz * dis
+						finalOffset_y = dy * dis
+
+						local nx, ny, nz =  CS.LuaUtil.RaycastHitGetNormal(hitinfos[i])
+						local ddx, ddy, ddz = CS.LuaUtil.Vector3Reflect(dx, dy, dz, nx, ny, nz)
+						
+						local len = utils.GetVector3Module(self.LObject.velocity.x, self.LObject.velocity.y, self.LObject.velocity.z)
+						self.LObject.velocity.x = ddx * len * self.bounciness
+						self.LObject.velocity.z = ddz * len * self.bounciness
+						self.LObject.velocity.y = ddy * len * self.bounciness
+						break
+					elseif go.name ~= "test" then
+						local object2 = utils.getObject(go:GetInstanceID())
+						if object2 == nil then
+							print("what2!?")
+							self.hitObject = nil
+							self.isHit = -1
+						else
+							if self.LObject.team ~= object2.team or (self.LObject.team == object2.team and object2._bit | 1 ~= object2._bit) then
+								self.hitObject = object2
+								self.isHit = 16
+								local dis = hitinfos[i].distance
+								finalOffset_x = dx * dis
+								finalOffset_z = dz * dis
+								finalOffset_y = dy * dis
+
+								local nx, ny, nz =  CS.LuaUtil.RaycastHitGetNormal(hitinfos[i])
+								local ddx, ddy, ddz = CS.LuaUtil.Vector3Reflect(dx, dy, dz, nx, ny, nz)
+								
+								local len = utils.GetVector3Module(self.LObject.velocity.x, self.LObject.velocity.y, self.LObject.velocity.z)
+								self.LObject.velocity.x = ddx * len * self.bounciness
+								self.LObject.velocity.z = ddz * len * self.bounciness
+								self.LObject.velocity.y = ddy * len * self.bounciness
+
+
+								if object2._bit | 1 ~= object2._bit then
+									ecs.addComponent(object2._eid, "Active")
+									ecs.applyEntity(object2._eid)
+
+									object2.velocity.x = object2.velocity.x - self.LObject.velocity.x
+									object2.velocity.z = object2.velocity.z - self.LObject.velocity.z
+									object2.velocity.y = object2.velocity.y - self.LObject.velocity.y
+									object2.rotation_velocity = 0
+								else
+									object2.velocity.x = object2.velocity.x - self.LObject.velocity.x / 10
+									object2.velocity.z = object2.velocity.z - self.LObject.velocity.z / 10
+									object2.velocity.y = object2.velocity.y - self.LObject.velocity.y / 10
+								end
+								break
+							else
+								self.hitObject = nil
+								self.isHit = -1
+							end
+						end
+					else
+						self.hitObject = nil
+						self.isHit = -1
+					end
+				end
+			end
+			if hitinfos.Length == 0 then
+				self.hitObject = nil
+				self.isHit = -1
+			end
 		end
 
 		local dt = 1
 		CS.LuaUtil.RigidbodyMovePosition(self.collider.attachedRigidbody, finalOffset_x * dt, finalOffset_y * dt, finalOffset_z * dt)
 	else
 
-	local velocity = self.LObject.velocity * CS.UnityEngine.Time.deltaTime * self.LObject.speed
+	local velocity_x = self.LObject.velocity.x * CS.UnityEngine.Time.deltaTime * self.LObject.speed
+	local velocity_z = self.LObject.velocity.z * CS.UnityEngine.Time.deltaTime * self.LObject.speed
+	local velocity_y = self.LObject.velocity.y * CS.UnityEngine.Time.deltaTime * self.LObject.speed
 	
 
-	local contactColliders = CS.UnityEngine.Physics.OverlapBox(self.collider.bounds.center + velocity, self.collider.bounds.extents, self.LObject.physics_object.transform.rotation, self.filter.layerMask.value)
+	-- local contactColliders = CS.UnityEngine.Physics.OverlapBox(self.collider.bounds.center + velocity, self.collider.bounds.extents, self.LObject.physics_object.transform.rotation, self.filter.layerMask.value)
+	local cx, cy, cz = CS.LuaUtil.GetColliderBoundsCenter(self.collider_id)
+	local ex, ey, ez = CS.LuaUtil.GetColliderBoundsExtents(self.collider_id)
+	local rx, ry, rz, rw = CS.LuaUtil.GetRotation(self.LObject.physics_object_id)
+	local contactColliders = CS.LuaUtil.PhysicsOverlapBox(cx + velocity_x, cy + velocity_y, cz + velocity_z, ex, ey, ez, rx, ry, rz, rw, self.filter.layerMask.value)
 
 	-- local contactColliders = CS.Tools.Instance:PhysicsOverlapBoxNonAlloc(self.collider.bounds.center + velocity, self.collider.bounds.extents, self.gameObject.transform.rotation, self.filter.layerMask.value)
 
 	-- local contactColliders = CS.LuaUtil.PhysicsBoxCastNonAlloc(self.collider.bounds.center, self.collider.bounds.extents, velocity.normalized, self.gameObject.transform.rotation, velocity.magnitude, self.filter.layerMask.value)
 
 	-- 最终位移坐标
-	local finalOffset_x = velocity.x
-	local finalOffset_z = velocity.z
-	local finalOffset_y = velocity.y
+	local finalOffset_x = velocity_x
+	local finalOffset_z = velocity_z
+	local finalOffset_y = velocity_y
 	for i = 0, contactColliders.Length - 1, 1 do
 		local k = contactColliders[i]
 		if k ~= nil and k.attachedRigidbody ~= self.collider.attachedRigidbody then
@@ -529,61 +642,115 @@ function LColliderBDY:BDYFixedUpdate()
 				end
 			elseif go.name ~= "test" then -- and object2 ~= nil and not object2["isCatched"] and self.collider.attachedRigidbody.gameObject ~= go -- 是游戏object，则只允许左右进行碰撞
 				local object2 = utils.getObject(go:GetInstanceID())
-				if self.LObject.team ~= object2.team then
-				-- local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
+				if object2 == nil then
+				else
+					if self.LObject.team ~= object2.team then
+					-- local LC = object2.bodyArray_InstanceID[k:GetInstanceID()]
 
-				-- if not string.find(LC.layers, string.match(self.collider.name, "%[(%d+)%]")) then
-					up = true
-					down = true
-					left = true
-					right = true
-				-- end
-				-- above = true
-				-- under = true
+					-- if not string.find(LC.layers, string.match(self.collider.name, "%[(%d+)%]")) then
+						up = true
+						down = true
+						left = true
+						right = true
+					-- end
+					-- above = true
+					-- under = true
+					end
+
+					if self.bounciness == 999 then
+						if self.LObject.team ~= object2.team or (self.LObject.team == object2.team and object2._bit | 1 ~= object2._bit) then
+							if type(self.hitObject) ~= "table" then
+								self.hitObject = {}
+							end
+
+							if self.hitObject[k:GetInstanceID()] == nil then
+
+								-- print("asdasd")
+
+								self.hitObject[k:GetInstanceID()] = true
+								-- self.isHit = 16
+
+								local rcx, rcy, rcz = CS.LuaUtil.GetColliderBoundsCenter(k:GetInstanceID())
+
+								local xx =  (rcx + 0) - cx
+								local yy =  (rcy + 5) - cy
+								local zz =  (rcz + 0) - cz
+								local length = utils.GetVector3Module(xx, yy, zz) -- 射线的长度
+								local dx = xx / length -- 方向
+								local dy = yy / length -- 方向
+								local dz = zz / length -- 方向
+
+								-- print(object2.state, dx)
+			
+			
+								if object2._bit | 1 ~= object2._bit then
+									ecs.addComponent(object2._eid, "Active")
+									ecs.applyEntity(object2._eid)
+			
+									object2.velocity.x = object2.velocity.x + dx * 10
+									object2.velocity.z = object2.velocity.z + dz * 10
+									object2.velocity.y = object2.velocity.y + dy * 5
+
+									-- object2.velocity.x = object2.velocity.x + xx
+									-- object2.velocity.z = object2.velocity.z + zz
+									-- object2.velocity.y = object2.velocity.y + yy
+									object2.rotation_velocity = 0
+								else
+									object2.velocity.x = object2.velocity.x + dx * 10 / 10
+									object2.velocity.z = object2.velocity.z + dz * 10 / 10
+									object2.velocity.y = object2.velocity.y + dy * 5 / 10
+
+									-- object2.velocity.x = object2.velocity.x + xx / 10
+									-- object2.velocity.z = object2.velocity.z + zz / 10
+									-- object2.velocity.y = object2.velocity.y + yy / 10
+								end
+							end
+						end
+					end
 				end
 			else
 				-- return 1, false, false, 1, elseArray
 			end
 
-			if up or down or left or right or above or under then
+			if (up or down or left or right or above or under) and self.bounciness ~= 999 then
 					
-				local m = utils.getBoundsIntersectsArea222(self.collider.bounds, velocity, k.bounds)
-				if m.magnitude > 0 then
+				local m_x, m_y, m_z = utils.getBoundsIntersectsArea222(cx, cy, cz, ex, ey, ez, velocity_x, velocity_y, velocity_z, k:GetInstanceID())
+				if utils.GetVector3Module(m_x, m_y, m_z) > 0 then
 			
 					local offset_x = nil
 					local offset_z = nil
 					local offset_y = nil
 
 					if (left or right) and (up or down) then
-						if m.x > m.z then
-							m.x = 0
+						if m_x > m_z then
+							m_x = 0
 						else
-							m.z = 0
+							m_z = 0
 						end
 					end
 
-					if velocity.x > 0 then
-						offset_x = velocity.x - m.x
+					if velocity_x > 0 then
+						offset_x = velocity_x - m_x
 					else
-						offset_x = velocity.x + m.x
+						offset_x = velocity_x + m_x
 					end
 
-					if velocity.z > 0 then
-						offset_z = velocity.z - m.z
+					if velocity_z > 0 then
+						offset_z = velocity_z - m_z
 					else
-						offset_z = velocity.z + m.z
+						offset_z = velocity_z + m_z
 					end
 
-					if velocity.y > 0 then
-						offset_y = velocity.y - m.y
+					if velocity_y > 0 then
+						offset_y = velocity_y - m_y
 					else
-						offset_y = velocity.y + m.y
+						offset_y = velocity_y + m_y
 					end
 
 
 					-- 留下最小位移坐标
 					if left or right then
-						if velocity.x > 0 then
+						if velocity_x > 0 then
 							if offset_x < finalOffset_x then
 								finalOffset_x = offset_x
 							end
@@ -598,7 +765,7 @@ function LColliderBDY:BDYFixedUpdate()
 					end
 
 					if up or down then
-						if velocity.z > 0 then
+						if velocity_z > 0 then
 							if offset_z < finalOffset_z then
 								finalOffset_z = offset_z
 							end
@@ -613,7 +780,7 @@ function LColliderBDY:BDYFixedUpdate()
 					end
 
 					if (left or right) and (up or down) then
-						if m.x > m.z then
+						if m_x > m_z then
 							isWall_leftright = -1
 						else
 							isWall_updown = -1
@@ -622,7 +789,7 @@ function LColliderBDY:BDYFixedUpdate()
 
 					if above or under then
 
-						if velocity.y > 0 then
+						if velocity_y > 0 then
 							if offset_y < finalOffset_y then
 								finalOffset_y = offset_y
 							end
@@ -632,7 +799,7 @@ function LColliderBDY:BDYFixedUpdate()
 							end
 						end
 
-						if isGround == -1 and m.y > 0 then
+						if isGround == -1 and m_y > 0 then
 							isGround = 1 << tonumber(0)
 						end
 					end
@@ -646,23 +813,20 @@ function LColliderBDY:BDYFixedUpdate()
 	local dt = 1
 	CS.LuaUtil.RigidbodyMovePosition(self.collider.attachedRigidbody, finalOffset_x * dt, finalOffset_y * dt, finalOffset_z * dt)
 
-	end
-
 	if self.bounciness > 0 then
 		if isWall_leftright == 1 then
 			self.LObject.velocity.x = -self.LObject.velocity.x * self.bounciness
-			self.LObject.rotation_velocity = (CS.Tools.Instance:RandomRangeInt(0, 2) * 2 - 1) * self.LObject.rotation_velocity * self.bounciness
 		end
 		if isWall_updown == 1 then
 			self.LObject.velocity.z = -self.LObject.velocity.z * self.bounciness
-			self.LObject.rotation_velocity = (CS.Tools.Instance:RandomRangeInt(0, 2) * 2 - 1) * self.LObject.rotation_velocity * self.bounciness
 		end
 		if isGround == 1 then
 			self.LObject.velocity.y = -self.LObject.velocity.y * self.bounciness
-			self.LObject.rotation_velocity = (CS.Tools.Instance:RandomRangeInt(0, 2) * 2 - 1) * self.LObject.rotation_velocity * self.bounciness
-
-			-- self.LObject.velocity  = self.LObject.velocity * CS.Tools.Instance:RandomRangeFloat(0.9, 1)
 		end
+		if isWall_leftright == 1 or isWall_updown == 1 or isGround == 1 then
+			self.LObject.rotation_velocity = (CS.Tools.Instance:RandomRangeInt(0, 2) * 2 - 1) * self.LObject.rotation_velocity * self.bounciness
+		end
+	end
 	end
 	return isGround
 end

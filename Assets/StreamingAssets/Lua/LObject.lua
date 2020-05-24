@@ -147,7 +147,7 @@ utils.registerComponent("Render", function(this)
 
 	this.pic_offset_object = CS.UnityEngine.GameObject("pic_offset")
 	this.pic_offset_object_id = this.pic_offset_object:GetInstanceID()
-	CS.LuaUtil.AddID(this.pic_offset_object_id, this.pic_offset_object)
+	CS.LuaUtil.AddGameObjectID(this.pic_offset_object_id, this.pic_offset_object)
 	-- self.pic_offset_object.transform:SetParent(self.gameObject.transform)
 	this.pic_offset_object.transform.localScale = CS.UnityEngine.Vector3(2, 2, 2)
 	this.pic_offset_object.transform.localPosition = CS.UnityEngine.Vector3.zero
@@ -159,7 +159,7 @@ utils.registerComponent("Render", function(this)
 
 	this.pic_object = CS.UnityEngine.GameObject("pic")
 	this.pic_object_id = this.pic_object:GetInstanceID()
-	CS.LuaUtil.AddID(this.pic_object_id, this.pic_object)
+	CS.LuaUtil.AddGameObjectID(this.pic_object_id, this.pic_object)
 	this.pic_object.transform:SetParent(this.pic_offset_object.transform)
 	this.pic_object.transform.localPosition = CS.UnityEngine.Vector3.zero
 	this.pic_object.transform.localScale = CS.UnityEngine.Vector3.one

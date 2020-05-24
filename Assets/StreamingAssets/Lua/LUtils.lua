@@ -691,137 +691,6 @@ function utils.displayObjectsInfo()
 	end
 end
 
-function utils.runObjectsUpdate()
-	
-	for i, v in pairs(objects) do
-		utils.update(v)
-		-- v:runFrame()
-		-- if v.AI then
-		-- 	v.database.AI:judgeAI(v)
-		-- end
-		if v.controller ~= nil and v.AI then
-			v.controller:judgeAI(v)
-		end
-	end
-end
-
-function utils.runObjectsFixedupdate()
-	for i, v in pairs(objects) do
-
-		utils.fixedupdate(v)
-		if v.controller ~= nil and v.AI then
-			v.controller:resetCommands()
-		end
-	end
-end
-
-
-function utils.update(self)
-	
-	-- if self.animation.isPlaying == true then
-
-	-- 	-- if self.frame >= self.functions.time then
-	-- 	-- 	self.delayCounter = self.delayCounter + 1
-	-- 	-- end
-
-	-- 	-- print(CS.Tools.Instance:GetAnimationState(self.animation, "body_run_front").time)
-	-- 	-- self.frame = self.frame + CS.UnityEngine.Time.deltaTime * self.functions.speed
-
-	-- 	if self.functions.time >= self.delayCounter * (1 / 60) then
-	-- 		print(self.delayCounter)
-	-- 		self.delayCounter = self.delayCounter + 1
-	-- 	end
-	-- end
-
-	-- if self.state == "weapon_shoot_HK416c" then
-	-- 	print(self.timeLine, self.localTimeLine, self.delayCounter)
-	-- end
-
-	utils.runStateUpdate(self)
-
-	if utils.isMatched(self, utils.allOf(utils.getComponentID("DataBase"))) then
-		if self.action ~= nil then
-			local c = self.database.animations[self.action].keyframes[self.delayCounter + 1]
-
-
-			if c == nil then
-				self.delayCounter = 0
-				self.timeLine = 0
-				self.localTimeLine = 0
-				c = self.database.animations[self.action].keyframes[self.delayCounter + 1]
-			end
-
-			-- if self.kind == 5 and self.state ~= "cursor" then
-			-- 	print(self.delayCounter, self.timeLine)
-			-- end
-			if self.timeLine >= c * (1 / 60) then
-
-				local f = self.database.animations[self.action].eventQueue[c]
-				self.delayCounter = self.delayCounter + 1
-				self.localTimeLine = 0
-				if f ~= nil then
-					for i, v in ipairs(f) do
-						self.database:invokeEvent(v.category, self, v)
-					end
-				end
-
-			end
-		end
-
-		-- if c < self.database.animations[self.action].delay then
-		self.timeLine = self.timeLine + CS.UnityEngine.Time.deltaTime * self.speed
-		self.localTimeLine = self.localTimeLine + CS.UnityEngine.Time.deltaTime * self.speed
-		-- else
-		-- 	self.delayCounter = 0
-		-- 	self.timeLine = 0
-		-- end
-	end
-
-
-	-- if self.parent == self then
-	-- 	-- local spriteLowerBound = self.spriteRenderer.bounds.size.y * 0.5
-	-- 	local floorHeight = 0
-	-- 	local posX = self.gameObject.transform.position.x
-	-- 	local posY = self.gameObject.transform.position.y
-	-- 	local posZ = (posY + floorHeight) * utils.Tan30
-	-- 	self.gameObject.transform.position = CS.UnityEngine.Vector3(posX, posY, posZ)
-	-- end
-
-	if utils.isMatched(self, utils.allOf(utils.getComponentID("Render"))) then
-	
-		-- local pos = self.physics_object.transform.position
-		-- self.pic_offset_object.transform.position = CS.UnityEngine.Vector3(pos.x , pos.y + pos.z, self.root.physics_object.transform.position.z)
-		local pos = self.physics_object.transform.position
-		CS.LuaUtil.SetPos(self.pic_offset_object_id, pos.x, pos.y + pos.z, self.root.physics_object.transform.position.z)
-
-		-- if self.parent == self then
-		-- 	local pos2 = self.pic_offset_object.transform.position
-		-- 	local pos3 = self.root.physics_object.transform.position.z
-		-- 	CS.LuaUtil.SetLocalPos(self.pic_offset_object_id, pos2.x, pos2.y, 0)
-		-- end
-
-		self.rotation = self.rotation + self.rotation_velocity
-
-		local rrr = self.physics_object.transform.eulerAngles
-		if (self.root == self and self.direction.x == 1) or (self.root ~= self and self.root.direction.x * self.direction.x == 1) then
-			if rrr.magnitude > 0 then
-				CS.LuaUtil.SetRotationEuler(self.pic_offset_object_id, 0, 0, 360 - rrr.y + self.rotation)
-			else
-				CS.LuaUtil.SetRotationEuler(self.pic_offset_object_id, 0, 0, 0 + self.rotation)
-			end
-		else
-			if rrr.magnitude > 0 then
-				CS.LuaUtil.SetRotationEuler(self.pic_offset_object_id, 0, 180, rrr.y + 180 + self.rotation)
-			else
-				CS.LuaUtil.SetRotationEuler(self.pic_offset_object_id, 0, 180, 0 + self.rotation)
-			end
-		end
-	end
-
-	-- local pos2 = self.gameObject.transform.position
-	-- self.bdy_object_test.transform.position = CS.UnityEngine.Vector3(pos2.x , pos2.y + pos2.z, 0)
-end
-
 function utils.changeState(self, state)
 	local animation = nil
 	if state ~= nil then
@@ -848,7 +717,7 @@ end
 function utils.SetParentAndRoot(self, object, id)
 	if object ~= nil and (self.physics_object.transform.parent == nil or self.physics_object.transform.parent ~= self.physics_object.transform) then
 
-		self.physics_object.transform:SetParent(object.physics_object.transform)
+		self.physics_object.transform:SetParent(object.physics_object.transform, true)
 		self.rigidbody.isKinematic = true
 		self.parent = object
 		if object.parent ~= nil then
@@ -857,123 +726,10 @@ function utils.SetParentAndRoot(self, object, id)
 			self.root = object
 		end
 		object.children[id] = self
-		self.physics_object.transform.localEulerAngles = CS.UnityEngine.Vector3(0, 0, 0)
+		-- self.physics_object.transform.localEulerAngles = CS.UnityEngine.Vector3(0, 0, 0)
 
 		self.team = object.team
 		self.spriteRenderer.material = object.spriteRenderer.material
-	end
-end
-
-function utils.fixedupdate(self)
-	if utils.isMatched(self, utils.allOf(utils.getComponentID("UI"))) then
-		return
-	end
-
-	self.oriPos = self.rigidbody.position
-	-- self:runState()
-
-	utils.runStateFxiedUpdate(self)
-
-	-- if self.accvvvX ~= nil then
-	-- 	self.velocity.x = self.velocity.x + self.accvvvX * self.direction.x
-	-- end
-	-- if self.accvvvY ~= nil then
-	-- 	self.velocity.y = self.velocity.y + self.accvvvY * self.direction.y
-	-- end
-	-- if self.accvvvZ ~= nil then
-	-- 	self.velocity.z = self.velocity.z + self.accvvvZ * self.direction.z
-	-- end
-	-- self.accvvvX = nil
-	-- self.accvvvY = nil
-	-- self.accvvvZ = nil
-
-
-	-- self.velocity = self.velocity + CS.UnityEngine.Physics.gravity * 0.01
-
-	-- self.gameObject.transform.position = self.gameObject.transform.position + CS.UnityEngine.Vector3(self.velocity.x, self.velocity.y, self.velocity.z) * CS.UnityEngine.Time.deltaTime
-
-	-- self.rigidbody.position = self.rigidbody.position + self.velocity * CS.UnityEngine.Time.deltaTime
-
-	if self.root ~= self then
-		return
-	end
-
-	-- local pos2 = self.rigidbody.position
-	-- self.bdy_object_test.transform.position = CS.UnityEngine.Vector3(pos2.x, pos2.y + pos2.z, 0)
-	
-	-- print(self.velocity)
-	-- self.elseArray = {}
-	-- 碰撞检测
-
-	local f = 0
-	for i, v in pairs(self.bodyArray) do
-		self.isOnGround = v:BDYFixedUpdate()
-
-		if self.isOnGround ~= -1 then
-
-			if self.kind ~= 99 then
-				self.velocity.y = -0.01
-			end
-		end
-		i = i
-	end
-	if f == 0 then
-		self.rigidbody.position = self.rigidbody.position + self.velocity * CS.UnityEngine.Time.deltaTime
-	end
-
-	if self.isOnGround ~= -1 then
-		self.database:invokeEvent("Ground", self, nil)
-	else
-		self.database:invokeEvent("Flying", self, nil)
-	end
-
-	-- 攻击检测
-	for i, v in pairs(self.attckArray) do
-		v:ATKFixedUpdate()
-	end
-
-	-- if self.kind == 0 and self.root == self then
-	-- 	dump(self, "", 1)
-	-- 	self["HP"] = self["HP"] - 1
-	-- 	if self.HP > 0 then
-	-- 		self.database:invokeEvent("Live", self, nil)
-	-- 	else
-	-- 		self.database:invokeEvent("Dead", self, nil)
-	-- 	end
-	-- end
-end
-
-function utils.runStateUpdate(this)
-	if this.state ~= nil then
-		local st = this.database.characters_state[this.state]
-		for i, v in ipairs(st.update) do
-			if v.func == nil or v.func(this) then
-				for j, v2 in ipairs(v.test) do
-					this.database:invokeEvent(v2.category, this, v2.json)
-				end
-			end
-		end
-	end
-end
-
-function utils.runStateFxiedUpdate(this)
-	local st = this.database.characters_state["global"]
-	for i, v in ipairs(st.fixedUpdate) do
-		if v.func == nil or v.func(this) then
-			for j, v2 in ipairs(v.test) do
-				this.database:invokeEvent(v2.category, this, v2.json)
-			end
-		end
-	end
-	if this.state ~= nil and this.state ~= "global" then
-		st = this.database.characters_state[this.state]
-		for i, v in ipairs(st.fixedUpdate) do
-			if v.func == nil or v.func(this) then
-				for j, v2 in ipairs(v.test) do
-					this.database:invokeEvent(v2.category, this, v2.json)
-				end
-			end
-		end
 	end
 end
 
@@ -1209,6 +965,17 @@ function utils.getBoundsIntersectsArea222(lhs, dis, rhs)
 
 	local xxx = r - CS.UnityEngine.Vector3(math.abs(c.x), math.abs(c.y), math.abs(c.z))
 	return xxx
+end
+
+function utils.getBoundsIntersectsArea222(lcx, lcy, lcz, lex, ley, lez, lvx, lvy, lvz, r_collider_id)
+	local rcx, rcy, rcz = CS.LuaUtil.GetColliderBoundsCenter(r_collider_id)
+	local rex, rey, rez = CS.LuaUtil.GetColliderBoundsExtents(r_collider_id)
+
+	local cx = lcx + lvx - rcx
+	local cy = lcy + lvy - rcy
+	local cz = lcz + lvz - rcz
+
+	return lex + rex - math.abs(cx), ley + rey - math.abs(cy), lez + rez - math.abs(cz)
 end
 
 function utils.createUnityObject(p, name, x, y, width, height)

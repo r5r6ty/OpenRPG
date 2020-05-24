@@ -330,17 +330,28 @@ public class LuaUtil
 {
     private static Dictionary<int, GameObject> m_gameObjects = new Dictionary<int, GameObject>();
     private static Dictionary<int, Rigidbody> m_rigidbodys = new Dictionary<int, Rigidbody>();
+    private static Dictionary<int, Collider> m_colliders = new Dictionary<int, Collider>();
 
     private static RaycastHit[] m_RaycastHits = new RaycastHit[5];
 
-    public static void AddID(int id, GameObject go)
+    public static void AddGameObjectID(int id, GameObject go)
     {
         m_gameObjects.Add(id, go);
     }
 
-    public static void DeleteID(int id)
+    public static void RemoveGameObjectID(int id)
     {
         m_gameObjects.Remove(id);
+    }
+
+    public static void AddColliderID(int id, Collider go)
+    {
+        m_colliders.Add(id, go);
+    }
+
+    public static void RemoveColliderID(int id)
+    {
+        m_colliders.Remove(id);
     }
 
     public static void SetPos(int id, float x, float y, float z)
@@ -369,6 +380,11 @@ public class LuaUtil
         z = pos.z;
     }
 
+    public static void SetlocalScale(int id, float x, float y, float z)
+    {
+        m_gameObjects[id].transform.localScale = new Vector3(x, y, z);
+    }
+
     public static void SetRotationByEuler(int id, float x, float y, float z)
     {
         m_gameObjects[id].transform.rotation = Quaternion.Euler(x, y, z);
@@ -387,6 +403,15 @@ public class LuaUtil
         z = pos.z;
     }
 
+    public static void GetRotation(int id, out float x, out float y, out float z, out float w)
+    {
+        Quaternion quaternion = m_gameObjects[id].transform.rotation;
+        x = quaternion.x;
+        y = quaternion.y;
+        z = quaternion.z;
+        w = quaternion.w;
+    }
+
     public static void RigidbodyMovePosition(Rigidbody rigidbody, float x, float y, float z)
     {
         rigidbody.MovePosition(new Vector3(rigidbody.position.x + x, rigidbody.position.y + y, rigidbody.position.z + z));
@@ -400,10 +425,78 @@ public class LuaUtil
         z = pos.z;
     }
 
+    public static void RaycastHitGetPoint(RaycastHit hit, out float x, out float y, out float z)
+    {
+        Vector3 p = hit.point;
+        x = p.x;
+        y = p.y;
+        z = p.z;
+    }
+
+    public static void RaycastHitGetNormal(RaycastHit hit, out float x, out float y, out float z)
+    {
+        Vector3 p = hit.normal;
+        x = p.x;
+        y = p.y;
+        z = p.z;
+    }
+
+    public static void Vector3Reflect(float dx, float dy, float dz, float nx, float ny, float nz, out float x, out float y, out float z)
+    {
+        Vector3 p = Vector3.Reflect(new Vector3(dx, dy, dz), new Vector3(nx, ny, nz));
+        x = p.x;
+        y = p.y;
+        z = p.z;
+    }
+
     public static RaycastHit[] PhysicsBoxCastNonAlloc(Vector3 center, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float maxDistance, int mask)
     {
         Physics.BoxCastNonAlloc(center, halfExtents, direction, m_RaycastHits, orientation, maxDistance, mask);
         return m_RaycastHits;
+    }
+
+    public static Collider[] PhysicsOverlapBox(float cx, float cy, float cz, float ex, float ey, float ez, float rx, float ry, float rz, float rw, int mask)
+    {
+        return Physics.OverlapBox(new Vector3(cx, cy, cz), new Vector3(ex, ey, ez), new Quaternion(rx, ry, rz, rw), mask);
+    }
+
+    public static RaycastHit[] PhysicsRaycastAll(float ox, float oy, float oz, float dx, float dy, float dz, float dis, int m)
+    {
+        return Physics.RaycastAll(new Vector3(ox, oy, oz), new Vector3(dx, dy, dz), dis, m);
+    }
+
+    public static void GetColliderBoundsCenter(int id, out float x, out float y, out float z)
+    {
+        Vector3 center = m_colliders[id].bounds.center;
+        x = center.x;
+        y = center.y;
+        z = center.z;
+    }
+
+    public static void GetColliderBoundsExtents(int id, out float x, out float y, out float z)
+    {
+        Vector3 extents = m_colliders[id].bounds.extents;
+        x = extents.x;
+        y = extents.y;
+        z = extents.z;
+    }
+
+    public static void GetPhysicsGravity(out float x, out float y, out float z)
+    {
+        Vector3 g = Physics.gravity;
+        x = g.x;
+        y = g.y;
+        z = g.z;
+    }
+
+    public static Vector3 QuaternionMultiplyVector3(float qx, float qy, float qz, float qw, float vx, float vy, float vz)
+    {
+        return new Quaternion(qx, qy, qz, qw) * new Vector3(vx, vy, vz);
+    }
+
+    public static void DrawLine(float sx, float sy, float sz, float ex, float ey, float ez, float r, float g, float b, float a)
+    {
+        Debug.DrawLine(new Vector3(sx, sy, sz), new Vector3(ex, ey, ez), new Color(r, g, b, a));
     }
 
     public static XLua.LuaTable AddLuaComponent(GameObject go, string m)//XLua.LuaTable tableClass

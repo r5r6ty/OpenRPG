@@ -400,6 +400,16 @@ Rubbish.CS = CS
 Rubbish.print = print
 Rubbish.utils = utils
 
+Rubbish.getPosZ = function(id)
+	local x, y, z = CS.LuaUtil.GetPos(id)
+	return z
+end
+
+Rubbish.getPosX = function(id)
+	local x, y, z = CS.LuaUtil.GetPos(id)
+	return x
+end
+
 function LCastleDBCharacter:readDB()
 	local str = utils.openFileText(self.DBPath .. self.DBFile)
 

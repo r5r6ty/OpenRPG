@@ -27,8 +27,13 @@ public class GameLoader : MonoBehaviour
 
     void Awake()
     {
+#if UNITY_STANDALONE_WIN
+        luapath = @"https://r5r6ty.github.io/OpenRPG/";
+        //StartCoroutine(ReadData(luapath + s + ".lua"));
+#endif
+
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-    luapath = Application.dataPath + "/" + folder + "/";
+        luapath = Application.dataPath + "/" + folder + "/";
 #else
     luapath = folder + "/";
 #endif
@@ -46,6 +51,31 @@ public class GameLoader : MonoBehaviour
     }
 
     IEnumerator ReadData(string path)
+    {
+        UnityWebRequest www = UnityWebRequest.Get(path);
+        yield return www.SendWebRequest();
+        while (www.isDone == false)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+        yield return new WaitForSeconds(0.5f);
+        string scripts = www.downloadHandler.text;
+        string methodName = path.Replace(".lua", "");
+        methodName = methodName.Substring(methodName.LastIndexOf(@"/") + 1); // 获得名称
+        print(methodName);
+        LuaManager.Instance.SetScripts(methodName, scripts); // 下面有介绍
+
+        count++;
+
+        if (count >= total)
+        {
+            init.SetActive(true);
+            //testStart();
+            Destroy(gameObject);
+        }
+    }
+
+    IEnumerator ReadDataFromWeb(string path)
     {
         UnityWebRequest www = UnityWebRequest.Get(path);
         yield return www.SendWebRequest();

@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -15,7 +17,7 @@ public class GameLoader : MonoBehaviour
     static string luapath;
 
     public string[] scripts;
-    public Object[] prefabs;
+    public UnityEngine.Object[] prefabs;
 
     int count = 0;
     int total = 0;
@@ -27,9 +29,28 @@ public class GameLoader : MonoBehaviour
 
     void Awake()
     {
-#if UNITY_STANDALONE_WIN
-        luapath = @"https://r5r6ty.github.io/OpenRPG/";
-        //StartCoroutine(ReadData(luapath + s + ".lua"));
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR_WIN
+        luapath = @"https://r5r6ty.github.io/OpenRPG/Assets/StreamingAssets/";
+        UnityWebRequest www = UnityWebRequest.Get(luapath + "version" + ".lua");
+        string ver = www.downloadHandler.text;
+
+        if (Directory.Exists(Application.dataPath + @"\StreamingAssets\") == false)
+        {
+            Directory.CreateDirectory(Application.dataPath + @"\StreamingAssets\");
+        }
+
+        string old_ver = "0";
+        FileInfo flinfo = new FileInfo(Application.dataPath + @"\StreamingAssets\" + "version" + ".lua");
+        if (flinfo.Exists)
+        {
+            old_ver = flinfo.OpenText().ReadToEnd();
+        }
+
+        if (flinfo.Exists == false || Convert.ToInt32(ver) > Convert.ToInt32(old_ver))
+        {
+            //UnityWebRequest www = UnityWebRequest.Get(luapath + "version" + ".lua");
+        }
+
 #endif
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
@@ -38,7 +59,7 @@ public class GameLoader : MonoBehaviour
     luapath = folder + "/";
 #endif
 
-        foreach (Object s in prefabs)
+        foreach (UnityEngine.Object s in prefabs)
         {
             ObjectManager.Instance.SetO(s.name, s);
         }

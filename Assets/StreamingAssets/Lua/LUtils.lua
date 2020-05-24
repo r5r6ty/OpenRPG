@@ -9,19 +9,21 @@ local utils = {}
 utils.platform = "PC"
 utils.resourcePath = CS.UnityEngine.Application.dataPath .. "/StreamingAssets/Resource/"
 utils.resourcePathDataPath = CS.UnityEngine.Application.dataPath .. "/StreamingAssets/Resource/data/"
-utils.resourcePathFontPath = CS.UnityEngine.Application.dataPath .. "/StreamingAssets/Resource/font/"
+-- utils.resourcePathFontPath = CS.UnityEngine.Application.dataPath .. "/StreamingAssets/Resource/font/"
 
 -- utils.platform = "WebGL"
--- utils.resourcePath = string.gsub("https://r5r6ty.github.io/OpenACT/Assets/0/StreamingAssets/Lua/", "Lua", "Resource")
--- utils.resourcePathDataPath = string.gsub("https://r5r6ty.github.io/OpenACT/Assets/0/StreamingAssets/Lua/", "Lua", "Resource/data")
+-- utils.resourcePath = string.gsub("https://r5r6ty.github.io/OpenRPG/Assets/0/StreamingAssets/Lua/", "Lua", "Resource")
+-- utils.resourcePathDataPath = string.gsub("https://r5r6ty.github.io/OpenRPG/Assets/0/StreamingAssets/Lua/", "Lua", "Resource/data")
+-- utils.resourcePath = "https://r5r6ty.github.io/OpenRPG/Assets" .. "/StreamingAssets/Resource/"
+-- utils.resourcePathDataPath = "https://r5r6ty.github.io/OpenRPG/Assets" .. "/StreamingAssets/Resource/data/"
 
-local luaPath = CS.GameLoader.Getluapath()
-if string.find(luaPath, "http") then
-	utils.platform = "WebGL"
-	utils.resourcePath = string.gsub(luaPath, "Lua", "Resource")
-	utils.resourcePathDataPath = string.gsub(luaPath, "Lua", "Resource/data")
-	utils.resourcePathFontPath = string.gsub(luaPath, "Lua", "Resource/font")
-end
+-- local luaPath = CS.GameLoader.Getluapath()
+-- if string.find(luaPath, "http") then
+-- 	utils.platform = "WebGL"
+-- 	utils.resourcePath = string.gsub(luaPath, "Lua", "Resource")
+-- 	utils.resourcePathDataPath = string.gsub(luaPath, "Lua", "Resource/data")
+-- 	utils.resourcePathFontPath = string.gsub(luaPath, "Lua", "Resource/font")
+-- end
 
 utils.ZOOM = 1
 local LCanvas = nil
@@ -120,25 +122,26 @@ function utils.openFileText(path)
 		str = io.read("*a")
 		io.close(file)
 	else
-		local stat, mainre = coroutine.resume(utils.download, path)
-		while (not mainre.isDone) or (not stat) do
-			if mainre.isNetworkError then
-				print(mainre.error)
-				return nil
-			end
-		end
-		print(mainre.isDone, stat, mainre.downloadProgress)
-		str = mainre.downloadHandler.text
-
-
-		-- local www = CS.UnityEngine.WWW(path)
-		-- while not www.isDone do
-		-- 	if www.error ~= nil and www.error ~= "" then
-		-- 		print(www.error)
+		-- local stat, mainre = coroutine.resume(utils.download, path)
+		-- while (not mainre.isDone) or (not stat) do
+		-- 	if mainre.isNetworkError then
+		-- 		print(mainre.error)
 		-- 		return nil
 		-- 	end
 		-- end
-		-- str = www.text
+		-- print(mainre.isDone, stat, mainre.downloadProgress)
+		-- str = mainre.downloadHandler.text
+
+
+		print("Downloading " .. path)
+		local www = CS.UnityEngine.WWW(path)
+		while not www.isDone do
+			if www.error ~= nil and www.error ~= "" then
+				print(www.error)
+				return nil
+			end
+		end
+		str = www.text
 	end
 	return str
 end
@@ -155,22 +158,24 @@ function utils.openFileBytes(path)
 		bytes = io.read("*a")
 		io.close(file)
 	else
-		local stat, mainre = coroutine.resume(utils.download, path)
-		while (not mainre.isDone) or (not stat) do
-			if mainre.isNetworkError then
-				print(mainre.error)
-				return nil
-			end
-		end
-		bytes = mainre.downloadHandler.data
-		-- local www = CS.UnityEngine.WWW(path)
-		-- while not www.isDone do
-		-- 	if www.error ~= nil and www.error ~= "" then
-		-- 		print(www.error)
+		-- local stat, mainre = coroutine.resume(utils.download, path)
+		-- while (not mainre.isDone) or (not stat) do
+		-- 	if mainre.isNetworkError then
+		-- 		print(mainre.error)
 		-- 		return nil
 		-- 	end
 		-- end
-		-- bytes = www.bytes
+		-- bytes = mainre.downloadHandler.data
+
+		print("Downloading " .. path)
+		local www = CS.UnityEngine.WWW(path)
+		while not www.isDone do
+			if www.error ~= nil and www.error ~= "" then
+				print(www.error)
+				return nil
+			end
+		end
+		bytes = www.bytes
 	end
 	return bytes
 end

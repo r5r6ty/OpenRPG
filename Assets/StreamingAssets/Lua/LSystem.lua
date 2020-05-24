@@ -134,6 +134,54 @@ ecs.registerMultipleSystem("BDYSystem", function(self)
         local dt = CS.UnityEngine.Time.deltaTime * self.speed
         CS.LuaUtil.RigidbodyMovePosition(self.rigidbody, self.velocity.x * dt, self.velocity.y * dt, self.velocity.z * dt)
     end
+    -- self.isOnGround = -1
+    -- local dt = CS.UnityEngine.Time.deltaTime * self.speed
+    -- local length = utils.GetVector3Module(self.velocity.x * dt, self.velocity.y * dt, self.velocity.z * dt) -- 射线的长度
+    -- local dx = self.velocity.x * dt / length -- 方向
+    -- local dy = self.velocity.y * dt / length -- 方向
+    -- local dz = self.velocity.z * dt / length -- 方向
+
+    -- local ishit, hitinfo = CS.LuaUtil.RigidbodySweepTest(self.rigidbody, dx, dy, dz, length)
+    -- if ishit then
+    --     local hx, hy, hz = CS.LuaUtil.RaycastHitGetPoint(hitinfo)
+    --     local x, y, z = CS.LuaUtil.RigidbodyClosestPointOnBounds(self.rigidbody, hx, hy, hz)
+    --     CS.LuaUtil.RigidbodyMovePosition(self.rigidbody, hx - x, hy - y, hz - z)
+    --     local up, down, left, right, above, under = false, false, false, false, false, false
+    --     local go = hitinfo.collider.attachedRigidbody.gameObject
+    --     if go.name == "test" then -- 如果是地图块
+    --         local name = utils.split(hitinfo.collider.name, ",")
+    --         local num = tonumber(name[#name]) -- 地图块最后一个数字作为bit
+    --         if num & 1 == 1 then --位操作，算出这个方块朝哪个方向进行碰撞，一个方块可以有多个碰撞方向，这部分随意设计，只需要能知道这个collider的判定方向，用layermask什么都行
+    --             up = true
+    --         end
+    --         if num & 2 == 2 then --位操作
+    --             down = true
+    --         end
+    --         if num & 4 == 4 then --位操作
+    --             left = true
+    --         end
+    --         if num & 8 == 8 then --位操作
+    --             right = true
+    --         end
+    --         if num & 16 == 16 then --位操作
+    --             above = true
+    --         end
+    --         if num & 32 == 32 then --位操作
+    --             under = true
+    --         end
+
+    --         if up or down or left or right or above or under then
+    --             if above or under then
+    --                 self.isOnGround = 1
+    --                 self.velocity.y = 0
+    --             end
+    --         end
+    --     end
+    -- else
+    --     local dt = CS.UnityEngine.Time.deltaTime * self.speed
+    --     CS.LuaUtil.RigidbodyMovePosition(self.rigidbody, self.velocity.x * dt, self.velocity.y * dt, self.velocity.z * dt)
+    -- end
+
     if self.isOnGround ~= -1 then
         ecs.processSingleSystem("Ground", self)
     else
@@ -599,11 +647,19 @@ ecs.registerSingleSystem("MoveToTarget", function(this, value)
 		local dy = y / length -- 方向
         local dz = z / length -- 方向
 
+        local length2 = utils.GetVector3Module(this.velocity.x, this.velocity.y, this.velocity.z) -- 射线的长度
+		local dx2 = this.velocity.x / length2 -- 方向
+		local dy2 = this.velocity.y / length2 -- 方向
+        local dz2 = this.velocity.z / length2 -- 方向
+        this.velocity.x = this.velocity.x - dx2 * value.speed * this.speed
+        this.velocity.y = this.velocity.y - dy2 * value.speed * this.speed
+        this.velocity.z = this.velocity.z - dz2 * value.speed * this.speed
+
         this.velocity.x = this.velocity.x + dx * value.speed * this.speed
-        this.velocity.y = this.velocity.y + dy * value.speed
+        this.velocity.y = this.velocity.y + dy * value.speed * this.speed
         this.velocity.z = this.velocity.z + dz * value.speed * this.speed
     end
-end, ecs.allOf("Active", "Physics"))
+end, ecs.allOf("Active", "Physics", "Target"))
 
 ecs.registerSingleSystem("Ray", function(this, value)
     local hitinfo = nil

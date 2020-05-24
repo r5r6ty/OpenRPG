@@ -27,31 +27,60 @@ public class GameLoader : MonoBehaviour
         return luapath;
     }
 
+    bool canReadData = true;
+
+    IEnumerator SendRequestVersion(string path)
+    {
+        Uri uri = new Uri(path); //Uri 是 System 命名空间下的一个类,注意引用该命名空间
+        UnityWebRequest uwr = new UnityWebRequest(uri);        //创建UnityWebRequest对象
+        uwr.timeout = 5;
+        yield return uwr.SendWebRequest();                     //等待返回请求的信息
+        if (uwr.isHttpError || uwr.isNetworkError)             //如果其 请求失败，或是 网络错误
+        {
+            Debug.LogError(uwr.error); //打印错误原因
+        }
+        else //请求成功
+        {
+            Debug.Log("请求成功");
+        }
+    }
+
     void Awake()
     {
-#if UNITY_STANDALONE_WIN && !UNITY_EDITOR_WIN
-        luapath = @"https://r5r6ty.github.io/OpenRPG/Assets/StreamingAssets/";
-        UnityWebRequest www = UnityWebRequest.Get(luapath + "version" + ".lua");
-        string ver = www.downloadHandler.text;
+//#if UNITY_STANDALONE_WIN && !UNITY_EDITOR_WIN
+        //luapath = @"https://r5r6ty.github.io/OpenRPG/Assets/StreamingAssets/";
+        //StartCoroutine(SendRequestVersion(luapath + "version" + ".txt"));
 
-        if (Directory.Exists(Application.dataPath + @"\StreamingAssets\") == false)
-        {
-            Directory.CreateDirectory(Application.dataPath + @"\StreamingAssets\");
-        }
+        //print("wolai");
 
-        string old_ver = "0";
-        FileInfo flinfo = new FileInfo(Application.dataPath + @"\StreamingAssets\" + "version" + ".lua");
-        if (flinfo.Exists)
-        {
-            old_ver = flinfo.OpenText().ReadToEnd();
-        }
+        //if (Directory.Exists(Application.dataPath + @"\StreamingAssets\") == false)
+        //{
+        //    Directory.CreateDirectory(Application.dataPath + @"\StreamingAssets\");
+        //}
 
-        if (flinfo.Exists == false || Convert.ToInt32(ver) > Convert.ToInt32(old_ver))
-        {
-            //UnityWebRequest www = UnityWebRequest.Get(luapath + "version" + ".lua");
-        }
+        //string old_ver = "0";
+        //FileInfo flinfo = new FileInfo(Application.dataPath + @"\StreamingAssets\" + "version" + ".lua");
+        //if (flinfo.Exists)
+        //{
+        //    old_ver = flinfo.OpenText().ReadToEnd();
+        //}
 
-#endif
+        //if (flinfo.Exists == false || Convert.ToInt32(ver) > Convert.ToInt32(old_ver))
+        //{
+        //    print("-----------------------------------------------");
+        //    print(Convert.ToInt32(ver));
+        //    print(Convert.ToInt32(old_ver));
+        //    print("-----------------------------------------------");
+        //}
+        //else
+        //{
+        //    print("-----------------------------------------------");
+        //    print(Convert.ToInt32(ver));
+        //    print(Convert.ToInt32(old_ver));
+        //    print("-----------------------------------------------");
+        //}
+
+//#endif
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
         luapath = Application.dataPath + "/" + folder + "/";
@@ -72,31 +101,6 @@ public class GameLoader : MonoBehaviour
     }
 
     IEnumerator ReadData(string path)
-    {
-        UnityWebRequest www = UnityWebRequest.Get(path);
-        yield return www.SendWebRequest();
-        while (www.isDone == false)
-        {
-            yield return new WaitForEndOfFrame();
-        }
-        yield return new WaitForSeconds(0.5f);
-        string scripts = www.downloadHandler.text;
-        string methodName = path.Replace(".lua", "");
-        methodName = methodName.Substring(methodName.LastIndexOf(@"/") + 1); // 获得名称
-        print(methodName);
-        LuaManager.Instance.SetScripts(methodName, scripts); // 下面有介绍
-
-        count++;
-
-        if (count >= total)
-        {
-            init.SetActive(true);
-            //testStart();
-            Destroy(gameObject);
-        }
-    }
-
-    IEnumerator ReadDataFromWeb(string path)
     {
         UnityWebRequest www = UnityWebRequest.Get(path);
         yield return www.SendWebRequest();
@@ -471,6 +475,19 @@ public class LuaUtil
     public static void RigidbodyGetPosition(Rigidbody rigidbody, out float x, out float y, out float z)
     {
         Vector3 pos = rigidbody.position;
+        x = pos.x;
+        y = pos.y;
+        z = pos.z;
+    }
+
+    public static bool RigidbodySweepTest(Rigidbody rigidbody, float dx, float dy, float dz, float dis, out RaycastHit hit)
+    {
+        return rigidbody.SweepTest(new Vector3(dx, dy, dz), out hit, dis);
+    }
+
+    public static void RigidbodyClosestPointOnBounds(Rigidbody rigidbody, float px, float py, float pz, out float x, out float y, out float z)
+    {
+        Vector3 pos = rigidbody.ClosestPointOnBounds(new Vector3(px, py, pz));
         x = pos.x;
         y = pos.y;
         z = pos.z;

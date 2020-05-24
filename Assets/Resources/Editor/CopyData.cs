@@ -11,6 +11,12 @@ public static class CopyData
     [MenuItem("OpenRPG/CopyDataAndRun", false, 1)]
     public static void CopyData_Run()
     {
+        FileInfo flinfo = new FileInfo(Application.dataPath + @"\StreamingAssets\vlist.txt");
+        if (flinfo.Exists)
+        {
+            File.Delete(Application.dataPath + @"\StreamingAssets\vlist.txt");
+        }
+
         CopyDirectory(Application.dataPath + @"\StreamingAssets\", @"D:\uppp\OpenRPG\OpenRPG_Data\StreamingAssets\", true);
 
         try
@@ -77,7 +83,17 @@ public static class CopyData
                 {
                     FileInfo flinfo = new FileInfo(fls);
                     if (flinfo.Extension != ".meta")
+                    {
                         flinfo.CopyTo(DestinationPath + flinfo.Name, overwriteexisting);
+
+                        //if (flinfo.DirectoryName.Equals((Application.dataPath + @"\StreamingAssets\Lua").Replace("/", @"\")))
+                        //{
+                        //    using (System.IO.StreamWriter file = new System.IO.StreamWriter(Application.dataPath + @"\StreamingAssets\vlist.txt", true))
+                        //    {
+                        //        file.WriteLine(fls.Replace(Application.dataPath + @"\StreamingAssets\", ""));
+                        //    }
+                        //}
+                    }
                 }
                 foreach (string drs in Directory.GetDirectories(SourcePath))
                 {

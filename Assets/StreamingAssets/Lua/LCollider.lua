@@ -831,6 +831,10 @@ function LColliderBDY:BDYFixedUpdate()
 	return isGround
 end
 
+-- function LColliderBDY:BDYFixedUpdate()
+
+-- end
+
 -- function LColliderBDY:BDYFixedUpdate2D3D(velocity, weight)
 -- 	local isGround = nil
 -- 	local isCeiling = false

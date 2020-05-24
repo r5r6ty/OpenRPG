@@ -1,7 +1,8 @@
 local LMap = require "LMap"
 local utils = require "LUtils"
-require "LObject_Gun"
-require "LUIObject"
+require "LCollider"
+-- require "LObject_Gun"
+-- require "LUIObject"
 
 require "LPlayer"
 
@@ -344,7 +345,7 @@ function start()
         ecs.addComponent(id1, "State", "aim")
         ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 - 10, 0, 0, 0, 2)
         ecs.addComponent(id1, "BDY")
-        ecs.addComponent(id1, "AI")
+        -- ecs.addComponent(id1, "AI")
         ecs.addComponent(id1, "Target", ppp)
         ecs.addComponent(id1, "Gravity")
         local eee = ecs.applyEntity(id1)

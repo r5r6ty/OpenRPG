@@ -443,6 +443,9 @@
 						},
 						{
 							"component": "Target"
+						},
+						{
+							"component": "Gravity"
 						}
 					],
 					"active": true
@@ -3597,14 +3600,14 @@
 							"json": {
 								"x": 24,
 								"y": -1,
-								"x2": 30,
-								"y2": 0,
+								"x2": 0,
+								"y2": 30,
 								"z2": 0,
 								"state": "bullet",
 								"animation": "chase_bullet",
 								"id": "9",
 								"amount": 12,
-								"precise": 180
+								"precise": 360
 							}
 						},
 						{
@@ -3739,7 +3742,7 @@
 							"category": "MoveToTarget",
 							"active": true,
 							"json": {
-								"speed": 1
+								"speed": 0.1
 							}
 						},
 						{
@@ -4055,8 +4058,8 @@
 							"json": {
 								"x": 21,
 								"y": -2,
-								"x2": 5,
-								"y2": 5,
+								"x2": 0,
+								"y2": 30,
 								"z2": 0,
 								"state": "bullet",
 								"animation": "chase_bullet",

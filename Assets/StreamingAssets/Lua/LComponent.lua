@@ -169,7 +169,7 @@ ecs.registerComponent("Physics", 0, function(self, x, y, z, vx, vy, vz, t)
     -- self.physics_object.transform.localScale = CS.UnityEngine.Vector3.one
 
     self.rigidbody = self.physics_object:AddComponent(typeof(CS.UnityEngine.Rigidbody))
-    -- self.rigidbody.useGravity = false
+    self.rigidbody.useGravity = false
     self.rigidbody.isKinematic = true
     -- self.rigidbody.detectCollisions = false
     self.rigidbody.freezeRotation = true

@@ -6,6 +6,8 @@ require "LCollider"
 
 require "LPlayer"
 
+utils = utils
+
 local readCharacterData
 
 local k1, k2, k3 = nil
@@ -29,6 +31,7 @@ local _fixedUpdate
 local luaBehaviour = nil
 
 local console = nil
+local console_input = nil
 
 local LObject_bit
 local UI_bit
@@ -44,6 +47,10 @@ function start()
     if console:Initialize() then
         console:SetTitle("OpenRPG Debug Window")
         CS.TestConsole.Start2()
+        console_input = CS.ConsoleTestWindows.ConsoleInput()
+        console_input.OnInputText = function(str)
+            load(str, "run", "t", self:GetComponent(typeof(CS.XLuaTest.LuaBehaviour)).scriptEnv)()
+        end
     end
 
     print("lua start...")
@@ -345,7 +352,7 @@ function start()
         ecs.addComponent(id1, "State", "aim")
         ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 - 10, 0, 0, 0, 2)
         ecs.addComponent(id1, "BDY")
-        -- ecs.addComponent(id1, "AI")
+        ecs.addComponent(id1, "AI")
         ecs.addComponent(id1, "Target", ppp)
         ecs.addComponent(id1, "Gravity")
         local eee = ecs.applyEntity(id1)
@@ -445,6 +452,8 @@ function update()
     for _, v in ipairs(_update) do
         ecs.processMultipleSystem(v)
     end
+
+    console_input:Update()
 end
 
 function lateupdate()

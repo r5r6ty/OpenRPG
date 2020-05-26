@@ -9,7 +9,7 @@ namespace ConsoleTestWindows
 	public class ConsoleInput
 	{
 		//public delegate void InputText( string strInput );
-		public event System.Action<string> OnInputText;
+		public Action<string> OnInputText;
 		public string inputString;
 
 		public void ClearLine()
@@ -23,13 +23,13 @@ namespace ConsoleTestWindows
 
 		public void RedrawInputLine()
 		{
-			if (inputString.Length == 0) return;
+			// if (inputString.Length == 0) return;
 
 			if (Console.CursorLeft > 0)
 				ClearLine();
 
 			System.Console.ForegroundColor = ConsoleColor.Green;
-			System.Console.Write(inputString);
+			System.Console.Write("> " + inputString);
 		}
 
 		internal void OnBackspace()
@@ -57,7 +57,19 @@ namespace ConsoleTestWindows
 
 			if (OnInputText != null)
 			{
-				OnInputText(strtext);
+				try
+				{
+					OnInputText(strtext);
+				}
+				catch(System.Exception e)
+				{
+					System.Console.ForegroundColor = ConsoleColor.Red;
+					Debug.Log(e.Message);
+				}
+				finally
+				{
+					System.Console.ForegroundColor = ConsoleColor.White;
+				}
 			}
 		}
 

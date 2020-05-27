@@ -100,4 +100,9 @@ public class TestConsole : MonoBehaviour
     {
         Application.logMessageReceived += HandleLog2;
     }
+
+    public static void End2()
+    {
+        Application.logMessageReceived -= HandleLog2;
+    }
 }

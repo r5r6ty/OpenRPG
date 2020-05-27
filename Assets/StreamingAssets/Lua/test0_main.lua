@@ -32,6 +32,7 @@ local luaBehaviour = nil
 
 local console = nil
 local console_input = nil
+local isconsole = false
 
 local LObject_bit
 local UI_bit
@@ -51,6 +52,7 @@ function start()
         console_input.OnInputText = function(str)
             load(str, "run", "t", self:GetComponent(typeof(CS.XLuaTest.LuaBehaviour)).scriptEnv)()
         end
+        isconsole = true
     end
 
     print("lua start...")
@@ -270,16 +272,16 @@ function start()
     _update = {"JudgePlayerSystem", "AnimationSystem1", "StateUpdateSystem", "AnimationSystem2", "SpriteRenderSystem", "LineRenderSystem", "JudgeAISystem"}
     _fixedUpdate = {"StateFxiedUpdateSystem", "BDYSystem", "ATKSystem", "ResetAISystem", "ResetPlayerSystem", "SleepSystem"} -- , "PhysicsSystem"
 
-    -- -- 创建一个实体
-    -- for i = 1, 1, 1 do
-    --     local id1 = ecs.newEntity()
-    --     ecs.addComponent(id1, "Active")
-    --     ecs.addComponent(id1, "DataBase", 9)
-    --     ecs.addComponent(id1, "Image", nil)
-    --     ecs.addComponent(id1, "Animation", "cursor_test")
-    --     ecs.addComponent(id1, "State", "cursor_test")
-    --     ecs.applyEntity(id1)
-    -- end
+    -- 创建一个实体
+    for i = 1, 1, 1 do
+        local id1 = ecs.newEntity()
+        ecs.addComponent(id1, "Active")
+        ecs.addComponent(id1, "DataBase", 9)
+        ecs.addComponent(id1, "Image", nil)
+        ecs.addComponent(id1, "Animation", "cursor_test")
+        ecs.addComponent(id1, "State", "cursor_test")
+        ecs.applyEntity(id1)
+    end
 
     local ppp
     -- 创建一个实体
@@ -453,7 +455,9 @@ function update()
         ecs.processMultipleSystem(v)
     end
 
-    console_input:Update()
+    if isconsole then
+        console_input:Update()
+    end
 end
 
 function lateupdate()
@@ -542,7 +546,10 @@ end
 
 function ondestroy()
     print("lua destroy")
-    console:Shutdown()
+    if isconsole then
+        console:Shutdown()
+        CS.TestConsole.End2()
+    end
 end
 
 function readCharacterData()

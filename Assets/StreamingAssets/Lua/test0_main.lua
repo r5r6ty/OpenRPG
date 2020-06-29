@@ -16,7 +16,7 @@ local curve = nil
 local moveSpeed = 32
 local camera = nil
 
-local zoom = 2
+local zoom = 1
 local dataTable = nil
 
 local mychar = nil

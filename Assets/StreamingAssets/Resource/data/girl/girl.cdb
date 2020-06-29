@@ -4586,6 +4586,9 @@
 					"name": "SpriteRenderer"
 				},
 				{
+					"name": "Spine"
+				},
+				{
 					"name": "TrailRenderer"
 				},
 				{

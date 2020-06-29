@@ -74,6 +74,27 @@ end, function (self)
     self.rotation_velocity = nil
 end)
 
+ecs.registerComponent("Spine", ecs.allOf("DataBase"), function(self)
+    local skeletonJson = CS.UnityEngine.TextAsset(utils.openFileText(CS.UnityEngine.Application.dataPath .. "spineboy-unity.json"))
+    local atlasText = CS.UnityEngine.TextAsset(utils.openFileText(CS.UnityEngine.Application.dataPath .. "spineboy.atlas.txt"))
+    local textures = 
+    local materialPropertySource = 
+    self.runtimeAtlasAsset = CS.Spine.Unity.SpineAtlasAsset.CreateRuntimeInstance(atlasText, textures, materialPropertySource, true)
+    self.runtimeSkeletonDataAsset = CS.Spine.Unity.SkeletonDataAsset.CreateRuntimeInstance(skeletonJson, self.runtimeAtlasAsset, true)
+    self.runtimeSkeletonDataAsset:GetSkeletonData(false) -- preload.
+    self.runtimeSkeletonAnimation = CS.Spine.Unity.SkeletonAnimation.NewSkeletonAnimationGameObject(self.runtimeSkeletonDataAsset)
+
+    -- Extra Stuff
+    self.runtimeSkeletonAnimation:Initialize(false)
+    self.runtimeSkeletonAnimation.Skeleton:SetSkin("base")
+    self.runtimeSkeletonAnimation.Skeleton:SetSlotsToSetupPose()
+    self.runtimeSkeletonAnimation.AnimationState:SetAnimation(0, "run", true)
+    self.runtimeSkeletonAnimation:GetComponent(typeof(CS.UnityEngine.MeshRenderer)).sortingOrder = 10
+    -- self.runtimeSkeletonAnimation.transform.Translate(Vector3.down * 2)
+end, function (self)
+
+end) 
+
 ecs.registerComponent("TrailRenderer", ecs.allOf("SpriteRenderer"), function(self)
 	self.trailRenderer = self.pic_offset_object:AddComponent(typeof(CS.UnityEngine.TrailRenderer))
     -- self.trailRenderer.enabled = false

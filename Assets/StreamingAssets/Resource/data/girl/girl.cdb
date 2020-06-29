@@ -705,16 +705,24 @@
 		{
 			"lines": [
 				{
+					"file": "palettes/n_pal1.pal",
+					"color": 0,
+					"active": true
+				},
+				{
 					"file": "palettes/pal1.pal",
-					"color": 16711680
+					"color": 16711680,
+					"active": false
 				},
 				{
 					"file": "palettes/pal2.pal",
-					"color": 16170751
+					"color": 16170751,
+					"active": false
 				},
 				{
 					"file": "palettes/pal3.pal",
-					"color": 16639
+					"color": 16639,
+					"active": false
 				}
 			],
 			"props": [],
@@ -728,6 +736,10 @@
 				{
 					"name": "color",
 					"typeStr": "11"
+				},
+				{
+					"typeStr": "2",
+					"name": "active"
 				}
 			]
 		},
@@ -1833,11 +1845,32 @@
 					"comment": "",
 					"necessary": [],
 					"optional": []
+				},
+				{
+					"id": "Bone",
+					"color": 0,
+					"comment": "",
+					"necessary": [],
+					"optional": []
+				},
+				{
+					"id": "Wait",
+					"color": 0,
+					"comment": "",
+					"necessary": [],
+					"optional": []
+				},
+				{
+					"id": "FlipX",
+					"color": 0,
+					"comment": "",
+					"necessary": [],
+					"optional": []
 				}
 			],
 			"props": [],
 			"separators": [
-				34
+				37
 			],
 			"name": "frameType",
 			"columns": [
@@ -3039,6 +3072,1430 @@
 							"horizontalAlignment": 0
 						}
 					]
+				},
+				{
+					"name": "hand1",
+					"clips": [
+						{
+							"category": "Sprite",
+							"sprite": "f94b0a6a82cc22af16b3115bae895d27",
+							"wait": 6000,
+							"x": 0,
+							"y": -1
+						}
+					]
+				},
+				{
+					"name": "hand2",
+					"clips": [
+						{
+							"category": "Sprite",
+							"sprite": "bc2e707b10926f054989e2e1544924e8",
+							"wait": 6000,
+							"x": 0,
+							"y": -1
+						}
+					]
+				},
+				{
+					"name": "leg1",
+					"clips": [
+						{
+							"category": "Sprite",
+							"sprite": "e4fcde2f3f753aefe7deb59bd845432a",
+							"wait": 6000,
+							"x": 0,
+							"y": -1
+						}
+					]
+				},
+				{
+					"name": "leg2",
+					"clips": [
+						{
+							"category": "Sprite",
+							"sprite": "80d0ea30d16d75113f3e549fb9570b1b",
+							"wait": 6000,
+							"x": 0,
+							"y": -1
+						}
+					]
+				},
+				{
+					"name": "head_f",
+					"clips": [
+						{
+							"category": "Sprite",
+							"sprite": "fc7aeca7e4892dfa311a1246922f2db6",
+							"wait": 6000,
+							"x": -8,
+							"y": -13
+						}
+					]
+				},
+				{
+					"name": "head_b",
+					"clips": [
+						{
+							"category": "Sprite",
+							"sprite": "76f232c635b9eec6e9d8d3668088121d",
+							"wait": 6000,
+							"x": -8,
+							"y": -13
+						}
+					]
+				},
+				{
+					"name": "body_f",
+					"clips": [
+						{
+							"category": "Sprite",
+							"sprite": "5f2900dd74563c9a9c7ba2301dcc523f",
+							"wait": 6000,
+							"x": -4,
+							"y": -4
+						}
+					]
+				},
+				{
+					"name": "body_b",
+					"clips": [
+						{
+							"category": "Sprite",
+							"sprite": "952cc5bee5100ef16b47e1fb3e3cc550",
+							"wait": 6000,
+							"x": -4,
+							"y": -4
+						}
+					]
+				},
+				{
+					"name": "hand1_HI",
+					"clips": [
+						{
+							"x": 0,
+							"y": -1,
+							"width": 6,
+							"height": 2,
+							"id": "0",
+							"bodyFlags": 3,
+							"layers": "16"
+						},
+						{
+							"category": "Sprite",
+							"sprite": "2bad8640abf59fa3fa76e683b3b659fb",
+							"wait": 5,
+							"x": 0,
+							"y": -1
+						},
+						{
+							"category": "Sprite",
+							"sprite": "f94b0a6a82cc22af16b3115bae895d27",
+							"wait": 5,
+							"x": 0,
+							"y": -1
+						}
+					]
+				},
+				{
+					"name": "hand2_HI",
+					"clips": [
+						{
+							"x": 0,
+							"y": -1,
+							"width": 6,
+							"height": 2,
+							"id": "0",
+							"bodyFlags": 3,
+							"layers": "16"
+						},
+						{
+							"category": "Sprite",
+							"sprite": "a6b90ccebbdf4a9b2bbfb35a562922ae",
+							"wait": 5,
+							"x": 0,
+							"y": -1
+						},
+						{
+							"category": "Sprite",
+							"sprite": "bc2e707b10926f054989e2e1544924e8",
+							"wait": 5,
+							"x": 0,
+							"y": -1
+						}
+					]
+				},
+				{
+					"name": "leg1_HI",
+					"clips": [
+						{
+							"category": "Sprite",
+							"sprite": "673fa99740df13e15879beaa79cd752d",
+							"wait": 6000,
+							"x": 0,
+							"y": -1
+						}
+					]
+				},
+				{
+					"name": "leg2_HI",
+					"clips": [
+						{
+							"category": "Sprite",
+							"sprite": "1a6d440b9499165c68e4bb5b667a7094",
+							"wait": 6000,
+							"x": 0,
+							"y": -1
+						}
+					]
+				},
+				{
+					"name": "head_HI_f",
+					"clips": [
+						{
+							"category": "Sprite",
+							"sprite": "94dc1fe6a800c2b985dea5b44e167229",
+							"wait": 6000,
+							"x": -23,
+							"y": -17
+						}
+					]
+				},
+				{
+					"name": "head_HI_b",
+					"clips": [
+						{
+							"category": "Sprite",
+							"sprite": "33155158c95ffe82bb049c43f3d087f7",
+							"wait": 6000,
+							"x": -23,
+							"y": -17
+						}
+					]
+				},
+				{
+					"name": "body_HI_f",
+					"clips": [
+						{
+							"category": "Sprite",
+							"sprite": "8d61dd54000d842b93a5b9157a6f7907",
+							"wait": 6000,
+							"x": -6,
+							"y": -4
+						}
+					]
+				},
+				{
+					"name": "body_HI_b",
+					"clips": [
+						{
+							"category": "Sprite",
+							"sprite": "200f753c6889716fcb1c3e3dc8d54ac4",
+							"wait": 6000,
+							"x": -6,
+							"y": -4
+						}
+					]
+				},
+				{
+					"name": "new_body_idle_front",
+					"clips": [
+						{
+							"category": "Body",
+							"x": -4,
+							"y": -25,
+							"width": 8,
+							"height": 25,
+							"id": "0",
+							"bodyFlags": 3,
+							"layers": "16"
+						},
+						{
+							"id": "head",
+							"layer": -1,
+							"x": 0,
+							"y": 14,
+							"rotation": 0,
+							"animation": "head_HI_f",
+							"category": "Child"
+						},
+						{
+							"id": "body",
+							"layer": 0,
+							"x": 0,
+							"y": 10,
+							"rotation": 0,
+							"animation": "body_HI_f",
+							"category": "Child"
+						},
+						{
+							"id": "leg1",
+							"layer": 1,
+							"x": -2,
+							"y": 6,
+							"rotation": -90,
+							"direction_x": 1,
+							"category": "Child"
+						},
+						{
+							"id": "leg2",
+							"layer": 2,
+							"x": 3,
+							"y": 6,
+							"rotation": -90,
+							"direction_x": 1,
+							"category": "Child"
+						},
+						{
+							"id": "hand1",
+							"layer": -2,
+							"x": -2,
+							"y": 13,
+							"rotation": -135,
+							"direction_x": 1,
+							"category": "Child"
+						},
+						{
+							"id": "hand2",
+							"layer": 3,
+							"x": 3,
+							"y": 13,
+							"rotation": -45,
+							"direction_x": 1,
+							"category": "Child"
+						},
+						{
+							"category": "Wait",
+							"wait": 6000
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 13,
+							"id": "head",
+							"animation": "head_f",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 9,
+							"id": "body",
+							"animation": "body_f",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 6,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 6,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 12,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -120,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 12,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -60,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 15
+						}
+					]
+				},
+				{
+					"name": "new_body_idle_back",
+					"clips": [
+						{
+							"category": "Body",
+							"x": -4,
+							"y": -25,
+							"width": 8,
+							"height": 25,
+							"id": "0",
+							"bodyFlags": 3,
+							"layers": "16"
+						},
+						{
+							"id": "head",
+							"layer": -1,
+							"x": 0,
+							"y": 14,
+							"rotation": 0,
+							"animation": "head_HI_b",
+							"category": "Child"
+						},
+						{
+							"id": "body",
+							"layer": 0,
+							"x": 0,
+							"y": 10,
+							"rotation": 0,
+							"animation": "body_HI_b",
+							"category": "Child"
+						},
+						{
+							"id": "leg1",
+							"layer": 1,
+							"x": 3,
+							"y": 6,
+							"rotation": -90,
+							"direction_x": 1,
+							"category": "Child"
+						},
+						{
+							"id": "leg2",
+							"layer": 2,
+							"x": -2,
+							"y": 6,
+							"rotation": -90,
+							"direction_x": 1,
+							"category": "Child"
+						},
+						{
+							"id": "hand1",
+							"layer": -2,
+							"x": 3,
+							"y": 13,
+							"rotation": -45,
+							"direction_x": 1,
+							"category": "Child"
+						},
+						{
+							"id": "hand2",
+							"layer": 3,
+							"x": -2,
+							"y": 13,
+							"rotation": -135,
+							"direction_x": 1,
+							"category": "Child"
+						},
+						{
+							"category": "Wait",
+							"wait": 6000
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 13,
+							"id": "head",
+							"animation": "head_b",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 9,
+							"id": "body",
+							"animation": "body_b",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 6,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 6,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 12,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -60,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 12,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -120,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 15
+						}
+					]
+				},
+				{
+					"name": "new_body_run_front",
+					"clips": [
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 14,
+							"id": "head",
+							"animation": "head_HI_f",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 10,
+							"id": "body",
+							"animation": "body_HI_f",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": -1,
+							"y": 6,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 6,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 13,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -150,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 13,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -30,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 14,
+							"id": "head",
+							"animation": "head_HI_f",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 10,
+							"id": "body",
+							"animation": "body_HI_f",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 6,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 6,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -120,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 13,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 13,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -45,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 15,
+							"id": "head",
+							"animation": "head_HI_f",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 11,
+							"id": "body",
+							"animation": "body_HI_f",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": -1,
+							"y": 7,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 2,
+							"y": 8,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 14,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 14,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -45,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 15,
+							"id": "head",
+							"animation": "head_HI_f",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 11,
+							"id": "body",
+							"animation": "body_HI_f",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": -1,
+							"y": 7,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 2,
+							"y": 7,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -60,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 14,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -150,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 14,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -30,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 14,
+							"id": "head",
+							"animation": "head_HI_f",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 10,
+							"id": "body",
+							"animation": "body_HI_f",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 6,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 2,
+							"y": 6,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 13,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -150,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 13,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -30,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 14,
+							"id": "head",
+							"animation": "head_HI_f",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 10,
+							"id": "body",
+							"animation": "body_HI_f",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 6,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -120,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 1,
+							"y": 6,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 13,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 13,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -45,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 15,
+							"id": "head",
+							"animation": "head_HI_f",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 11,
+							"id": "body",
+							"animation": "body_HI_f",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": -1,
+							"y": 8,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 2,
+							"y": 7,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 14,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 14,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -45,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 15,
+							"id": "head",
+							"animation": "head_HI_f",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 11,
+							"id": "body",
+							"animation": "body_HI_f",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": -1,
+							"y": 7,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -60,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 2,
+							"y": 7,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 14,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -150,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 14,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -30,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						}
+					]
+				},
+				{
+					"name": "new_body_run_back",
+					"clips": [
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 14,
+							"id": "head",
+							"animation": "head_HI_b",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 10,
+							"id": "body",
+							"animation": "body_HI_b",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 6,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 6,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 13,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -30,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 13,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -150,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 14,
+							"id": "head",
+							"animation": "head_HI_b",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 10,
+							"id": "body",
+							"animation": "body_HI_b",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 6,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 6,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -120,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 13,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -45,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 13,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 15,
+							"id": "head",
+							"animation": "head_HI_b",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 11,
+							"id": "body",
+							"animation": "body_HI_b",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 2,
+							"y": 7,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -1,
+							"y": 8,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 14,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -45,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 14,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 15,
+							"id": "head",
+							"animation": "head_HI_b",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 11,
+							"id": "body",
+							"animation": "body_HI_b",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 2,
+							"y": 7,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -1,
+							"y": 7,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -60,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 14,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -30,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 14,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -150,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 14,
+							"id": "head",
+							"animation": "head_HI_b",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 10,
+							"id": "body",
+							"animation": "body_HI_b",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 1,
+							"y": 6,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 6,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 13,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -30,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 13,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -150,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 14,
+							"id": "head",
+							"animation": "head_HI_b",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 10,
+							"id": "body",
+							"animation": "body_HI_b",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 1,
+							"y": 6,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -120,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 6,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 13,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -45,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 13,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 15,
+							"id": "head",
+							"animation": "head_HI_b",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 11,
+							"id": "body",
+							"animation": "body_HI_b",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": -1,
+							"y": 8,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -90,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 7,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 14,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -45,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 14,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 15,
+							"id": "head",
+							"animation": "head_HI_b",
+							"layer": -1,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 11,
+							"id": "body",
+							"animation": "body_HI_b",
+							"layer": 0,
+							"rotation": 0
+						},
+						{
+							"category": "Child",
+							"x": -1,
+							"y": 7,
+							"id": "leg1",
+							"layer": 1,
+							"rotation": -60,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 0,
+							"y": 7,
+							"id": "leg2",
+							"layer": 2,
+							"rotation": -135,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": 3,
+							"y": 14,
+							"id": "hand1",
+							"layer": -2,
+							"rotation": -30,
+							"direction_x": 1
+						},
+						{
+							"category": "Child",
+							"x": -2,
+							"y": 14,
+							"id": "hand2",
+							"layer": 3,
+							"rotation": -150,
+							"direction_x": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 5
+						}
+					]
 				}
 			],
 			"separators": [],
@@ -3084,50 +4541,50 @@
 						{
 							"category": "State",
 							"active": true,
-							"trigger": "this.controller ~= nil and this.controller.commands[\"walk\"].UIActive ~= nil and this.state ~= \"run\"",
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walk\"].UIActive ~= nil and this.state ~= \"new_run\"",
 							"json": {
-								"state": "run"
+								"state": "new_run"
 							}
 						},
 						{
 							"category": "State",
 							"active": true,
 							"json": {
-								"state": "aim"
+								"state": "new_aim"
 							},
-							"trigger": "this.controller ~= nil and this.controller.commands[\"walk2idle\"].UIActive ~= nil and this.state == \"run\""
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walk2idle\"].UIActive ~= nil and this.state == \"new_run\""
 						},
 						{
 							"category": "State",
 							"active": true,
 							"json": {
-								"state": "run"
+								"state": "new_run"
 							},
-							"trigger": "this.controller ~= nil and this.controller.commands[\"walkU\"].UIActive ~= nil and this.state ~= \"run\""
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walkU\"].UIActive ~= nil and this.state ~= \"new_run\""
 						},
 						{
 							"category": "State",
 							"active": true,
 							"json": {
-								"state": "aim"
+								"state": "new_aim"
 							},
-							"trigger": "this.controller ~= nil and this.controller.commands[\"walkU2idle\"].UIActive ~= nil and this.state == \"run\""
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walkU2idle\"].UIActive ~= nil and this.state == \"new_run\""
 						},
 						{
 							"category": "State",
 							"active": true,
 							"json": {
-								"state": "run"
+								"state": "new_run"
 							},
-							"trigger": "this.controller ~= nil and this.controller.commands[\"walkD\"].UIActive ~= nil and this.state ~= \"run\""
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walkD\"].UIActive ~= nil and this.state ~= \"new_run\""
 						},
 						{
 							"category": "State",
 							"active": true,
 							"json": {
-								"state": "aim"
+								"state": "new_aim"
 							},
-							"trigger": "this.controller ~= nil and this.controller.commands[\"walkD2idle\"].UIActive ~= nil and this.state == \"run\""
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walkD2idle\"].UIActive ~= nil and this.state == \"new_run\""
 						}
 					],
 					"Exit": [],
@@ -3499,11 +4956,11 @@
 				},
 				{
 					"name": "right_aim_hand",
-					"animation": "aim_right_hand",
+					"animation": "hand1_HI",
 					"update": [
 						{
 							"category": "TurnToTarget",
-							"active": true,
+							"active": false,
 							"json": {
 								"x": 24,
 								"y": -2,
@@ -3514,7 +4971,7 @@
 							"category": "Child",
 							"active": true,
 							"json": {
-								"layer": 1,
+								"layer": -1,
 								"x": 8,
 								"y": 1,
 								"rotation": 0,
@@ -3528,11 +4985,11 @@
 				},
 				{
 					"name": "left_aim_hand",
-					"animation": "aim_right_hand",
+					"animation": "hand2_HI",
 					"update": [
 						{
 							"category": "TurnToTarget",
-							"active": true,
+							"active": false,
 							"json": {
 								"x": 24,
 								"y": -2,
@@ -3543,7 +5000,7 @@
 							"category": "Child",
 							"active": true,
 							"json": {
-								"layer": -1,
+								"layer": 1,
 								"x": 8,
 								"y": 1,
 								"rotation": 0,
@@ -4258,6 +5715,168 @@
 							"json": "this."
 						}
 					]
+				},
+				{
+					"name": "new_aim",
+					"entry": [],
+					"Exit": [],
+					"update": [
+						{
+							"category": "Animation",
+							"active": true,
+							"json": {
+								"animation": "new_body_idle_back"
+							},
+							"trigger": "this.action == \"new_body_idle_front\" and this.target ~= nil and getPosZ(this.target.physics_object_id) >= getPosZ(this.physics_object_id)"
+						},
+						{
+							"category": "Set",
+							"active": true,
+							"trigger": "0",
+							"json": "this.direction.z = -1"
+						},
+						{
+							"category": "Animation",
+							"active": true,
+							"json": {
+								"animation": "new_body_idle_front"
+							},
+							"trigger": "this.action == \"new_body_idle_back\" and this.target ~= nil and getPosZ(this.target.physics_object_id) < getPosZ(this.physics_object_id)"
+						},
+						{
+							"category": "Set",
+							"active": true,
+							"trigger": "2",
+							"json": "this.direction.z = 1"
+						},
+						{
+							"category": "FlipX",
+							"active": true,
+							"json": {
+								"direction_x": 1
+							},
+							"trigger": "this.direction.x == -1 and this.target ~= nil and getPosX(this.physics_object_id) - getPosX(this.target.physics_object_id) < 0"
+						},
+						{
+							"category": "FlipX",
+							"active": true,
+							"json": {
+								"direction_x": -1
+							},
+							"trigger": "this.direction.x == 1 and this.target ~= nil and getPosX(this.physics_object_id) - getPosX(this.target.physics_object_id) >= 0"
+						}
+					],
+					"fixedUpdate": [
+						{
+							"category": "Move",
+							"active": true,
+							"json": {}
+						},
+						{
+							"category": "Move",
+							"active": false,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"jump\"].UIActive ~= nil"
+						},
+						{
+							"category": "Set",
+							"active": true,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"changeWeapon\"].UIActive ~= nil",
+							"json": "local p = this.children['1'].children['0'] this.children['1'].children['0'] = this.children['2'] this.children['1'].children['0'].rotation = 0 this.children['1'].children['0'].direction.x = 1 this.children['1'].children['0']:SetParentAndRoot(this.children['1']) this.children['2'] = p this.children['2']:SetParentAndRoot(this)"
+						}
+					],
+					"animation": "new_body_idle_front"
+				},
+				{
+					"name": "new_run",
+					"entry": [],
+					"Exit": [],
+					"update": [
+						{
+							"category": "Animation",
+							"active": true,
+							"trigger": "this.action == \"new_body_run_front\" and this.target ~= nil and getPosZ(this.target.physics_object_id) >= getPosZ(this.physics_object_id)",
+							"json": {
+								"animation": "new_body_run_back"
+							}
+						},
+						{
+							"category": "Set",
+							"active": true,
+							"json": "this.direction.z = -1",
+							"trigger": "0"
+						},
+						{
+							"category": "Animation",
+							"active": true,
+							"trigger": "this.action == \"new_body_run_back\" and this.target ~= nil and getPosZ(this.target.physics_object_id) < getPosZ(this.physics_object_id)",
+							"json": {
+								"animation": "new_body_run_front"
+							}
+						},
+						{
+							"category": "Set",
+							"active": true,
+							"json": "this.direction.z = 1",
+							"trigger": "2"
+						},
+						{
+							"category": "FlipX",
+							"active": true,
+							"trigger": "this.direction.x == -1 and this.target ~= nil and getPosX(this.physics_object_id) - getPosX(this.target.physics_object_id) < 0",
+							"json": {
+								"direction_x": 1
+							}
+						},
+						{
+							"category": "FlipX",
+							"active": true,
+							"trigger": "this.direction.x == 1 and this.target ~= nil and getPosX(this.physics_object_id) - getPosX(this.target.physics_object_id) >= 0",
+							"json": {
+								"direction_x": -1
+							}
+						}
+					],
+					"fixedUpdate": [
+						{
+							"category": "Move",
+							"active": true,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walk\"].UIActive ~= nil and this.controller.commands[\"walk\"].UIActive == 1",
+							"json": {
+								"x": 1
+							}
+						},
+						{
+							"category": "Move",
+							"active": true,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walk\"].UIActive ~= nil and this.controller.commands[\"walk\"].UIActive == -1",
+							"json": {
+								"x": -1
+							}
+						},
+						{
+							"category": "Move",
+							"active": true,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walkU\"].UIActive ~= nil",
+							"json": {
+								"z": 1
+							}
+						},
+						{
+							"category": "Move",
+							"active": true,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walkD\"].UIActive ~= nil",
+							"json": {
+								"z": -1
+							}
+						},
+						{
+							"category": "Set",
+							"active": true,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"changeWeapon\"].UIActive ~= nil",
+							"json": "local p = this.children['1'].children['0'] this.children['1'].children['0'] = this.children['2'] this.children['1'].children['0'].rotation = 0 this.children['1'].children['0'].direction.x = 1 this.children['1'].children['0']:SetParentAndRoot(this.children['1']) this.children['2'] = p this.children['2']:SetParentAndRoot(this)"
+						}
+					],
+					"animation": "new_body_run_front"
 				}
 			],
 			"separators": [],
@@ -4343,6 +5962,12 @@
 					"display": null
 				},
 				{
+					"typeStr": "6:animations",
+					"name": "animation",
+					"opt": true,
+					"display": null
+				},
+				{
 					"typeStr": "3",
 					"name": "layer",
 					"opt": true
@@ -4357,6 +5982,17 @@
 					"name": "bounciness",
 					"display": 1,
 					"opt": true
+				},
+				{
+					"typeStr": "4",
+					"name": "rotation",
+					"opt": true
+				},
+				{
+					"typeStr": "3",
+					"name": "direction_x",
+					"opt": true,
+					"display": null
 				},
 				{
 					"typeStr": "6:sounds",
@@ -4584,9 +6220,6 @@
 				},
 				{
 					"name": "SpriteRenderer"
-				},
-				{
-					"name": "Spine"
 				},
 				{
 					"name": "TrailRenderer"

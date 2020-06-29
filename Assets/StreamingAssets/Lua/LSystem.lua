@@ -14,19 +14,22 @@ ecs.registerMultipleSystem("SpriteRenderSystem", function(self)
 
     local rrr_x, rrr_y, rrr_z = CS.LuaUtil.GetEulerAngles(self.physics_object_id)
     local rrr_length = utils.GetVector3Module(rrr_x, rrr_y, rrr_z)
-    if (self.root == self and self.direction.x == 1) or (self.root ~= self and self.root.direction.x * self.direction.x == 1) then
-        if rrr_length > 0 then
-            CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, 0, 360 - rrr_y + self.rotation)
-        else
-            CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, 0, 0 + self.rotation)
-        end
-    else
-        if rrr_length > 0 then
-            CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, 180, rrr_y + 180 + self.rotation)
-        else
-            CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, 180, 0 + self.rotation)
-        end
-    end
+    -- if (self.root == self and self.direction.x == 1) or (self.root ~= self and self.root.direction.x * self.direction.x == 1) then
+    --     if rrr_length > 0 then
+    --         CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, 0, 360 - rrr_y + self.rotation)
+    --     else
+    --         CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, 0, 0 + self.rotation)
+    --     end
+    -- else
+    --     if rrr_length > 0 then
+    --         CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, 180, rrr_y + 180 + self.rotation)
+    --     else
+    --         CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, 180, 0 + self.rotation)
+    --     end
+    -- end
+
+
+    CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, rrr_y, self.rotation)
 end, ecs.allOf("Active", "DataBase", "SpriteRenderer", "Physics"))
 
 -- 渲染line
@@ -347,6 +350,9 @@ ecs.registerSingleSystem("Sprite", function(this, value)
     end
 end, ecs.allOf("Active", "DataBase", "SpriteRenderer"))
 
+ecs.registerSingleSystem("Wait", function(this, value)
+end, ecs.allOf("Active", "DataBase", "SpriteRenderer"))
+
 ecs.registerSingleSystem("Image", function(this, value)
     if value.id == nil then
         this.image.sprite = this.database.sprites[value.sprite]
@@ -541,6 +547,16 @@ end)
 -- 	end
 -- end)
 
+ecs.registerSingleSystem("FlipX", function(this, value)
+    this.direction.x = value.direction_x
+
+    if this.direction.x == 1 then
+        CS.LuaUtil.SetRotationByEuler(this.physics_object_id, 0, 0, 0)
+    else
+        CS.LuaUtil.SetRotationByEuler(this.physics_object_id, 0, 180, 0)
+    end
+end, ecs.allOf("Active", "DataBase", "Physics"))
+
 ecs.registerSingleSystem("Mouse", function(this, value)
     local mousePos = CS.UnityEngine.Input.mousePosition
     -- mousePos.z = v3.z
@@ -567,8 +583,12 @@ ecs.registerSingleSystem("Child", function(this, value)
             object.rotation = value.rotation
         end
 
-        if value.direction_x ~= nil then
-            object.direction.x = value.direction_x
+        -- if value.direction_x ~= nil then
+        --     object.direction.x = value.direction_x
+        -- end
+
+        if value.animation ~= nil then
+            utils.changeAnimation(object, value.animation)
         end
 
         -- local z = value.layer / 100
@@ -577,7 +597,7 @@ ecs.registerSingleSystem("Child", function(this, value)
         -- end
         -- object.gameObject.transform.localPosition = CS.UnityEngine.Vector3(value.x / 100, value.y / 100, z)
 
-        CS.LuaUtil.SetLocalPos(object.physics_object_id, this.direction.x * value.x / 100, value.y / 100, 0)
+        CS.LuaUtil.SetLocalPos(object.physics_object_id, value.x / 100, value.y / 100, 0)
 
         object.spriteRenderer.sortingOrder = -(value.layer * this.root.direction.z - this.spriteRenderer.sortingOrder)
     end

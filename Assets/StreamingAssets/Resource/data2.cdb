@@ -2891,11 +2891,17 @@
 					"typeStr": "13",
 					"name": "file",
 					"display": null
+				},
+				{
+					"typeStr": "2",
+					"name": "active",
+					"display": null
 				}
 			],
 			"lines": [
 				{
-					"file": "map/t1.pal"
+					"file": "map/t1.pal",
+					"active": true
 				}
 			],
 			"separators": [],

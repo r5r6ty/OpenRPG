@@ -268,66 +268,68 @@ function LCastleDBMap:createPalettes()
 	local palettes_ui = {}
 	for i, v in ipairs(self:getLines("palettes")) do
 
-		local texture = CS.UnityEngine.Texture2D(256, 1, CS.UnityEngine.TextureFormat.RGBA32, false, false)
-		-- local texture = CS.UnityEngine.Texture2D(256, 1, CS.UnityEngine.Experimental.Rendering.DefaultFormat.LDR, CS.UnityEngine.Experimental.Rendering.TextureCreationFlags.None)
-		-- local texture = CS.UnityEngine.Texture2D(256, 1, CS.UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, CS.UnityEngine.Experimental.Rendering.TextureCreationFlags.None)
+		if v.active then
+			local texture = CS.UnityEngine.Texture2D(256, 1, CS.UnityEngine.TextureFormat.RGBA32, false, false)
+			-- local texture = CS.UnityEngine.Texture2D(256, 1, CS.UnityEngine.Experimental.Rendering.DefaultFormat.LDR, CS.UnityEngine.Experimental.Rendering.TextureCreationFlags.None)
+			-- local texture = CS.UnityEngine.Texture2D(256, 1, CS.UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_UNorm, CS.UnityEngine.Experimental.Rendering.TextureCreationFlags.None)
 
 
-		texture.wrapMode = CS.UnityEngine.TextureWrapMode.Clamp
-		texture.filterMode = CS.UnityEngine.FilterMode.Point
+			texture.wrapMode = CS.UnityEngine.TextureWrapMode.Clamp
+			texture.filterMode = CS.UnityEngine.FilterMode.Point
 
-		local count = 0
-		-- local file = io.open(self.DBPath .. v.file, "r")
-		-- for line in file:lines() do
-		-- 	local r, g, b = string.match(line, "(%d+) (%d+) (%d+)")
- 		-- 		print(r, g, b)
-		-- 	if r ~= nil and g ~= nil and b ~=nil then
-		-- 		if count == 0 then
-		-- 			texture:SetPixel(count, 0, CS.UnityEngine.Color(r / 255, g / 255, b / 255, 0))
-		-- 		else
-		-- 			texture:SetPixel(count, 0, CS.UnityEngine.Color(r / 255, g / 255, b / 255, 1))
-		-- 		end
-		-- 		count = count + 1
-		-- 	end
-		-- end
-		-- io.close(file)
+			local count = 0
+			-- local file = io.open(self.DBPath .. v.file, "r")
+			-- for line in file:lines() do
+			-- 	local r, g, b = string.match(line, "(%d+) (%d+) (%d+)")
+			-- 		print(r, g, b)
+			-- 	if r ~= nil and g ~= nil and b ~=nil then
+			-- 		if count == 0 then
+			-- 			texture:SetPixel(count, 0, CS.UnityEngine.Color(r / 255, g / 255, b / 255, 0))
+			-- 		else
+			-- 			texture:SetPixel(count, 0, CS.UnityEngine.Color(r / 255, g / 255, b / 255, 1))
+			-- 		end
+			-- 		count = count + 1
+			-- 	end
+			-- end
+			-- io.close(file)
 
 
-		local str = utils.openFileText(self.DBPath .. v.file)
+			local str = utils.openFileText(self.DBPath .. v.file)
 
-		local p = utils.split(str, "\n")
-		for i2, v2 in ipairs(p) do
-			local r, g, b = string.match(v2, "(%d+) (%d+) (%d+)")
-			if r ~= nil and g ~= nil and b ~= nil then
-				if count == 0 or count == 255 then
-					texture:SetPixel(count, 0, CS.UnityEngine.Color(r / 255, g / 255, b / 255, 0))
-				else
-					texture:SetPixel(count, 0, CS.UnityEngine.Color(r / 255, g / 255, b / 255, 1))
+			local p = utils.split(str, "\n")
+			for i2, v2 in ipairs(p) do
+				local r, g, b = string.match(v2, "(%d+) (%d+) (%d+)")
+				if r ~= nil and g ~= nil and b ~= nil then
+					if count == 0 or count == 255 then
+						texture:SetPixel(count, 0, CS.UnityEngine.Color(r / 255, g / 255, b / 255, 0))
+					else
+						texture:SetPixel(count, 0, CS.UnityEngine.Color(r / 255, g / 255, b / 255, 1))
+					end
+					count = count + 1
 				end
-				count = count + 1
 			end
+
+			texture:Apply()
+
+
+			-- local sprite = CS.UnityEngine.Sprite.Create(texture, CS.UnityEngine.Rect(0, 0, texture.width, texture.height), CS.UnityEngine.Vector2(0, 1))
+
+			local material = CS.UnityEngine.Material(utils.getShader())
+
+			-- local unityobject_child = CS.UnityEngine.GameObject("testtt")
+			-- local sr = unityobject_child:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
+			-- sr.sprite = sprite
+			-- local m = unityobject_child:GetComponent(typeof(CS.UnityEngine.Renderer)).material
+			-- m.shader = shader
+			-- m:SetTexture("_Palette", texture)
+			material:SetTexture("_Palette", texture)
+
+			table.insert(palettes, material)
+
+			local material_ui = CS.UnityEngine.Material(utils.getUIShader())
+			material_ui:SetTexture("_Palette", texture)
+			table.insert(palettes_ui, material_ui)
 		end
-
-		texture:Apply()
-
-
-		-- local sprite = CS.UnityEngine.Sprite.Create(texture, CS.UnityEngine.Rect(0, 0, texture.width, texture.height), CS.UnityEngine.Vector2(0, 1))
-
-		local material = CS.UnityEngine.Material(utils.getShader())
-
-		-- local unityobject_child = CS.UnityEngine.GameObject("testtt")
-		-- local sr = unityobject_child:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
-		-- sr.sprite = sprite
-		-- local m = unityobject_child:GetComponent(typeof(CS.UnityEngine.Renderer)).material
-		-- m.shader = shader
-		-- m:SetTexture("_Palette", texture)
-		material:SetTexture("_Palette", texture)
-
-		table.insert(palettes, material)
-
-		local material_ui = CS.UnityEngine.Material(utils.getUIShader())
-		material_ui:SetTexture("_Palette", texture)
-		table.insert(palettes_ui, material_ui)
 	end
 	return palettes, palettes_ui
 end
@@ -442,7 +444,7 @@ function LCastleDBCharacter:readDB()
 			local delayC = 0
 			for j = 0, #v.clips - 1, 1 do
 				local currentFrame = v.clips[j + 1]
-				if currentFrame.category == "Sprite" or currentFrame.category == "Trace" or currentFrame.category == "Image" or currentFrame.category == "Text" or currentFrame.category == "Button" then
+				if currentFrame.category == "Sprite" or currentFrame.category == "Wait" or currentFrame.category == "Trace" or currentFrame.category == "Image" or currentFrame.category == "Text" or currentFrame.category == "Button" then
 					if self.animations[v.name].eventQueue[delayC] == nil then
 						self.animations[v.name].eventQueue[delayC] = {}
 					end
@@ -454,7 +456,7 @@ function LCastleDBCharacter:readDB()
 					table.insert(self.animations[v.name].keyframes, delayC)
 
 					delayC = delayC + currentFrame.wait
-				elseif currentFrame.category == "Sound" or currentFrame.category == "Body" or currentFrame.category == "Attack" then
+				elseif currentFrame.category == "Sound" or currentFrame.category == "Body" or currentFrame.category == "Attack" or currentFrame.category == "Child" then
 					if self.animations[v.name].eventQueue[delayC] == nil then
 						self.animations[v.name].eventQueue[delayC] = {}
 					end

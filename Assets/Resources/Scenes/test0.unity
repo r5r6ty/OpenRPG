@@ -1049,13 +1049,14 @@ GameObject:
   - component: {fileID: 863183757}
   - component: {fileID: 863183756}
   - component: {fileID: 863183755}
+  - component: {fileID: 863183758}
   m_Layer: 0
   m_Name: New Sprite (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!61 &863183755
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1146,6 +1147,24 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &863183758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 863183754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e5f836931475b447b89744f38f01dac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skeletonJson: {fileID: 4900000, guid: 44c7ee72624c4544996c434379c9e5b6, type: 3}
+  atlasText: {fileID: 4900000, guid: 7d868e1772ea7e541ac3b32aebd291d6, type: 3}
+  textures:
+  - {fileID: 2800000, guid: f52e0c453aed7274b9383e830918fcc4, type: 3}
+  materialPropertySource: {fileID: 2100000, guid: eca33c67705bf7b4eb20f5b12fce212b,
+    type: 2}
 --- !u!1 &968810520
 GameObject:
   m_ObjectHideFlags: 0
@@ -1674,7 +1693,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1643738036
 MonoBehaviour:
   m_ObjectHideFlags: 0

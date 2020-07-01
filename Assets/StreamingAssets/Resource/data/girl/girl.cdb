@@ -6293,6 +6293,70 @@
 					"display": null
 				}
 			]
+		},
+		{
+			"name": "sprites",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "name"
+				},
+				{
+					"typeStr": "7",
+					"name": "image",
+					"display": null
+				}
+			],
+			"lines": [
+				{
+					"name": "body_f",
+					"image": "5f2900dd74563c9a9c7ba2301dcc523f"
+				},
+				{
+					"name": "head_f",
+					"image": "fc7aeca7e4892dfa311a1246922f2db6"
+				},
+				{
+					"name": "hand1",
+					"image": "f94b0a6a82cc22af16b3115bae895d27"
+				},
+				{
+					"name": "hand2",
+					"image": "bc2e707b10926f054989e2e1544924e8"
+				},
+				{
+					"name": "leg1",
+					"image": "e4fcde2f3f753aefe7deb59bd845432a"
+				},
+				{
+					"name": "leg2",
+					"image": "80d0ea30d16d75113f3e549fb9570b1b"
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "spines",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "name"
+				},
+				{
+					"typeStr": "13",
+					"name": "skeleton",
+					"display": null
+				}
+			],
+			"lines": [
+				{
+					"name": "girl",
+					"skeleton": "db/output/girl.json"
+				}
+			],
+			"separators": [],
+			"props": {}
 		}
 	],
 	"compress": false

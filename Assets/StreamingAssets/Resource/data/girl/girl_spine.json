@@ -264,7 +264,33 @@
 		}
 	},
 	"animations": {
+		"aimR": {
+			"ik": {
+				"bone_ik3": [
+					{ "time": 0, "mix": 1 }
+				],
+				"bone_ik5": [
+					{ "time": 0, "mix": 0.1 }
+				],
+				"bone_ik6": [
+					{ "time": 0, "mix": 0.2 }
+				],
+			}
+		},
 		"idle": {
+			"ik": {
+				"bone_ik2": [
+					{ "time": 0, "mix": 1 }
+				],
+				"bone_ik5": [
+					{ "time": 0, "mix": 0.1 }
+				],
+				"bone_ik6": [
+					{ "time": 0, "mix": 0.2 }
+				],
+			}
+		},
+		"aimL": {
 			"bones": {
 				"hip": {
 					"translate": [

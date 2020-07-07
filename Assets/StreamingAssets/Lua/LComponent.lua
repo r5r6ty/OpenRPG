@@ -81,6 +81,11 @@ ecs.registerComponent("SpineRenderer", ecs.allOf("DataBase"), function(self)
     CS.LuaUtil.SetlocalScale(self.spine_offset_object_id, 2, 2, 2)
 
     self.runtimeSkeletonAnimation = CS.Spine.Unity.SkeletonAnimation.NewSkeletonAnimationGameObject(self.database.spines["girl"])
+
+    self.bone = self.runtimeSkeletonAnimation.Skeleton:FindBone("crosshair")
+
+    print(self.bone.Data.Name, self.bone.active, self.bone.scaleX, self.bone.scaleY)
+
     self.runtimeSkeletonAnimation.enabled = false
     -- Extra Stuff
     self.runtimeSkeletonAnimation:Initialize(false)

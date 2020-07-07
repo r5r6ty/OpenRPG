@@ -603,6 +603,18 @@ ecs.registerSingleSystem("State", function(this, value)
     utils.changeState(this, value.state, value.spineAnimation)
 end, ecs.allOf("Active", "Animation", "State", "SpineRenderer"))
 
+ecs.registerSingleSystem("Aim", function(this, value)
+    local mousePosition = CS.UnityEngine.Input.mousePosition
+    local worldMousePosition = CS.UnityEngine.Camera.main:ScreenToWorldPoint(mousePosition)
+
+    local skeletonSpacePoint = this.runtimeSkeletonAnimation.transform:InverseTransformPoint(worldMousePosition)
+
+    skeletonSpacePoint.x = skeletonSpacePoint.x * 1 --this.runtimeSkeletonAnimation.Skeleton.ScaleX
+    skeletonSpacePoint.y = skeletonSpacePoint.y * 1 --this.runtimeSkeletonAnimation.Skeleton.ScaleY
+
+    this.bone:SetLocalPosition(skeletonSpacePoint)
+end, ecs.allOf("Active", "Animation", "State", "SpineRenderer"))
+
 ecs.registerSingleSystem("Animation", function(this, value)
     utils.changeAnimation(this, value.animation)
 end, ecs.allOf("Active", "Animation"))

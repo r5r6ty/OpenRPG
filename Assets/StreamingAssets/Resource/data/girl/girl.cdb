@@ -1866,11 +1866,18 @@
 					"comment": "",
 					"necessary": [],
 					"optional": []
+				},
+				{
+					"id": "Aim",
+					"color": 0,
+					"comment": "",
+					"necessary": [],
+					"optional": []
 				}
 			],
 			"props": [],
 			"separators": [
-				37
+				38
 			],
 			"name": "frameType",
 			"columns": [
@@ -5778,7 +5785,12 @@
 					"name": "spine_idle",
 					"entry": [],
 					"Exit": [],
-					"update": [],
+					"update": [
+						{
+							"category": "Aim",
+							"active": true
+						}
+					],
 					"fixedUpdate": [
 						{
 							"category": "Move",

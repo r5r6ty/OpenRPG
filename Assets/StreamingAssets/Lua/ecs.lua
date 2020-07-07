@@ -334,24 +334,36 @@ end
 
 local systems = {}
 
-function ecs.registerMultipleSystem(newtype, func, bit)
+function ecs.registerMultipleSystem(newtype, func, ...)
 
     assert(systems[newtype] == nil, "already exist system: " .. newtype)
-    assert(not (bit == nil and bit <= 0), "bit must > 0")
 
-    cache[bit] = cache[bit] or {}
+    local f = { ... }
+    local bits = {}
+    local entities = {}
+    for _, v in ipairs(f) do
+        assert(not (v == nil and v <= 0), "bit must > 0")
+
+        table.insert(bits, v)
+
+
+        cache[v] = cache[v] or {}
+        table.insert(entities, cache[v])
+    end
 
 	systems[newtype] = {
-        MatchedBit = bit,
-        matchedEntity = cache[bit],
+        MatchedBit = bits,
+        matchedEntity = entities,
         execute = func
     }
 end
 
 function ecs.displayMultipleSystem(newtype)
     local n = 0
-    for _, v in pairs(cache[systems[newtype].MatchedBit]) do
-        n = n + 1
+    for _, vv in ipairs(systems[newtype].MatchedBit) do
+        for _, v in pairs(cache[vv]) do
+            n = n + 1
+        end
     end
     return n
 end
@@ -368,8 +380,10 @@ end
 
 function ecs.processMultipleSystem(stype, ...)
     local system = systems[stype]
-    for _, v2 in pairs(system.matchedEntity) do
-        system.execute(v2, ...)
+    for _, v in pairs(system.matchedEntity) do
+        for _, v2 in pairs(v) do
+            system.execute(v2, ...)
+        end
     end
 end
 

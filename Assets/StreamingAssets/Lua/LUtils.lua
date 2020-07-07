@@ -711,6 +711,22 @@ function utils.changeState(self, state)
 	return false
 end
 
+function utils.changeState(self, state, spineAnimation)
+	local animation = nil
+	if state ~= nil then
+		self.state = state
+		animation = self.database.characters_state[self.state].animation
+	end
+	if animation ~= nil then
+		self.action = animation
+		self.delayCounter = 0
+		self.timeLine = 0
+		self.runtimeSkeletonAnimation.AnimationState:SetAnimation(0, self.runtimeSkeletonAnimation.skeleton.Data:FindAnimation(spineAnimation), true);
+		return true
+	end
+	return false
+end
+
 function utils.changeAnimation(self, animation)
 	if animation ~= nil then
 		self.action = animation

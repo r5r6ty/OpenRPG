@@ -74,25 +74,44 @@ end, function (self)
     self.rotation_velocity = nil
 end)
 
-ecs.registerComponent("Spine", ecs.allOf("DataBase"), function(self)
-    local skeletonJson = CS.UnityEngine.TextAsset(utils.openFileText(CS.UnityEngine.Application.dataPath .. "spineboy-unity.json"))
-    local atlasText = CS.UnityEngine.TextAsset(utils.openFileText(CS.UnityEngine.Application.dataPath .. "spineboy.atlas.txt"))
-    local textures = 
-    local materialPropertySource = 
-    self.runtimeAtlasAsset = CS.Spine.Unity.SpineAtlasAsset.CreateRuntimeInstance(atlasText, textures, materialPropertySource, true)
-    self.runtimeSkeletonDataAsset = CS.Spine.Unity.SkeletonDataAsset.CreateRuntimeInstance(skeletonJson, self.runtimeAtlasAsset, true)
-    self.runtimeSkeletonDataAsset:GetSkeletonData(false) -- preload.
-    self.runtimeSkeletonAnimation = CS.Spine.Unity.SkeletonAnimation.NewSkeletonAnimationGameObject(self.runtimeSkeletonDataAsset)
+ecs.registerComponent("SpineRenderer", ecs.allOf("DataBase"), function(self)
+    self.spine_offset_object = CS.UnityEngine.GameObject("spine_offset")
+    self.spine_offset_object_id = self.spine_offset_object:GetInstanceID()
+    CS.LuaUtil.AddGameObjectID(self.spine_offset_object_id, self.spine_offset_object)
+    CS.LuaUtil.SetlocalScale(self.spine_offset_object_id, 2, 2, 2)
 
+    self.runtimeSkeletonAnimation = CS.Spine.Unity.SkeletonAnimation.NewSkeletonAnimationGameObject(self.database.spines["girl"])
+    self.runtimeSkeletonAnimation.enabled = false
     -- Extra Stuff
     self.runtimeSkeletonAnimation:Initialize(false)
-    self.runtimeSkeletonAnimation.Skeleton:SetSkin("base")
+    -- self.runtimeSkeletonAnimation.Skeleton:SetSkin("base")
     self.runtimeSkeletonAnimation.Skeleton:SetSlotsToSetupPose()
-    self.runtimeSkeletonAnimation.AnimationState:SetAnimation(0, "run", true)
-    self.runtimeSkeletonAnimation:GetComponent(typeof(CS.UnityEngine.MeshRenderer)).sortingOrder = 10
+    self.runtimeSkeletonAnimation.AnimationState:SetAnimation(0, "idle", true)
+    -- self.runtimeSkeletonAnimation:GetComponent(typeof(CS.UnityEngine.MeshRenderer)).sortingOrder = 10
     -- self.runtimeSkeletonAnimation.transform.Translate(Vector3.down * 2)
-end, function (self)
 
+    self.spine_object = self.runtimeSkeletonAnimation.gameObject
+    self.spine_object.name = "spine"
+    self.spine_object_id = self.spine_object:GetInstanceID()
+    CS.LuaUtil.AddGameObjectID(self.spine_object_id, self.spine_object)
+    self.spine_object.transform:SetParent(self.spine_offset_object.transform, false)
+
+    self.requiresNewMesh = true
+
+    self.accumulatedTime = 0
+end, function (self)
+    CS.UnityEngine.GameObject.Destroy(self.spine_offset_object)
+    self.spine_offset_object = nil
+    CS.LuaUtil.RemoveGameObjectID(self.spine_offset_object_id)
+    self.spine_offset_object_id = nil
+    CS.UnityEngine.GameObject.Destroy(self.spine_object)
+    self.spine_object = nil
+    CS.LuaUtil.RemoveGameObjectID(self.spine_object_id)
+    self.spine_object_id = nil
+    self.runtimeSkeletonAnimation = nil
+
+    self.requiresNewMesh = nil
+    self.accumulatedTime = nil
 end) 
 
 ecs.registerComponent("TrailRenderer", ecs.allOf("SpriteRenderer"), function(self)
@@ -154,6 +173,13 @@ end, nil)
 
 ecs.registerComponent("Sound", ecs.allOf("SpriteRenderer"), function(self)
     self.audioSource = self.pic_offset_object:AddComponent(typeof(CS.UnityEngine.AudioSource))
+    self.audioSource.playOnAwake = false
+end, function (self)
+    self.audioSource = nil
+end)
+
+ecs.registerComponent("Sound", ecs.allOf("SpineRenderer"), function(self)
+    self.audioSource = self.spine_offset_object:AddComponent(typeof(CS.UnityEngine.AudioSource))
     self.audioSource.playOnAwake = false
 end, function (self)
     self.audioSource = nil

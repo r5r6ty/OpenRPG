@@ -1,0 +1,290 @@
+{
+	"skeleton": {
+		"width": 30.15,
+		"height": 34.16,
+		"fps": 24,
+		"spine": "3.6.0",
+		"hash": " "
+	},
+	"bones": [
+		{
+			"name": "root"
+		},
+		{
+			"y": 11.99,
+			"name": "hip",
+			"parent": "root"
+		},
+		{
+			"x": -1.76,
+			"y": 0.62,
+			"name": "bone_legR_ikTarget",
+			"parent": "root"
+		},
+		{
+			"x": 2.74,
+			"y": 0.47,
+			"name": "bone_legL_ikTarget",
+			"parent": "root"
+		},
+		{
+			"length": 4,
+			"x": -0.15,
+			"y": 2.34,
+			"rotation": 90.24,
+			"name": "torso",
+			"parent": "hip"
+		},
+		{
+			"length": 5,
+			"x": 2.8,
+			"y": -1.83,
+			"rotation": -90,
+			"name": "legUL",
+			"parent": "hip"
+		},
+		{
+			"length": 5,
+			"x": -2.09,
+			"y": -0.99,
+			"rotation": -89.76,
+			"name": "legUR",
+			"parent": "hip"
+		},
+		{
+			"length": 5,
+			"x": 5.4,
+			"y": -0.15,
+			"rotation": 5,
+			"name": "legDR",
+			"parent": "legUR"
+		},
+		{
+			"x": 4.6,
+			"y": 0.05,
+			"rotation": -90,
+			"name": "head",
+			"parent": "torso"
+		},
+		{
+			"length": 5,
+			"x": 4.69,
+			"rotation": -0.76,
+			"name": "legDL",
+			"parent": "legUL"
+		}
+	],
+	"slots": [
+		{
+			"name": "body_HI_f",
+			"bone": "torso",
+			"attachment": "body_HI_f"
+		},
+		{
+			"name": "head_HI_f",
+			"bone": "head",
+			"attachment": "head_HI_f"
+		},
+		{
+			"name": "leg1_HI",
+			"bone": "legUR",
+			"attachment": "leg1_HI"
+		},
+		{
+			"name": "leg2_HI",
+			"bone": "legUL",
+			"attachment": "leg2_HI"
+		},
+		{
+			"name": "leg1_HI1",
+			"bone": "legDR",
+			"attachment": "leg1_HI"
+		},
+		{
+			"name": "leg2_HI1",
+			"bone": "legDL",
+			"attachment": "leg2_HI"
+		}
+	],
+	"ik": [
+		{
+			"bendPositive": false,
+			"order": 0,
+			"name": "bone_legL_ik",
+			"target": "bone_legL_ikTarget",
+			"bones": [
+				"legUL",
+				"legDL"
+			]
+		},
+		{
+			"order": 1,
+			"name": "bone_legR_ik",
+			"target": "bone_legR_ikTarget",
+			"bones": [
+				"legUR",
+				"legDR"
+			]
+		}
+	],
+	"skins": {
+		"default": {
+			"leg1_HI": {
+				"leg1_HI": {
+					"name": "leg1_HI",
+					"width": 6,
+					"height": 2,
+					"x": 3.07,
+					"y": -0.05
+				}
+			},
+			"leg2_HI1": {
+				"leg2_HI": {
+					"name": "leg2_HI",
+					"width": 6,
+					"height": 2,
+					"x": 2.2
+				}
+			},
+			"head_HI_f": {
+				"head_HI_f": {
+					"name": "head_HI_f",
+					"width": 30,
+					"height": 21,
+					"x": -8.55,
+					"y": 6.3
+				}
+			},
+			"leg1_HI1": {
+				"leg1_HI": {
+					"name": "leg1_HI",
+					"width": 6,
+					"height": 2,
+					"x": 3.07,
+					"y": -0.05
+				}
+			},
+			"body_HI_f": {
+				"body_HI_f": {
+					"name": "body_HI_f",
+					"width": 13,
+					"height": 9,
+					"rotation": -90
+				}
+			},
+			"leg2_HI": {
+				"leg2_HI": {
+					"name": "leg2_HI",
+					"width": 6,
+					"height": 2,
+					"x": 2.2
+				}
+			}
+		}
+	},
+	"animations": {
+		"run": {
+			"bones": {
+				"torso": {
+					"translate": [
+						{
+							"time": 0
+						},
+						{
+							"time": 0.4167,
+							"x": 1.73
+						},
+						{
+							"time": 0.8334
+						}
+					]
+				},
+				"legUL": {
+					"translate": [
+						{
+							"time": 0
+						},
+						{
+							"time": 0.4167,
+							"x": 2.44,
+							"y": -0.76
+						},
+						{
+							"time": 0.8334
+						}
+					]
+				},
+				"legUR": {
+					"translate": [
+						{
+							"time": 0
+						},
+						{
+							"time": 0.4167,
+							"x": -1.63,
+							"y": -0.51
+						},
+						{
+							"time": 0.8334
+						}
+					]
+				},
+				"head": {
+					"rotate": [
+						{
+							"time": 0,
+							"angle": 0
+						},
+						{
+							"time": 0.4167,
+							"angle": -27.8
+						},
+						{
+							"time": 0.8334,
+							"angle": 0
+						}
+					],
+					"shear": [
+						{
+							"time": 0
+						},
+						{
+							"time": 0.4167
+						},
+						{
+							"time": 0.8334
+						}
+					]
+				},
+				"bone_legR_ikTarget": {
+					"translate": [
+						{
+							"time": 0
+						},
+						{
+							"time": 0.4167,
+							"y": 5.49
+						},
+						{
+							"time": 0.8334
+						}
+					]
+				},
+				"bone_legL_ikTarget": {
+					"translate": [
+						{
+							"time": 0
+						},
+						{
+							"time": 0.4167,
+							"y": 5.74
+						},
+						{
+							"time": 0.8334
+						}
+					]
+				}
+			}
+		}
+	}
+}

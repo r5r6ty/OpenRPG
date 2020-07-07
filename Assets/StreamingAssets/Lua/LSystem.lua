@@ -32,6 +32,14 @@ ecs.registerMultipleSystem("SpriteRenderSystem", function(self)
     CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, rrr_y, self.rotation)
 end, ecs.allOf("Active", "DataBase", "SpriteRenderer", "Physics"))
 
+-- 渲染spine
+ecs.registerMultipleSystem("SpineRenderSystem", function(self)
+
+    local pos_x, pos_y, pos_z = CS.LuaUtil.GetPos(self.physics_object_id)
+    local r_pos_x, r_pos_y, r_pos_z = CS.LuaUtil.GetPos(self.root.physics_object_id)
+    CS.LuaUtil.SetPos(self.spine_offset_object_id, pos_x, pos_y + pos_z, r_pos_z)
+end, ecs.allOf("Active", "DataBase", "SpineRenderer", "Physics"))
+
 -- 渲染line
 ecs.registerMultipleSystem("LineRenderSystem", function(self)
     
@@ -39,21 +47,29 @@ end, ecs.allOf("Active", "DataBase", "LineRenderer", "Physics"))
 
 -- 动画1
 ecs.registerMultipleSystem("AnimationSystem1", function(self)
-    -- if self.action ~= nil then
+    local frameDeltaTime = 1 / 60
+    local maxFrameSkip = 4
+    
+    self.accumulatedTime = CS.UnityEngine.Time.deltaTime
+    local frames = 0
+    while self.accumulatedTime >= frameDeltaTime do
+        frames = frames + 1
+        if frames > maxFrameSkip then
+            break
+        end
+        self.accumulatedTime = self.accumulatedTime - frameDeltaTime
+    end
+
+    if frames > 0 then
         local c = self.database.animations[self.action].keyframes[self.delayCounter + 1]
-
-
         if c == nil then
+            self.timeLine = self.timeLine - self.runtimeSkeletonAnimation.AnimationState:GetCurrent(0).Animation.Duration
             self.delayCounter = 0
-            self.timeLine = 0
             self.localTimeLine = 0
             c = self.database.animations[self.action].keyframes[self.delayCounter + 1]
         end
 
-        -- if self.kind == 5 and self.state ~= "cursor" then
-        -- 	print(self.delayCounter, self.timeLine)
-        -- end
-        if self.timeLine >= c * (1 / 60) then
+        if self.timeLine >= c * frameDeltaTime then
 
             local f = self.database.animations[self.action].eventQueue[c]
             self.delayCounter = self.delayCounter + 1
@@ -64,16 +80,31 @@ ecs.registerMultipleSystem("AnimationSystem1", function(self)
                     ecs.processSingleSystem(v.category, self, v)
                 end
             end
-
         end
-    -- end
-end, ecs.allOf("Active", "DataBase", "Animation"))
+
+        self.timeLine = self.timeLine + frames * frameDeltaTime * self.speed
+        self.localTimeLine = self.timeLine + frames * frameDeltaTime * self.speed
+
+        self.runtimeSkeletonAnimation:Update(frames * frameDeltaTime * self.speed)
+        self.requiresNewMesh = true
+    end
+
+end, ecs.allOf("Active", "DataBase", "Animation", "SpineRenderer"))
+
+ecs.registerMultipleSystem("SpineLateUpdate", function(self)
+
+    if self.requiresNewMesh then
+        self.runtimeSkeletonAnimation:LateUpdate()
+        self.requiresNewMesh = false
+    end
+
+end, ecs.allOf("Active", "DataBase", "Animation", "SpineRenderer"))
 
 -- 动画2
 ecs.registerMultipleSystem("AnimationSystem2", function(self)
     -- if c < self.database.animations[self.action].delay then
-    self.timeLine = self.timeLine + CS.UnityEngine.Time.deltaTime * self.speed
-    self.localTimeLine = self.localTimeLine + CS.UnityEngine.Time.deltaTime * self.speed
+    -- self.timeLine = self.timeLine + CS.UnityEngine.Time.deltaTime * self.speed
+    -- self.localTimeLine = self.localTimeLine + CS.UnityEngine.Time.deltaTime * self.speed
     -- else
     -- 	self.delayCounter = 0
     -- 	self.timeLine = 0
@@ -336,7 +367,7 @@ ecs.registerSingleSystem("Ground", function(this, value)
     --         this.sleep = true
     --     end
     -- end
-end, ecs.allOf("Active", "SpriteRenderer"))
+end, ecs.allOf("Active", "SpineRenderer"))
 
 ecs.registerSingleSystem("Sprite", function(this, value)
     if value.sprite == nil and value.id ~= nil then
@@ -569,8 +600,8 @@ end)
 -- this.functions = CS.Tools.Instance:GetAnimationState(this.animation, this.action)
 
 ecs.registerSingleSystem("State", function(this, value)
-    utils.changeState(this, value.state)
-end, ecs.allOf("Active", "Animation", "State"))
+    utils.changeState(this, value.state, value.spineAnimation)
+end, ecs.allOf("Active", "Animation", "State", "SpineRenderer"))
 
 ecs.registerSingleSystem("Animation", function(this, value)
     utils.changeAnimation(this, value.animation)

@@ -83,6 +83,10 @@ function castleDB:loadIMGToTexture2Ds()
 end
 
 function castleDB:getLines(name)
+	if self.DBSheets[name] == nil then
+		print("cannot find sheet called " .. name .. " in " .. self.DBFile .. "!")
+		return nil
+	end
 	return self.DBSheets[name].lines
 end
 
@@ -226,6 +230,7 @@ function LCastleDBMap:createSprites()
 
 			texture2D.wrapMode = CS.UnityEngine.TextureWrapMode.Clamp
 			texture2D.filterMode = CS.UnityEngine.FilterMode.Point
+			texture2D.name = p[1]
 		
 			-- texture2D:LoadImage(data)
 			CS.UnityEngine.ImageConversion.LoadImage(texture2D, data)
@@ -311,7 +316,6 @@ function LCastleDBMap:createPalettes()
 
 			texture:Apply()
 
-
 			-- local sprite = CS.UnityEngine.Sprite.Create(texture, CS.UnityEngine.Rect(0, 0, texture.width, texture.height), CS.UnityEngine.Vector2(0, 1))
 
 			local material = CS.UnityEngine.Material(utils.getShader())
@@ -372,7 +376,8 @@ LCastleDBCharacter = {
 						animationClips = nil,
 						prototypes = nil,
 						-- eventManager = nil
-						groups = nil
+						groups = nil,
+						spines = nil
 					}
 setmetatable(LCastleDBCharacter, LCastleDBMap)
 LCastleDBCharacter.__index = LCastleDBCharacter
@@ -394,6 +399,7 @@ function LCastleDBCharacter:new(path, file)
 	-- self.eventManager = {}
 
 	self.groups = nil
+	self.spines = nil
 	return self
 end
 
@@ -621,6 +627,21 @@ function LCastleDBCharacter:readDB()
 	self.audioClips = self:createAudioClips()
 	self.texture2Ds, self.texture256, self.sprites = self:createSprites()
 	self.palettes, self.palettes_ui = self:createPalettes()
+
+	-- local p = utils.split(self.DBFile, ".")
+	
+	-- local data = utils.openFileBytes(self.DBPath .. p[1] .. ".png")
+
+	local texs = {}
+	table.insert(texs, self.texture2Ds)
+	self.spines = {}
+	for i, v in ipairs(self:getLines("spines")) do
+		print(self.DBPath .. v.atlas)
+		local runtimeAtlasAsset = CS.Spine.Unity.AtlasAsset.CreateRuntimeInstance(CS.UnityEngine.TextAsset(utils.openFileText(self.DBPath .. v.atlas)), texs, self.palettes[1], true)
+
+		self.spines[v.name] = CS.Spine.Unity.SkeletonDataAsset.CreateRuntimeInstance(CS.UnityEngine.TextAsset(utils.openFileText(self.DBPath .. v.skeleton)), runtimeAtlasAsset, true)
+		self.spines[v.name].defaultMix = 0.1
+	end
 
 	----------------------------------------------------------------------------------------------------------------------
 

@@ -1847,14 +1847,14 @@
 					"optional": []
 				},
 				{
-					"id": "Bone",
+					"id": "Wait",
 					"color": 0,
 					"comment": "",
 					"necessary": [],
 					"optional": []
 				},
 				{
-					"id": "Wait",
+					"id": "Bone",
 					"color": 0,
 					"comment": "",
 					"necessary": [],
@@ -2123,208 +2123,57 @@
 					"name": "body_run_front",
 					"clips": [
 						{
-							"category": "Act",
-							"wait": 40,
-							"kind": 6,
-							"id": "1",
-							"frame": 0
-						},
-						{
-							"category": "Object",
-							"wait": 5,
-							"x": 2,
-							"y": 13,
-							"kind": 2,
-							"id": "0",
-							"layer": -1
-						},
-						{
-							"category": "Object",
-							"wait": 5,
-							"x": -4,
-							"y": 13,
-							"kind": 2,
-							"id": "1",
-							"layer": -3
-						},
-						{
 							"sprite": "d3f31815b508e3a4c258bc9009cf4833",
 							"x": -10,
 							"y": -27,
-							"wait": 5,
+							"wait": 4,
 							"category": "Sprite"
-						},
-						{
-							"category": "Object",
-							"wait": 5,
-							"x": 2,
-							"y": 13,
-							"kind": 2,
-							"id": "0",
-							"layer": -1
-						},
-						{
-							"category": "Object",
-							"wait": 5,
-							"x": -4,
-							"y": 13,
-							"kind": 2,
-							"id": "1",
-							"layer": -3
 						},
 						{
 							"sprite": "fc8ff7d6f693a98f351cbf3c7b0457ec",
-							"wait": 5,
+							"wait": 4,
 							"x": -10,
 							"y": -27,
 							"category": "Sprite"
-						},
-						{
-							"category": "Object",
-							"wait": 5,
-							"x": 2,
-							"y": 14,
-							"kind": 2,
-							"id": "0",
-							"layer": -1
-						},
-						{
-							"category": "Object",
-							"wait": 5,
-							"x": -4,
-							"y": 14,
-							"kind": 2,
-							"id": "1",
-							"layer": -3
 						},
 						{
 							"sprite": "e9fbc16505df2fb91acf4522dc91d35c",
-							"wait": 5,
+							"wait": 4,
 							"x": -9,
 							"y": -28,
 							"category": "Sprite"
-						},
-						{
-							"category": "Object",
-							"wait": 5,
-							"x": 2,
-							"y": 14,
-							"kind": 2,
-							"id": "0",
-							"layer": -1
-						},
-						{
-							"category": "Object",
-							"wait": 5,
-							"x": -4,
-							"y": 14,
-							"kind": 2,
-							"id": "1",
-							"layer": -3
 						},
 						{
 							"sprite": "259d58e9e8a94f39c3e9c26b39cd4b6e",
-							"wait": 5,
+							"wait": 4,
 							"x": -9,
 							"y": -28,
 							"category": "Sprite"
-						},
-						{
-							"category": "Object",
-							"wait": 5,
-							"x": 2,
-							"y": 13,
-							"kind": 2,
-							"id": "0",
-							"layer": -1
-						},
-						{
-							"category": "Object",
-							"wait": 5,
-							"x": -4,
-							"y": 13,
-							"kind": 2,
-							"id": "1",
-							"layer": -3
 						},
 						{
 							"sprite": "1cb8d1efac9e2d7b276e501266c844ef",
-							"wait": 5,
+							"wait": 4,
 							"x": -10,
 							"y": -27,
 							"category": "Sprite"
-						},
-						{
-							"category": "Object",
-							"wait": 5,
-							"x": 2,
-							"y": 13,
-							"kind": 2,
-							"id": "0",
-							"layer": -1
-						},
-						{
-							"category": "Object",
-							"wait": 5,
-							"x": -4,
-							"y": 13,
-							"kind": 2,
-							"id": "1",
-							"layer": -3
 						},
 						{
 							"sprite": "b935a8ca8f78142b4a4ecf6d6a76cfa7",
-							"wait": 5,
+							"wait": 4,
 							"x": -10,
 							"y": -27,
 							"category": "Sprite"
 						},
 						{
-							"category": "Object",
-							"wait": 5,
-							"x": 2,
-							"y": 14,
-							"kind": 2,
-							"id": "0",
-							"layer": -1
-						},
-						{
-							"category": "Object",
-							"wait": 5,
-							"x": -4,
-							"y": 14,
-							"kind": 2,
-							"id": "1",
-							"layer": -3
-						},
-						{
 							"sprite": "2e60afb940073823a142fb25efdb2d56",
-							"wait": 5,
+							"wait": 4,
 							"x": -9,
 							"y": -28,
 							"category": "Sprite"
 						},
 						{
-							"category": "Object",
-							"wait": 5,
-							"x": 2,
-							"y": 14,
-							"kind": 2,
-							"id": "0",
-							"layer": -1
-						},
-						{
-							"category": "Object",
-							"wait": 5,
-							"x": -4,
-							"y": 14,
-							"kind": 2,
-							"id": "1",
-							"layer": -3
-						},
-						{
 							"sprite": "ce93b7cf1cbee059f5d6dab8b066cf24",
-							"wait": 5,
+							"wait": 4,
 							"x": -9,
 							"y": -28,
 							"category": "Sprite"
@@ -2338,54 +2187,54 @@
 							"sprite": "1d13f41f5b90be246740cedf9323daeb",
 							"x": -9,
 							"y": -27,
-							"wait": 5,
+							"wait": 4,
 							"category": "Sprite"
 						},
 						{
 							"sprite": "23ba3a994a76d7edb07b73a2899f1336",
-							"wait": 5,
+							"wait": 4,
 							"x": -9,
 							"y": -27,
 							"category": "Sprite"
 						},
 						{
 							"sprite": "e49170e57a440fcbe1bb398e7ed0f733",
-							"wait": 5,
+							"wait": 4,
 							"x": -8,
 							"y": -28,
 							"category": "Sprite"
 						},
 						{
 							"sprite": "5a96611ad7f5638c72e288e9e701ac4d",
-							"wait": 5,
+							"wait": 4,
 							"x": -8,
 							"y": -28,
 							"category": "Sprite"
 						},
 						{
 							"sprite": "442c1aa99d010795f300d7094b0778ea",
-							"wait": 5,
+							"wait": 4,
 							"x": -9,
 							"y": -27,
 							"category": "Sprite"
 						},
 						{
 							"sprite": "08a10ceaa642fe26e220aa3517a3230e",
-							"wait": 5,
+							"wait": 4,
 							"x": -9,
 							"y": -27,
 							"category": "Sprite"
 						},
 						{
 							"sprite": "650c25b904acb245388888780b85c07b",
-							"wait": 5,
+							"wait": 4,
 							"x": -8,
 							"y": -28,
 							"category": "Sprite"
 						},
 						{
 							"sprite": "36f669f4b209f0a00b178d3ff852f6e6",
-							"wait": 5,
+							"wait": 4,
 							"x": -8,
 							"y": -28,
 							"category": "Sprite"
@@ -4496,6 +4345,47 @@
 							"wait": 5
 						}
 					]
+				},
+				{
+					"name": "spine_idle",
+					"clips": [
+						{
+							"category": "Body",
+							"wait": 600,
+							"x": -4,
+							"y": -25,
+							"width": 8,
+							"height": 25,
+							"id": "0",
+							"bodyFlags": 3,
+							"layers": "16"
+						},
+						{
+							"category": "Wait",
+							"wait": 20
+						}
+					]
+				},
+				{
+					"name": "spine_run",
+					"clips": [
+						{
+							"category": "Sound",
+							"sfx": "bullet_hit1"
+						},
+						{
+							"category": "Wait",
+							"wait": 20
+						},
+						{
+							"category": "Sound",
+							"sfx": "bullet_hit1"
+						},
+						{
+							"category": "Wait",
+							"wait": 20
+						}
+					]
 				}
 			],
 			"separators": [],
@@ -4541,50 +4431,56 @@
 						{
 							"category": "State",
 							"active": true,
-							"trigger": "this.controller ~= nil and this.controller.commands[\"walk\"].UIActive ~= nil and this.state ~= \"new_run\"",
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walk\"].UIActive ~= nil and this.state ~= \"spine_run\"",
 							"json": {
-								"state": "new_run"
+								"state": "spine_run",
+								"spineAnimation": "run"
 							}
 						},
 						{
 							"category": "State",
 							"active": true,
 							"json": {
-								"state": "new_aim"
+								"state": "spine_idle",
+								"spineAnimation": "idle"
 							},
-							"trigger": "this.controller ~= nil and this.controller.commands[\"walk2idle\"].UIActive ~= nil and this.state == \"new_run\""
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walk2idle\"].UIActive ~= nil and this.state == \"spine_run\""
 						},
 						{
 							"category": "State",
 							"active": true,
 							"json": {
-								"state": "new_run"
+								"state": "spine_run",
+								"spineAnimation": "run"
 							},
-							"trigger": "this.controller ~= nil and this.controller.commands[\"walkU\"].UIActive ~= nil and this.state ~= \"new_run\""
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walkU\"].UIActive ~= nil and this.state ~= \"spine_run\""
 						},
 						{
 							"category": "State",
 							"active": true,
 							"json": {
-								"state": "new_aim"
+								"state": "spine_idle",
+								"spineAnimation": "idle"
 							},
-							"trigger": "this.controller ~= nil and this.controller.commands[\"walkU2idle\"].UIActive ~= nil and this.state == \"new_run\""
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walkU2idle\"].UIActive ~= nil and this.state == \"spine_run\""
 						},
 						{
 							"category": "State",
 							"active": true,
 							"json": {
-								"state": "new_run"
+								"state": "spine_run",
+								"spineAnimation": "run"
 							},
-							"trigger": "this.controller ~= nil and this.controller.commands[\"walkD\"].UIActive ~= nil and this.state ~= \"new_run\""
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walkD\"].UIActive ~= nil and this.state ~= \"spine_run\""
 						},
 						{
 							"category": "State",
 							"active": true,
 							"json": {
-								"state": "new_aim"
+								"state": "spine_idle",
+								"spineAnimation": "idle"
 							},
-							"trigger": "this.controller ~= nil and this.controller.commands[\"walkD2idle\"].UIActive ~= nil and this.state == \"new_run\""
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walkD2idle\"].UIActive ~= nil and this.state == \"spine_run\""
 						}
 					],
 					"Exit": [],
@@ -5877,6 +5773,61 @@
 						}
 					],
 					"animation": "new_body_run_front"
+				},
+				{
+					"name": "spine_idle",
+					"entry": [],
+					"Exit": [],
+					"update": [],
+					"fixedUpdate": [
+						{
+							"category": "Move",
+							"active": true,
+							"json": {}
+						}
+					],
+					"animation": "spine_idle"
+				},
+				{
+					"name": "spine_run",
+					"entry": [],
+					"Exit": [],
+					"update": [],
+					"fixedUpdate": [
+						{
+							"category": "Move",
+							"active": true,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walk\"].UIActive ~= nil and this.controller.commands[\"walk\"].UIActive == 1",
+							"json": {
+								"x": 1
+							}
+						},
+						{
+							"category": "Move",
+							"active": true,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walk\"].UIActive ~= nil and this.controller.commands[\"walk\"].UIActive == -1",
+							"json": {
+								"x": -1
+							}
+						},
+						{
+							"category": "Move",
+							"active": true,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walkU\"].UIActive ~= nil",
+							"json": {
+								"z": 1
+							}
+						},
+						{
+							"category": "Move",
+							"active": true,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"walkD\"].UIActive ~= nil",
+							"json": {
+								"z": -1
+							}
+						}
+					],
+					"animation": "spine_run"
 				}
 			],
 			"separators": [],
@@ -6347,12 +6298,17 @@
 					"typeStr": "13",
 					"name": "skeleton",
 					"display": null
+				},
+				{
+					"typeStr": "13",
+					"name": "atlas"
 				}
 			],
 			"lines": [
 				{
 					"name": "girl",
-					"skeleton": "db/output/girl.json"
+					"skeleton": "girl_spine.json",
+					"atlas": "girl.atlas"
 				}
 			],
 			"separators": [],

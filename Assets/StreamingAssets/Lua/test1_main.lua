@@ -402,6 +402,16 @@ function createSpriteAtlas2(db)
 --~ 	local sr = unityobject_child:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
 --~ 	sr.sprite = sprite
 
+	local p2 = utils.split(db.DBFile, ".")
+	local atlas = string.format("\n%s\nsize: %d,%d\nformat: RGBA8888\nfilter: Linear,Linear\nrepeat: none",p2[1] .. ".png", texture.width, texture.height)
+	local atlas_data = {}
+	local atlas_sprites = db:getLines("sprites")
+	if atlas_sprites ~= nil then
+		for i, v in ipairs(atlas_sprites) do
+			atlas_data[v.image] = v.name
+		end
+	end
+
 	local p = CS.UnityEngine.GameObject(db.DBFile)
 	for i = 1, #textures, 1 do
 
@@ -420,6 +430,13 @@ function createSpriteAtlas2(db)
 		textureNames[i].y = math.floor(rects[i - 1].y * texture.height)
 		textureNames[i].w = math.floor(rects[i - 1].width * texture.width)
 		textureNames[i].h = math.floor(rects[i - 1].height * texture.height)
+
+		if atlas_sprites ~= nil then
+			if atlas_data[textureNames[i].id] ~= nil then
+				atlas = atlas .. "\n" .. string.format("%s\n  rotate: false\n  xy: %d, %d\n  size: %d, %d\n  orig: %d, %d\n  offset: 0, 0\n  index: -1", atlas_data[textureNames[i].id], textureNames[i].x, texture.width - textureNames[i].h - textureNames[i].y, textureNames[i].w, textureNames[i].h, textureNames[i].w, textureNames[i].h)
+
+			end
+		end
 	end
 
 --~ 	local byte = texture:EncodeToPNG()
@@ -428,10 +445,13 @@ function createSpriteAtlas2(db)
 --~ 	file:write(byte)
 --~ 	file:close()
 
-	local p2 = utils.split(db.DBFile, ".")
+	
 	CS.System.IO.File.WriteAllBytes(db.DBPath .. p2[1] .. ".png", CS.UnityEngine.ImageConversion.EncodeToPNG(texture))
 
 	CS.System.IO.File.WriteAllBytes(db.DBPath .. p2[1] .. ".json", json.encode(textureNames))
+	if atlas_sprites ~= nil then
+		CS.System.IO.File.WriteAllBytes(db.DBPath .. p2[1] .. ".atlas", atlas)
+	end
 
 	print("completed!")
 end

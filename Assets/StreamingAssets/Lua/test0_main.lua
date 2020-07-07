@@ -64,7 +64,7 @@ function start()
     -- CS.UnityEngine.Screen.SetResolution(1280, 720, false)
     CS.UnityEngine.Screen.SetResolution(640 * zoom, 360 * zoom, false)
 
-    LMainCamera:GetComponent(typeof(CS.UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera)).enabled = false
+    -- LMainCamera:GetComponent(typeof(CS.UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera)).enabled = false
 
     camera = LMainCamera:GetComponent(typeof(CS.UnityEngine.Camera))
     camera.orthographicSize = CS.UnityEngine.Screen.height / 1 / 100 / zoom
@@ -269,7 +269,7 @@ function start()
     -- UI_bit = utils.allOf(utils.getComponentID("Active"), utils.getComponentID("DataBase"), utils.getComponentID("UI"))
 
     -- 创建系统集合
-    _update = {"JudgePlayerSystem", "AnimationSystem1", "StateUpdateSystem", "AnimationSystem2", "SpriteRenderSystem", "LineRenderSystem", "JudgeAISystem"}
+    _update = {"JudgePlayerSystem", "AnimationSystem1", "StateUpdateSystem", "AnimationSystem2", "SpriteRenderSystem", "SpineRenderSystem", "LineRenderSystem", "JudgeAISystem"}
     _fixedUpdate = {"StateFxiedUpdateSystem", "BDYSystem", "ATKSystem", "ResetAISystem", "ResetPlayerSystem", "SleepSystem"} -- , "PhysicsSystem"
 
     -- 创建一个实体
@@ -404,6 +404,25 @@ function start()
     --     ecs.applyEntity(id5)
     -- end
 
+    -- 创建一个实体
+    for i = 10, 10, 1 do
+        local id1 = ecs.newEntity()
+        ecs.addComponent(id1, "Active")
+        ecs.addComponent(id1, "DataBase", 9)
+        ecs.addComponent(id1, "Children")
+        -- ecs.addComponent(id1, "SpriteRenderer")
+        ecs.addComponent(id1, "SpineRenderer")
+        ecs.addComponent(id1, "Animation", "spine_idle")
+        ecs.addComponent(id1, "State", "spine_idle")
+        ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 - 10, 0, 0, 0, 1)
+        ecs.addComponent(id1, "BDY")
+        ecs.addComponent(id1, "Sound")
+        ecs.addComponent(id1, "Gravity")
+
+        utils.PLAYER = LPlayer:new(ecs.entities[id1], LMainCamera) -- LMainCamera:GetComponent(typeof(CS.UnityEngine.Camera))
+        ecs.addComponent(id1, "Player")
+        ecs.applyEntity(id1)
+    end
 
     local ppp
     -- 创建一个实体
@@ -418,10 +437,10 @@ function start()
         ecs.addComponent(id1, "State", "new_aim")
         ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 - 10, 0, 0, 0, 1)
         ecs.addComponent(id1, "BDY")
-        ecs.addComponent(id1, "Gravity")
+        -- ecs.addComponent(id1, "Gravity")
 
-        utils.PLAYER = LPlayer:new(ecs.entities[id1], LMainCamera) -- LMainCamera:GetComponent(typeof(CS.UnityEngine.Camera))
-        ecs.addComponent(id1, "Player")
+        -- utils.PLAYER = LPlayer:new(ecs.entities[id1], LMainCamera) -- LMainCamera:GetComponent(typeof(CS.UnityEngine.Camera))
+        -- ecs.addComponent(id1, "Player")
         ppp = ecs.applyEntity(id1)
         ppp.spriteRenderer.material = ppp.database.palettes[1]
 
@@ -651,6 +670,7 @@ end
 function lateupdate()
     -- player:followCharacter()
 
+    ecs.processMultipleSystem("SpineLateUpdate")
     ecs.processMultipleSystem("FollowPlayerSystem")
 end
 

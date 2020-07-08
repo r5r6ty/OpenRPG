@@ -140,7 +140,7 @@
 	"ik": [
 		{
 			"bendPositive": false,
-			"order": 3,
+			"order": 4,
 			"mix": 0,
 			"name": "bone_ik5",
 			"target": "bone_ikTarget2",
@@ -179,7 +179,7 @@
 		},
 		{
 			"bendPositive": false,
-			"order": 5,
+			"order": 3,
 			"mix": 0,
 			"name": "bone_ik2",
 			"target": "crosshair",
@@ -189,7 +189,7 @@
 		},
 		{
 			"bendPositive": false,
-			"order": 4,
+			"order": 5,
 			"mix": 0,
 			"name": "bone_ik6",
 			"target": "bone_ikTarget3",

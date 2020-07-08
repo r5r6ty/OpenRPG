@@ -607,12 +607,14 @@ ecs.registerSingleSystem("Aim", function(this, value)
     local mousePosition = CS.UnityEngine.Input.mousePosition
     local worldMousePosition = CS.UnityEngine.Camera.main:ScreenToWorldPoint(mousePosition)
 
-    local skeletonSpacePoint = this.runtimeSkeletonAnimation.transform:InverseTransformPoint(worldMousePosition)
+    local skeletonSpacePoint = this.runtimeSkeletonAnimation.transform:InverseTransformPoint(worldMousePosition);
+    if  this.runtimeSkeletonAnimation.Skeleton.FlipX then
+        skeletonSpacePoint.x = skeletonSpacePoint.x * -1
+    end
+    print(this.bone.Data.Name, this.bone.ScaleX, this.bone.ScaleY, skeletonSpacePoint)
+    -- spine3.6是SetPosition，3.8不是，是SetLocalPosition
+    CS.Spine.Unity.SkeletonExtensions.SetPosition(this.bone, skeletonSpacePoint)
 
-    skeletonSpacePoint.x = skeletonSpacePoint.x * 1 --this.runtimeSkeletonAnimation.Skeleton.ScaleX
-    skeletonSpacePoint.y = skeletonSpacePoint.y * 1 --this.runtimeSkeletonAnimation.Skeleton.ScaleY
-
-    this.bone:SetLocalPosition(skeletonSpacePoint)
 end, ecs.allOf("Active", "Animation", "State", "SpineRenderer"))
 
 ecs.registerSingleSystem("Animation", function(this, value)

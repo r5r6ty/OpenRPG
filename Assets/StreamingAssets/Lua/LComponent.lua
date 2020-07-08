@@ -84,7 +84,7 @@ ecs.registerComponent("SpineRenderer", ecs.allOf("DataBase"), function(self)
 
     self.bone = self.runtimeSkeletonAnimation.Skeleton:FindBone("crosshair")
 
-    print(self.bone.Data.Name, self.bone.active, self.bone.scaleX, self.bone.scaleY)
+    print(self.bone.Data.Name, self.bone.ScaleX, self.bone.ScaleY)
 
     self.runtimeSkeletonAnimation.enabled = false
     -- Extra Stuff

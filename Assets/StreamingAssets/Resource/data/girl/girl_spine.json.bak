@@ -103,16 +103,6 @@
 			"y": 11,
 			"name": "bone_ikTarget3",
 			"parent": "aim-constraint-target"
-		},
-		{
-			"x": 5,
-			"name": "grabL",
-			"parent": "handL"
-		},
-		{
-			"x": 5,
-			"name": "grabR",
-			"parent": "handR"
 		}
 	],
 	"slots": [

@@ -60,7 +60,7 @@ ecs.registerMultipleSystem("AnimationSystem1", function(self)
         self.accumulatedTime = self.accumulatedTime - frameDeltaTime
     end
 
-    if frames > 0 then
+    if self.runtimeSkeletonAnimation.AnimationState:GetCurrent(0) ~= nil and frames > 0 then
         local c = self.database.animations[self.action].keyframes[self.delayCounter + 1]
         if c == nil then
             self.timeLine = self.timeLine - self.runtimeSkeletonAnimation.AnimationState:GetCurrent(0).Animation.Duration

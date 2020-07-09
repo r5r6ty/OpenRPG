@@ -34,8 +34,11 @@
 			"parent": "root"
 		},
 		{
-			"length": 4,
-			"name": "torso",
+			"length": 3,
+			"x": -2,
+			"y": 2,
+			"rotation": -180,
+			"name": "leg_upL",
 			"parent": "hip"
 		},
 		{
@@ -47,11 +50,8 @@
 			"parent": "hip"
 		},
 		{
-			"length": 3,
-			"x": -2,
-			"y": 2,
-			"rotation": -180,
-			"name": "leg_upL",
+			"length": 4,
+			"name": "torso",
 			"parent": "hip"
 		},
 		{
@@ -150,7 +150,6 @@
 	"ik": [
 		{
 			"bendPositive": false,
-			"order": 3,
 			"mix": 0,
 			"name": "bone_ik5",
 			"target": "bone_ikTarget2",
@@ -160,7 +159,6 @@
 		},
 		{
 			"bendPositive": false,
-			"order": 0,
 			"name": "bone_ik",
 			"target": "bone_ikTarget",
 			"bones": [
@@ -170,7 +168,6 @@
 		},
 		{
 			"bendPositive": false,
-			"order": 1,
 			"name": "bone_ik1",
 			"target": "bone_ikTarget1",
 			"bones": [
@@ -180,7 +177,6 @@
 		},
 		{
 			"bendPositive": false,
-			"order": 2,
 			"name": "bone_ik4",
 			"target": "crosshair",
 			"bones": [
@@ -189,7 +185,6 @@
 		},
 		{
 			"bendPositive": false,
-			"order": 5,
 			"mix": 0,
 			"name": "bone_ik2",
 			"target": "crosshair",
@@ -199,7 +194,6 @@
 		},
 		{
 			"bendPositive": false,
-			"order": 4,
 			"mix": 0,
 			"name": "bone_ik6",
 			"target": "bone_ikTarget3",
@@ -209,7 +203,6 @@
 		},
 		{
 			"bendPositive": false,
-			"order": 6,
 			"mix": 0,
 			"name": "bone_ik3",
 			"target": "crosshair",
@@ -275,32 +268,6 @@
 		}
 	},
 	"animations": {
-		"aimR": {
-			"ik": {
-				"bone_ik3": [
-					{ "time": 0, "mix": 1 }
-				],
-				"bone_ik5": [
-					{ "time": 0, "mix": 0.1 }
-				],
-				"bone_ik6": [
-					{ "time": 0, "mix": 0.2 }
-				],
-			}
-		},
-		"aimL": {
-			"ik": {
-				"bone_ik2": [
-					{ "time": 0, "mix": 1 }
-				],
-				"bone_ik5": [
-					{ "time": 0, "mix": 0.1 }
-				],
-				"bone_ik6": [
-					{ "time": 0, "mix": 0.2 }
-				],
-			}
-		},
 		"idle": {
 			"bones": {
 				"hip": {

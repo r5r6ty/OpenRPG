@@ -1,12 +1,12 @@
 
-NewProject.png
+girl.png
 size: 32,32
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 hand2
   rotate: false
-  xy: 19, 12
+  xy: 1, 18
   size: 6, 2
   orig: 6, 2
   offset: 0, 0
@@ -41,7 +41,7 @@ head_f
   index: -1
 hand1
   rotate: false
-  xy: 1, 18
+  xy: 19, 12
   size: 6, 2
   orig: 6, 2
   offset: 0, 0

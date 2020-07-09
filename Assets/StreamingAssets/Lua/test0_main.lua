@@ -404,6 +404,7 @@ function start()
     --     ecs.applyEntity(id5)
     -- end
 
+    local ppp
     -- 创建一个实体
     for i = 10, 10, 1 do
         local id1 = ecs.newEntity()
@@ -411,7 +412,7 @@ function start()
         ecs.addComponent(id1, "DataBase", 9)
         ecs.addComponent(id1, "Children")
         -- ecs.addComponent(id1, "SpriteRenderer")
-        ecs.addComponent(id1, "SpineRenderer")
+        ecs.addComponent(id1, "SpineRenderer", "girl")
         ecs.addComponent(id1, "Animation", "spine_idle")
         ecs.addComponent(id1, "State", "spine_idle")
         ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 - 10, 0, 0, 0, 1)
@@ -421,8 +422,32 @@ function start()
 
         utils.PLAYER = LPlayer:new(ecs.entities[id1], LMainCamera) -- LMainCamera:GetComponent(typeof(CS.UnityEngine.Camera))
         ecs.addComponent(id1, "Player")
-        ecs.applyEntity(id1)
+        ppp = ecs.applyEntity(id1)
+
     end
+
+    local ggg
+    for i = 10, 10, 1 do
+        local id1 = ecs.newEntity()
+        ecs.addComponent(id1, "Active")
+        ecs.addComponent(id1, "DataBase", 9)
+        ecs.addComponent(id1, "Children")
+        -- ecs.addComponent(id1, "SpriteRenderer")
+        ecs.addComponent(id1, "SpineRenderer", "HK416C")
+        ecs.addComponent(id1, "Animation", "spine_idle")
+        ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 - 10, 0, 0, 0, 1)
+        ecs.addComponent(id1, "BDY")
+        ecs.addComponent(id1, "Sound")
+
+        ggg = ecs.applyEntity(id1)
+
+    end
+
+    local bf = ggg.spine_offset_object:AddComponent(typeof(CS.Spine.Unity.BoneFollower))
+    bf.skeletonRenderer = ppp.runtimeSkeletonAnimation
+    bf:SetBone("grabR")
+
+    -- ppp.spine_offset_object:addComponent(typeof(CS.Spine.Unity.))
 
     -- local ppp
     -- -- 创建一个实体

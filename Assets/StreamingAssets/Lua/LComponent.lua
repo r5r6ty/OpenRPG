@@ -74,24 +74,28 @@ end, function (self)
     self.rotation_velocity = nil
 end)
 
-ecs.registerComponent("SpineRenderer", ecs.allOf("DataBase"), function(self)
+ecs.registerComponent("SpineRenderer", ecs.allOf("DataBase"), function(self, name)
     self.spine_offset_object = CS.UnityEngine.GameObject("spine_offset")
     self.spine_offset_object_id = self.spine_offset_object:GetInstanceID()
     CS.LuaUtil.AddGameObjectID(self.spine_offset_object_id, self.spine_offset_object)
     CS.LuaUtil.SetlocalScale(self.spine_offset_object_id, 2, 2, 2)
 
-    self.runtimeSkeletonAnimation = CS.Spine.Unity.SkeletonAnimation.NewSkeletonAnimationGameObject(self.database.spines["girl"])
+    self.runtimeSkeletonAnimation = CS.Spine.Unity.SkeletonAnimation.NewSkeletonAnimationGameObject(self.database.spines[name])
 
-    self.bone = self.runtimeSkeletonAnimation.Skeleton:FindBone("crosshair")
+    if name == "girl" then
+        self.bone = self.runtimeSkeletonAnimation.Skeleton:FindBone("crosshair")
 
-    print(self.bone.Data.Name, self.bone.ScaleX, self.bone.ScaleY)
+        print(self.bone.Data.Name, self.bone.ScaleX, self.bone.ScaleY)
+    end
 
     self.runtimeSkeletonAnimation.enabled = false
     -- Extra Stuff
     self.runtimeSkeletonAnimation:Initialize(false)
     -- self.runtimeSkeletonAnimation.Skeleton:SetSkin("base")
     self.runtimeSkeletonAnimation.Skeleton:SetSlotsToSetupPose()
-    self.runtimeSkeletonAnimation.AnimationState:SetAnimation(0, "idle", true)
+    if name == "girl" then
+        self.runtimeSkeletonAnimation.AnimationState:SetAnimation(0, "idle", true)
+    end
     -- self.runtimeSkeletonAnimation:GetComponent(typeof(CS.UnityEngine.MeshRenderer)).sortingOrder = 10
     -- self.runtimeSkeletonAnimation.transform.Translate(Vector3.down * 2)
 

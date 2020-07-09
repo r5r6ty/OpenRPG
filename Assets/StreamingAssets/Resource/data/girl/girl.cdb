@@ -6294,48 +6294,6 @@
 			]
 		},
 		{
-			"name": "sprites",
-			"columns": [
-				{
-					"typeStr": "0",
-					"name": "name"
-				},
-				{
-					"typeStr": "7",
-					"name": "image",
-					"display": null
-				}
-			],
-			"lines": [
-				{
-					"name": "body_f",
-					"image": "5f2900dd74563c9a9c7ba2301dcc523f"
-				},
-				{
-					"name": "head_f",
-					"image": "fc7aeca7e4892dfa311a1246922f2db6"
-				},
-				{
-					"name": "hand1",
-					"image": "f94b0a6a82cc22af16b3115bae895d27"
-				},
-				{
-					"name": "hand2",
-					"image": "bc2e707b10926f054989e2e1544924e8"
-				},
-				{
-					"name": "leg1",
-					"image": "e4fcde2f3f753aefe7deb59bd845432a"
-				},
-				{
-					"name": "leg2",
-					"image": "80d0ea30d16d75113f3e549fb9570b1b"
-				}
-			],
-			"separators": [],
-			"props": {}
-		},
-		{
 			"name": "spines",
 			"columns": [
 				{
@@ -6350,17 +6308,82 @@
 				{
 					"typeStr": "13",
 					"name": "atlas"
+				},
+				{
+					"typeStr": "8",
+					"name": "sprites"
 				}
 			],
 			"lines": [
 				{
 					"name": "girl",
 					"skeleton": "girl_spine.json",
-					"atlas": "girl.atlas"
+					"atlas": "girl.atlas",
+					"sprites": [
+						{
+							"name": "body_f",
+							"sprite": "5f2900dd74563c9a9c7ba2301dcc523f"
+						},
+						{
+							"name": "head_f",
+							"sprite": "fc7aeca7e4892dfa311a1246922f2db6"
+						},
+						{
+							"name": "hand1",
+							"sprite": "f94b0a6a82cc22af16b3115bae895d27"
+						},
+						{
+							"name": "hand2",
+							"sprite": "bc2e707b10926f054989e2e1544924e8"
+						},
+						{
+							"name": "leg1",
+							"sprite": "e4fcde2f3f753aefe7deb59bd845432a"
+						},
+						{
+							"name": "leg2",
+							"sprite": "80d0ea30d16d75113f3e549fb9570b1b"
+						}
+					]
+				},
+				{
+					"name": "HK416C",
+					"skeleton": "db/HK416C/HK416C_spine.json",
+					"atlas": "girl.atlas",
+					"sprites": [
+						{
+							"name": "barrel",
+							"sprite": "3838a58acc9db87ab3724702d115898a"
+						},
+						{
+							"name": "magazine",
+							"sprite": "0b55cd6576d73d126cc80f578fb290f0"
+						}
+					]
 				}
 			],
 			"separators": [],
 			"props": {}
+		},
+		{
+			"name": "spines@sprites",
+			"props": {
+				"hide": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "name",
+					"display": null
+				},
+				{
+					"typeStr": "7",
+					"name": "sprite",
+					"display": null
+				}
+			]
 		}
 	],
 	"compress": false

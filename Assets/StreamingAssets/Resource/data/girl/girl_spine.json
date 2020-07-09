@@ -278,7 +278,7 @@
 				],
 			}
 		},
-		"idle": {
+		"aimL": {
 			"ik": {
 				"bone_ik2": [
 					{ "time": 0, "mix": 1 }
@@ -291,7 +291,7 @@
 				],
 			}
 		},
-		"aimL": {
+		"idle": {
 			"bones": {
 				"hip": {
 					"translate": [

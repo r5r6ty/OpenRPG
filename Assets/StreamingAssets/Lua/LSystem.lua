@@ -621,6 +621,20 @@ ecs.registerSingleSystem("Animation", function(this, value)
     utils.changeAnimation(this, value.animation)
 end, ecs.allOf("Active", "Animation"))
 
+ecs.registerSingleSystem("SpineAnimation", function(this, value)
+    
+    local ani = this.runtimeSkeletonAnimation.skeleton.Data:FindAnimation(value.spineAnimation)
+    if ani ~= nil then
+        local aimTrack = this.runtimeSkeletonAnimation.AnimationState:SetAnimation(value.trackIndex, ani, true)
+        aimTrack.AttachmentThreshold = 1
+        aimTrack.MixDuration = 0
+    else
+        local empty = this.runtimeSkeletonAnimation.state:AddEmptyAnimation(value.trackIndex, 0.5, 0.1)
+        empty.AttachmentThreshold = 1
+    end
+    
+end, ecs.allOf("Active", "Animation", "SpineRenderer"))
+
 ecs.registerSingleSystem("Child", function(this, value)
     local object = this.children[value.id]
     if object ~= nil then

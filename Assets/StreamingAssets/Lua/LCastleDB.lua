@@ -641,7 +641,7 @@ function LCastleDBCharacter:readDB()
 
 		self.spines[v.name] = CS.Spine.Unity.SkeletonDataAsset.CreateRuntimeInstance(CS.UnityEngine.TextAsset(utils.openFileText(self.DBPath .. v.skeleton)), runtimeAtlasAsset, true)
 		self.spines[v.name]:GetSkeletonData(false)
-		self.spines[v.name].defaultMix = 0.1
+		self.spines[v.name]:GetAnimationStateData().DefaultMix = 0.1
 	end
 
 	----------------------------------------------------------------------------------------------------------------------

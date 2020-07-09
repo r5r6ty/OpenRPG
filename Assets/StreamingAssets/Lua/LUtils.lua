@@ -721,7 +721,7 @@ function utils.changeState(self, state, spineAnimation)
 		self.action = animation
 		self.delayCounter = 0
 		self.timeLine = 0
-		self.runtimeSkeletonAnimation.AnimationState:SetAnimation(0, self.runtimeSkeletonAnimation.skeleton.Data:FindAnimation(spineAnimation), true);
+		self.runtimeSkeletonAnimation.AnimationState:SetAnimation(0, self.runtimeSkeletonAnimation.skeleton.Data:FindAnimation(spineAnimation), true)
 		return true
 	end
 	return false

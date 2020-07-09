@@ -16,7 +16,7 @@ local curve = nil
 local moveSpeed = 32
 local camera = nil
 
-local zoom = 1
+local zoom = 3
 local dataTable = nil
 
 local mychar = nil
@@ -67,7 +67,7 @@ function start()
     -- LMainCamera:GetComponent(typeof(CS.UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera)).enabled = false
 
     camera = LMainCamera:GetComponent(typeof(CS.UnityEngine.Camera))
-    camera.orthographicSize = CS.UnityEngine.Screen.height / 1 / 100 / zoom
+    camera.orthographicSize = CS.UnityEngine.Screen.height / 100 / 2 * 2 / zoom
     utils.CAMERA = camera
     
     -- utils.LUABEHAVIOUR = self:GetComponent(typeof(CS.XLuaTest.LuaBehaviour))

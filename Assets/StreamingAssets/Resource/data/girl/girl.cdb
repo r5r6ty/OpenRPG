@@ -1873,11 +1873,18 @@
 					"comment": "",
 					"necessary": [],
 					"optional": []
+				},
+				{
+					"id": "SpineAnimation",
+					"color": 0,
+					"comment": "",
+					"necessary": [],
+					"optional": []
 				}
 			],
 			"props": [],
 			"separators": [
-				38
+				39
 			],
 			"name": "frameType",
 			"columns": [
@@ -4441,7 +4448,8 @@
 							"trigger": "this.controller ~= nil and this.controller.commands[\"walk\"].UIActive ~= nil and this.state ~= \"spine_run\"",
 							"json": {
 								"state": "spine_run",
-								"spineAnimation": "run"
+								"spineAnimation": "run",
+								"trackIndex": 0
 							}
 						},
 						{
@@ -4449,7 +4457,8 @@
 							"active": true,
 							"json": {
 								"state": "spine_idle",
-								"spineAnimation": "idle"
+								"spineAnimation": "idle",
+								"trackIndex": 0
 							},
 							"trigger": "this.controller ~= nil and this.controller.commands[\"walk2idle\"].UIActive ~= nil and this.state == \"spine_run\""
 						},
@@ -4458,7 +4467,8 @@
 							"active": true,
 							"json": {
 								"state": "spine_run",
-								"spineAnimation": "run"
+								"spineAnimation": "run",
+								"trackIndex": 0
 							},
 							"trigger": "this.controller ~= nil and this.controller.commands[\"walkU\"].UIActive ~= nil and this.state ~= \"spine_run\""
 						},
@@ -4467,7 +4477,8 @@
 							"active": true,
 							"json": {
 								"state": "spine_idle",
-								"spineAnimation": "idle"
+								"spineAnimation": "idle",
+								"trackIndex": 0
 							},
 							"trigger": "this.controller ~= nil and this.controller.commands[\"walkU2idle\"].UIActive ~= nil and this.state == \"spine_run\""
 						},
@@ -4476,7 +4487,8 @@
 							"active": true,
 							"json": {
 								"state": "spine_run",
-								"spineAnimation": "run"
+								"spineAnimation": "run",
+								"trackIndex": 0
 							},
 							"trigger": "this.controller ~= nil and this.controller.commands[\"walkD\"].UIActive ~= nil and this.state ~= \"spine_run\""
 						},
@@ -4485,9 +4497,28 @@
 							"active": true,
 							"json": {
 								"state": "spine_idle",
-								"spineAnimation": "idle"
+								"spineAnimation": "idle",
+								"trackIndex": 0
 							},
 							"trigger": "this.controller ~= nil and this.controller.commands[\"walkD2idle\"].UIActive ~= nil and this.state == \"spine_run\""
+						},
+						{
+							"category": "SpineAnimation",
+							"active": true,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"shoot_right_l\"].UIActive ~= nil",
+							"json": {
+								"spineAnimation": "aimL",
+								"trackIndex": 1
+							}
+						},
+						{
+							"category": "SpineAnimation",
+							"active": true,
+							"json": {
+								"spineAnimation": "123",
+								"trackIndex": 1
+							},
+							"trigger": "this.controller ~= nil and this.controller.commands[\"shoot_right_l\"].UIActive == nil"
 						}
 					],
 					"Exit": [],
@@ -5804,7 +5835,12 @@
 					"name": "spine_run",
 					"entry": [],
 					"Exit": [],
-					"update": [],
+					"update": [
+						{
+							"category": "Aim",
+							"active": true
+						}
+					],
 					"fixedUpdate": [
 						{
 							"category": "Move",

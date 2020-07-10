@@ -6349,15 +6349,15 @@
 				{
 					"name": "HK416C",
 					"skeleton": "db/HK416C/HK416C_spine.json",
-					"atlas": "girl.atlas",
+					"atlas": "",
 					"sprites": [
 						{
 							"name": "barrel",
-							"sprite": "3838a58acc9db87ab3724702d115898a"
+							"sprite": "7bc7eaff5275d6171a8c52b72af7bf4f"
 						},
 						{
 							"name": "magazine",
-							"sprite": "0b55cd6576d73d126cc80f578fb290f0"
+							"sprite": "d1428b92d0c60e2e23dc0b6ffb4152b9"
 						}
 					]
 				}

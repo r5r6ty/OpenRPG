@@ -635,9 +635,12 @@ function LCastleDBCharacter:readDB()
 	local texs = {}
 	table.insert(texs, self.texture2Ds)
 	self.spines = {}
+	local runtimeAtlasAsset = nil
 	for i, v in ipairs(self:getLines("spines")) do
-		-- spine3.6是AtlasAsset，3.8不是
-		local runtimeAtlasAsset = CS.Spine.Unity.AtlasAsset.CreateRuntimeInstance(CS.UnityEngine.TextAsset(utils.openFileText(self.DBPath .. v.atlas)), texs, self.palettes[1], true)
+		if runtimeAtlasAsset == nil then
+			-- spine3.6是AtlasAsset，3.8不是
+			runtimeAtlasAsset = CS.Spine.Unity.AtlasAsset.CreateRuntimeInstance(CS.UnityEngine.TextAsset(utils.openFileText(self.DBPath .. v.atlas)), texs, self.palettes[1], true)
+		end
 
 		self.spines[v.name] = CS.Spine.Unity.SkeletonDataAsset.CreateRuntimeInstance(CS.UnityEngine.TextAsset(utils.openFileText(self.DBPath .. v.skeleton)), runtimeAtlasAsset, true)
 		self.spines[v.name]:GetSkeletonData(false)

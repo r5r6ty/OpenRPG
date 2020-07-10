@@ -233,6 +233,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15f1ee26b8807f14a93d3975e92e2243, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  skeletonJson: {fileID: 4900000, guid: e88b4ce65dece8c44a0a1169292c2bfd, type: 3}
   atlasText: {fileID: 4900000, guid: 2005daeb1e1aedb4d9a1139ccfb41349, type: 3}
 --- !u!4 &227246279
 Transform:

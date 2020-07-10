@@ -6,7 +6,7 @@ local bone = nil
 
 function start()
 
-    local bytes = utils.openFileBytes("D:/unityproject/OpenRPG/Assets/Resources/Scenes/girl/girl.png")
+    local bytes = utils.openFileBytes(CS.UnityEngine.Application.dataPath .. "/Resources/Scenes/girl/girl.png")
 
     local texture = CS.UnityEngine.Texture2D(0, 0, CS.UnityEngine.TextureFormat.RGBA32, false, false)
     texture.filterMode = CS.UnityEngine.FilterMode.Point
@@ -30,8 +30,8 @@ function start()
     
     local material = CS.UnityEngine.Material(CS.UnityEngine.Shader.Find("Spine/Skeleton"))
     
-    local runtimeAtlasAsset = CS.Spine.Unity.AtlasAsset.CreateRuntimeInstance(CS.UnityEngine.TextAsset(utils.openFileText("D:/unityproject/OpenRPG/Assets/Resources/Scenes/girl/girl.atlas.txt")), texs, material, true)
-    local runtimeSkeletonDataAsset = CS.Spine.Unity.SkeletonDataAsset.CreateRuntimeInstance(CS.UnityEngine.TextAsset(utils.openFileText("D:/unityproject/OpenRPG/Assets/Resources/Scenes/girl/girl.json")), runtimeAtlasAsset, true)
+    local runtimeAtlasAsset = CS.Spine.Unity.AtlasAsset.CreateRuntimeInstance(CS.UnityEngine.TextAsset(utils.openFileText(CS.UnityEngine.Application.dataPath .. "/Resources/Scenes/girl/girl.atlas.txt")), texs, material, true)
+    local runtimeSkeletonDataAsset = CS.Spine.Unity.SkeletonDataAsset.CreateRuntimeInstance(CS.UnityEngine.TextAsset(utils.openFileText(CS.UnityEngine.Application.dataPath .. "/Resources/Scenes/girl/girl.json")), runtimeAtlasAsset, true)
     runtimeSkeletonDataAsset:GetSkeletonData(false)
 
     runtimeSkeletonAnimation = CS.Spine.Unity.SkeletonAnimation.NewSkeletonAnimationGameObject(runtimeSkeletonDataAsset)

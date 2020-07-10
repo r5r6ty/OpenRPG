@@ -444,6 +444,7 @@ function start()
     end
 
     local bf = ggg.spine_offset_object:AddComponent(typeof(CS.Spine.Unity.BoneFollower))
+    bf.followLocalScale = true
     bf.skeletonRenderer = ppp.runtimeSkeletonAnimation
     bf:SetBone("grabR")
 

@@ -6,8 +6,8 @@ using UnityEngine;
 namespace Spine.Unity.Examples {
 	public class DataAssetsFromExportsExample_v2 : MonoBehaviour {
 
-		//public TextAsset skeletonJson;
-		public TextAsset atlasText;
+        public TextAsset skeletonJson;
+        public TextAsset atlasText;
 		//public Texture2D[] textures;
 		//public Material materialPropertySource;
 
@@ -27,15 +27,24 @@ namespace Spine.Unity.Examples {
 			textures[0] = new Texture2D(0, 0, TextureFormat.RGBA32, false, false);
 
 			textures[0].filterMode = FilterMode.Point;
-			byte[] bytes = File.ReadAllBytes("D:/unityproject/OpenRPG/Assets/Resources/Scenes/girl/girl.png");
+			byte[] bytes = File.ReadAllBytes(Application.dataPath + "/Resources/Scenes/girl/girl.png");
 			textures[0].LoadImage(bytes);
 			textures[0].name = "girl";
 
 			Material materialPropertySource = new Material(Shader.Find("Spine/Skeleton"));
 
-			runtimeAtlasAsset = AtlasAsset.CreateRuntimeInstance(new TextAsset(File.ReadAllText("D:/unityproject/OpenRPG/Assets/Resources/Scenes/girl/girl.atlas.txt")), textures, materialPropertySource, true);
-			runtimeSkeletonDataAsset = SkeletonDataAsset.CreateRuntimeInstance(new TextAsset(File.ReadAllText("D:/unityproject/OpenRPG/Assets/Resources/Scenes/girl/girl.json")), runtimeAtlasAsset, true);
-		}
+
+			//runtimeAtlasAsset = AtlasAsset.CreateRuntimeInstance(Resources.Load<TextAsset>("Scenes/girl/girl.atlas"), textures, materialPropertySource, true);
+			//runtimeSkeletonDataAsset = SkeletonDataAsset.CreateRuntimeInstance(Resources.Load<TextAsset>("Scenes/girl/girl"), runtimeAtlasAsset, true);
+
+			atlasText = new TextAsset(File.ReadAllText(Application.dataPath + "/Resources/Scenes/girl/girl.atlas.txt"));
+			atlasText.name = "girl.atlas";
+			skeletonJson = new TextAsset(File.ReadAllText(Application.dataPath + "/Resources/Scenes/girl/girl.json"));
+			skeletonJson.name = "girl";
+
+			runtimeAtlasAsset = AtlasAsset.CreateRuntimeInstance(atlasText, textures, materialPropertySource, true);
+            runtimeSkeletonDataAsset = SkeletonDataAsset.CreateRuntimeInstance(skeletonJson, runtimeAtlasAsset, true);
+        }
 
 		void Start () {
 			CreateRuntimeAssetsAndGameObject();

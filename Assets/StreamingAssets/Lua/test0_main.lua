@@ -431,11 +431,12 @@ function start()
         local id1 = ecs.newEntity()
         ecs.addComponent(id1, "Active")
         ecs.addComponent(id1, "DataBase", 9)
-        ecs.addComponent(id1, "Children")
         -- ecs.addComponent(id1, "SpriteRenderer")
         ecs.addComponent(id1, "SpineRenderer", "HK416C")
-        ecs.addComponent(id1, "Animation", "spine_idle")
+        ecs.addComponent(id1, "Animation", "spine_gun_idle")
+        ecs.addComponent(id1, "State", "spine_gun_idle")
         ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 - 10, 0, 0, 0, 1)
+        ecs.addComponent(id1, "Parent", ppp, "gun")
         ecs.addComponent(id1, "BDY")
         ecs.addComponent(id1, "Sound")
 
@@ -443,10 +444,10 @@ function start()
 
     end
 
-    local bf = ggg.spine_offset_object:AddComponent(typeof(CS.Spine.Unity.BoneFollower))
-    bf.followLocalScale = true
-    bf.skeletonRenderer = ppp.runtimeSkeletonAnimation
-    bf:SetBone("grabR")
+    -- local bf = ggg.physics_object:AddComponent(typeof(CS.Spine.Unity.BoneFollower))
+    -- bf.followLocalScale = true
+    -- bf.skeletonRenderer = ppp.runtimeSkeletonAnimation
+    -- bf:SetBone("grabR")
 
     -- ppp.spine_offset_object:addComponent(typeof(CS.Spine.Unity.))
 

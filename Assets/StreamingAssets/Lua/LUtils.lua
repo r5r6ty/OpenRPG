@@ -721,7 +721,12 @@ function utils.changeState(self, state, spineAnimation)
 		self.action = animation
 		self.delayCounter = 0
 		self.timeLine = 0
-		self.runtimeSkeletonAnimation.AnimationState:SetAnimation(0, self.runtimeSkeletonAnimation.skeleton.Data:FindAnimation(spineAnimation), true)
+		if spineAnimation ~= nil then
+			local ani = self.runtimeSkeletonAnimation.skeleton.Data:FindAnimation(spineAnimation)
+			if ani ~= nil then
+				self.runtimeSkeletonAnimation.AnimationState:SetAnimation(0, ani, true)
+			end
+		end
 		return true
 	end
 	return false
@@ -750,7 +755,7 @@ function utils.SetParentAndRoot(self, object, id)
 		-- self.physics_object.transform.localEulerAngles = CS.UnityEngine.Vector3(0, 0, 0)
 
 		self.team = object.team
-		self.spriteRenderer.material = object.spriteRenderer.material
+		-- self.spriteRenderer.material = object.spriteRenderer.material
 	end
 end
 

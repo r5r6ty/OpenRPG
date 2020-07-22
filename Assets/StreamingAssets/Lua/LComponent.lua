@@ -301,7 +301,7 @@ end, function (self)
     self.lineRenderer = nil
 end)
 
-ecs.registerComponent("Parent", ecs.allOf("Physics", "SpriteRenderer"), function(self, parent, id)
+ecs.registerComponent("Parent", ecs.allOf("Physics", "SpineRenderer"), function(self, parent, id)
     self.root = self
     self.parent = self
 

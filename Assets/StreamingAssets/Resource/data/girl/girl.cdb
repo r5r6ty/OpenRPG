@@ -4400,6 +4400,32 @@
 							"wait": 20
 						}
 					]
+				},
+				{
+					"name": "spine_gun_idle",
+					"clips": [
+						{
+							"category": "Wait",
+							"wait": 20
+						}
+					]
+				},
+				{
+					"name": "spine_gun_shoot",
+					"clips": [
+						{
+							"category": "Wait",
+							"wait": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 1
+						},
+						{
+							"category": "Wait",
+							"wait": 598
+						}
+					]
 				}
 			],
 			"separators": [],
@@ -5820,6 +5846,14 @@
 						{
 							"category": "Aim",
 							"active": true
+						},
+						{
+							"category": "Bone",
+							"active": true,
+							"json": {
+								"bone": "grabR",
+								"id": "gun"
+							}
 						}
 					],
 					"fixedUpdate": [
@@ -5839,6 +5873,14 @@
 						{
 							"category": "Aim",
 							"active": true
+						},
+						{
+							"category": "Bone",
+							"active": true,
+							"json": {
+								"bone": "grabR",
+								"id": "gun"
+							}
 						}
 					],
 					"fixedUpdate": [
@@ -5876,6 +5918,65 @@
 						}
 					],
 					"animation": "spine_run"
+				},
+				{
+					"name": "spine_gun_idle",
+					"entry": [],
+					"Exit": [],
+					"update": [],
+					"fixedUpdate": [
+						{
+							"category": "State",
+							"active": true,
+							"trigger": "this.root.controller ~= nil and this.root.controller.commands[\"punch_l\"].UIActive ~= nil",
+							"json": {
+								"state": "spine_gun_shoot"
+							}
+						}
+					],
+					"animation": "spine_gun_idle"
+				},
+				{
+					"name": "spine_gun_shoot",
+					"entry": [],
+					"Exit": [],
+					"update": [
+						{
+							"category": "Sound",
+							"active": true,
+							"trigger": "this.delayCounter == 1 and this.localTimeLine == 0",
+							"json": {
+								"sfx": "A9mm"
+							}
+						},
+						{
+							"category": "Object",
+							"active": true,
+							"trigger": "0",
+							"json": {
+								"x": 11,
+								"y": -4,
+								"x2": 40,
+								"y2": 0,
+								"z2": 0,
+								"state": "bullet",
+								"animation": "bullet",
+								"id": "9",
+								"amount": 5,
+								"precise": 10
+							}
+						},
+						{
+							"category": "State",
+							"active": true,
+							"trigger": "this.timeLine >= 5 / 60",
+							"json": {
+								"state": "weapon_idle_J"
+							}
+						}
+					],
+					"fixedUpdate": [],
+					"animation": "spine_gun_shoot"
 				}
 			],
 			"separators": [],

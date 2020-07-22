@@ -29,7 +29,7 @@ ecs.registerMultipleSystem("SpriteRenderSystem", function(self)
     -- end
 
 
-    CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, rrr_y, self.rotation)
+    CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, rrr_y, self.rotation + rrr_z)
 end, ecs.allOf("Active", "DataBase", "SpriteRenderer", "Physics"))
 
 -- 渲染spine
@@ -38,6 +38,11 @@ ecs.registerMultipleSystem("SpineRenderSystem", function(self)
     local pos_x, pos_y, pos_z = CS.LuaUtil.GetPos(self.physics_object_id)
     local r_pos_x, r_pos_y, r_pos_z = CS.LuaUtil.GetPos(self.root.physics_object_id)
     CS.LuaUtil.SetPos(self.spine_offset_object_id, pos_x, pos_y + pos_z, r_pos_z)
+
+
+    local rrr_x, rrr_y, rrr_z = CS.LuaUtil.GetEulerAngles(self.physics_object_id)
+
+    CS.LuaUtil.SetRotationByEuler(self.spine_offset_object_id, 0, rrr_y, 0 + rrr_z)
 end, ecs.allOf("Active", "DataBase", "SpineRenderer", "Physics"))
 
 -- 渲染line
@@ -611,7 +616,7 @@ ecs.registerSingleSystem("Aim", function(this, value)
     if  this.runtimeSkeletonAnimation.Skeleton.FlipX then
         skeletonSpacePoint.x = skeletonSpacePoint.x * -1
     end
-    print(this.bone.Data.Name, this.bone.ScaleX, this.bone.ScaleY, skeletonSpacePoint)
+    -- print(this.bone.Data.Name, this.bone.ScaleX, this.bone.ScaleY, skeletonSpacePoint)
     -- spine3.6是SetPosition，3.8不是，是SetLocalPosition
     CS.Spine.Unity.SkeletonExtensions.SetPosition(this.bone, skeletonSpacePoint)
 
@@ -658,9 +663,47 @@ ecs.registerSingleSystem("Child", function(this, value)
 
         CS.LuaUtil.SetLocalPos(object.physics_object_id, value.x / 100, value.y / 100, 0)
 
-        object.spriteRenderer.sortingOrder = -(value.layer * this.root.direction.z - this.spriteRenderer.sortingOrder)
+        -- object.spriteRenderer.sortingOrder = -(value.layer * this.root.direction.z - this.spriteRenderer.sortingOrder)
     end
 end)
+
+ecs.registerSingleSystem("Bone", function(this, value)
+
+    local bone = this.runtimeSkeletonAnimation.Skeleton:FindBone(value.bone)
+
+    local object = this.children[value.id]
+    if object ~= nil and bone ~= nil then
+        -- if value.rotation ~= nil then
+        --     object.rotation = value.rotation
+        -- end
+
+        -- if value.direction_x ~= nil then
+        --     object.direction.x = value.direction_x
+        -- end
+
+        -- if value.animation ~= nil then
+        --     utils.changeAnimation(object, value.animation)
+        -- end
+
+        -- local z = value.layer / 100
+        -- if this.root.direction.x == -1 then
+        -- 	z = -z
+        -- end
+        -- object.gameObject.transform.localPosition = CS.UnityEngine.Vector3(value.x / 100, value.y / 100, z)
+
+        local pos = CS.Spine.Unity.SkeletonExtensions.GetSkeletonSpacePosition(bone)
+        local rotation = CS.Spine.Unity.SkeletonExtensions.GetQuaternion(bone)
+        -- object.rotation = value.rotation
+        local r = rotation.eulerAngles
+        CS.LuaUtil.SetRotationByEuler(object.physics_object_id, r.x, r.y, r.z)
+
+        CS.LuaUtil.SetLocalPos(object.physics_object_id, pos.x, pos.y, 0)
+
+        -- print(pos.x, pos.y)
+
+        -- object.spriteRenderer.sortingOrder = -(value.layer * this.root.direction.z - this.spriteRenderer.sortingOrder)
+    end
+end, ecs.allOf("Active", "Animation", "SpineRenderer"))
 
 ecs.registerSingleSystem("MoveAC", function(this, value)
     this.accvvvY = value.id

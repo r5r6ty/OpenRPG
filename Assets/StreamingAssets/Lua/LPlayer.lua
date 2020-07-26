@@ -481,7 +481,7 @@ function LPlayer:followCharacter()
 		local char_x, char_y, char_z = CS.LuaUtil.GetPos(self.object.physics_object_id)
 		-- self.camera.transform.position = CS.UnityEngine.Vector3(charPos.x, charPos.y + charPos.z, self.camera.transform.position.z)
 
-		CS.LuaUtil.SetPos(self.camera_id, char_x, char_y + char_z, char_z - 10)
+		CS.LuaUtil.SetPos(self.camera_id, char_x, char_y - char_z, char_z + char_y - 100)
 	-- end
 end
 

@@ -875,8 +875,8 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 
 						local boxCollider = unityobject_child:AddComponent(typeof(CS.UnityEngine.BoxCollider))
 						CS.LuaUtil.AddColliderID(boxCollider:GetInstanceID(), boxCollider)
-						boxCollider.center = CS.UnityEngine.Vector3(boxCollider.center.x, boxCollider.center.y + ts.size / 100 * 10 / 2, boxCollider.center.z) --  - ts.size / 100
-						boxCollider.size = CS.UnityEngine.Vector3(ts.size / 100, ts.size / 100 * 10, ts.size / 100)
+						boxCollider.center = CS.UnityEngine.Vector3(boxCollider.center.x, boxCollider.center.y + ts.size / 100 / 2, boxCollider.center.z - ts.size / 100 * (10 - 1) / 2)
+						boxCollider.size = CS.UnityEngine.Vector3(ts.size / 100, ts.size / 100, ts.size / 100 * 10)
 
 						-- local deubg_object = CS.UnityEngine.GameObject.CreatePrimitive(CS.UnityEngine.PrimitiveType.Cube)
 						-- deubg_object.name = "debug"
@@ -929,8 +929,8 @@ function tool2_castleDB.drawMap(gameMap, x, y, scale)
 	b = b ~ 63
 	boxCollider_p.name = boxCollider_p.name .. "[0]" .. "," .. b
 
-	boxCollider_p.center = CS.UnityEngine.Vector3(0, 0.16 / 2, 0) --  - ts.size / 100
-	boxCollider_p.size = CS.UnityEngine.Vector3(100, 0.16, 100)
+	boxCollider_p.center = CS.UnityEngine.Vector3(0, 0, -0.16 / 2) --  - ts.size / 100
+	boxCollider_p.size = CS.UnityEngine.Vector3(100, 100, 0.16)
 
 	p.transform.localScale = CS.UnityEngine.Vector3(scale, scale, scale)
 
@@ -942,27 +942,38 @@ function tool2_castleDB.createMapObject(parent, name, p, k, gameMap, n, ts, spri
 	-- unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, -k * ts.size / 100, 0)
 
 	if flag == "block" then
-		unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, ts.size / 100, -k * ts.size / 100)
+		unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, -k * ts.size / 100, -ts.size / 100 + -ts.size / 100)
 	elseif flag == "wall" then
-		unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, 0, -k * ts.size / 100)
+		unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, -k * ts.size / 100, -ts.size / 100)
 	elseif flag == "background" then
-		unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, 0, -k * ts.size / 100)
+		unityobject_child.transform.localPosition = CS.UnityEngine.Vector3(p * ts.size / 100, -k * ts.size / 100, -ts.size / 100)
 	end
 
 
+	local pos = unityobject_child.transform.localPosition
 
 	local pic_offset_object = CS.UnityEngine.GameObject("pic_offset")
 	pic_offset_object.transform:SetParent(unityobject_child.transform)
-	pic_offset_object.transform.localPosition = CS.UnityEngine.Vector3(-ts.size / 100 / 2 , ts.size / 100, 0)
+	pic_offset_object.transform.position = CS.UnityEngine.Vector3(pos.x , pos.y - pos.z, pos.z + pos.y)
+
+	if flag == "block" then
+		local height = -ts.size / 100
+		pic_offset_object.transform.position = CS.UnityEngine.Vector3(pos.x , pos.y - pos.z, pos.z + pos.y - height)
+	end
+
+	if flag == "background" then
+		local height = -ts.size / 100 * 10
+		pic_offset_object.transform.position = CS.UnityEngine.Vector3(pos.x , pos.y - pos.z, pos.z + pos.y - height)
+	end
 
 	local pic_object = CS.UnityEngine.GameObject("pic")
 	pic_object.transform:SetParent(pic_offset_object.transform)
-	local pos = pic_offset_object.transform.position
-	pic_object.transform.position = CS.UnityEngine.Vector3(pos.x , pos.y + pos.z, pos.z)
 
-	if flag == "background" then
-		pic_object.transform.position = CS.UnityEngine.Vector3(pos.x , pos.y + pos.z, 10)
-	end
+
+
+	pic_object.transform.localPosition = CS.UnityEngine.Vector3(-ts.size / 100 / 2 , ts.size / 100, 0)
+
+
 
 	-- pic_object.transform.localPosition = CS.UnityEngine.Vector3.zero
 

@@ -64,7 +64,7 @@ function start()
     -- CS.UnityEngine.Screen.SetResolution(1280, 720, false)
     CS.UnityEngine.Screen.SetResolution(640 * zoom, 360 * zoom, false)
 
-    -- LMainCamera:GetComponent(typeof(CS.UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera)).enabled = false
+    LMainCamera:GetComponent(typeof(CS.UnityEngine.Experimental.Rendering.Universal.PixelPerfectCamera)).enabled = false
 
     camera = LMainCamera:GetComponent(typeof(CS.UnityEngine.Camera))
     camera.orthographicSize = CS.UnityEngine.Screen.height / 100 / 2 * 2 / zoom
@@ -269,7 +269,7 @@ function start()
     -- UI_bit = utils.allOf(utils.getComponentID("Active"), utils.getComponentID("DataBase"), utils.getComponentID("UI"))
 
     -- 创建系统集合
-    _update = {"JudgePlayerSystem", "AnimationSystem1", "StateUpdateSystem", "AnimationSystem2", "SpriteRenderSystem", "SpineRenderSystem", "LineRenderSystem", "JudgeAISystem"}
+    _update = {"JudgePlayerSystem", "AnimationSystem11", "AnimationSystem1", "StateUpdateSystem", "AnimationSystem2", "SpriteRenderSystem", "SpineRenderSystem", "LineRenderSystem", "JudgeAISystem"}
     _fixedUpdate = {"StateFxiedUpdateSystem", "BDYSystem", "ATKSystem", "ResetAISystem", "ResetPlayerSystem", "SleepSystem"} -- , "PhysicsSystem"
 
     -- 创建一个实体
@@ -415,7 +415,7 @@ function start()
         ecs.addComponent(id1, "SpineRenderer", "girl")
         ecs.addComponent(id1, "Animation", "spine_idle")
         ecs.addComponent(id1, "State", "spine_idle")
-        ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 - 10, 0, 0, 0, 1)
+        ecs.addComponent(id1, "Physics", i + 0.2 + 2, -2.7 - 10, -(0.32 + 1), 0, 0, 0, 1)
         ecs.addComponent(id1, "BDY")
         ecs.addComponent(id1, "Sound")
         ecs.addComponent(id1, "Gravity")
@@ -431,12 +431,27 @@ function start()
         local id1 = ecs.newEntity()
         ecs.addComponent(id1, "Active")
         ecs.addComponent(id1, "DataBase", 9)
-        -- ecs.addComponent(id1, "SpriteRenderer")
         ecs.addComponent(id1, "SpineRenderer", "HK416C")
         ecs.addComponent(id1, "Animation", "spine_gun_idle")
         ecs.addComponent(id1, "State", "spine_gun_idle")
         ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 - 10, 0, 0, 0, 1)
         ecs.addComponent(id1, "Parent", ppp, "gun")
+        ecs.addComponent(id1, "BDY")
+        ecs.addComponent(id1, "Sound")
+
+        ggg = ecs.applyEntity(id1)
+
+    end
+
+    for i = 10, 10, 1 do
+        local id1 = ecs.newEntity()
+        ecs.addComponent(id1, "Active")
+        ecs.addComponent(id1, "DataBase", 9)
+        ecs.addComponent(id1, "SpineRenderer", "HK416C")
+        ecs.addComponent(id1, "Animation", "spine_gun_idle")
+        ecs.addComponent(id1, "State", "spine_gun_idle")
+        ecs.addComponent(id1, "Physics", i + 0.2 + 2, 0.32 + 1, -2.7 - 10, 0, 0, 0, 1)
+        ecs.addComponent(id1, "Parent", ppp, "gun2")
         ecs.addComponent(id1, "BDY")
         ecs.addComponent(id1, "Sound")
 

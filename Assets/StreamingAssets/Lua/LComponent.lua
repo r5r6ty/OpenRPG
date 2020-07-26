@@ -99,28 +99,25 @@ ecs.registerComponent("SpineRenderer", ecs.allOf("DataBase"), function(self, nam
     -- self.runtimeSkeletonAnimation:GetComponent(typeof(CS.UnityEngine.MeshRenderer)).sortingOrder = 10
     -- self.runtimeSkeletonAnimation.transform.Translate(Vector3.down * 2)
 
-    self.spine_object = self.runtimeSkeletonAnimation.gameObject
-    self.spine_object.name = "spine"
-    self.spine_object_id = self.spine_object:GetInstanceID()
-    CS.LuaUtil.AddGameObjectID(self.spine_object_id, self.spine_object)
-    self.spine_object.transform:SetParent(self.spine_offset_object.transform, false)
+    self.pic_object = self.runtimeSkeletonAnimation.gameObject
+    self.pic_object.name = "spine"
+    self.pic_object_id = self.pic_object:GetInstanceID()
+    CS.LuaUtil.AddGameObjectID(self.pic_object_id, self.pic_object)
+    self.pic_object.transform:SetParent(self.spine_offset_object.transform, false)
 
     self.requiresNewMesh = true
-
-    self.accumulatedTime = 0
 end, function (self)
     CS.UnityEngine.GameObject.Destroy(self.spine_offset_object)
     self.spine_offset_object = nil
     CS.LuaUtil.RemoveGameObjectID(self.spine_offset_object_id)
     self.spine_offset_object_id = nil
-    CS.UnityEngine.GameObject.Destroy(self.spine_object)
-    self.spine_object = nil
-    CS.LuaUtil.RemoveGameObjectID(self.spine_object_id)
-    self.spine_object_id = nil
+    CS.UnityEngine.GameObject.Destroy(self.pic_object)
+    self.pic_object = nil
+    CS.LuaUtil.RemoveGameObjectID(self.pic_object_id)
+    self.pic_object_id = nil
     self.runtimeSkeletonAnimation = nil
 
     self.requiresNewMesh = nil
-    self.accumulatedTime = nil
 end) 
 
 ecs.registerComponent("TrailRenderer", ecs.allOf("SpriteRenderer"), function(self)
@@ -180,15 +177,15 @@ ecs.registerComponent("Image", ecs.allOf("DataBase"), function(this, parent)
     -- this.rectTransform.pivot = CS.UnityEngine.Vector2(0, 1)
 end, nil)
 
-ecs.registerComponent("Sound", ecs.allOf("SpriteRenderer"), function(self)
-    self.audioSource = self.pic_offset_object:AddComponent(typeof(CS.UnityEngine.AudioSource))
-    self.audioSource.playOnAwake = false
-end, function (self)
-    self.audioSource = nil
-end)
+-- ecs.registerComponent("Sound", ecs.allOf("SpriteRenderer"), function(self)
+--     self.audioSource = self.pic_offset_object:AddComponent(typeof(CS.UnityEngine.AudioSource))
+--     self.audioSource.playOnAwake = false
+-- end, function (self)
+--     self.audioSource = nil
+-- end)
 
-ecs.registerComponent("Sound", ecs.allOf("SpineRenderer"), function(self)
-    self.audioSource = self.spine_offset_object:AddComponent(typeof(CS.UnityEngine.AudioSource))
+ecs.registerComponent("Sound", 0, function(self) -- ecs.allOf("SpineRenderer")
+    self.audioSource = self.pic_object:AddComponent(typeof(CS.UnityEngine.AudioSource))
     self.audioSource.playOnAwake = false
 end, function (self)
     self.audioSource = nil
@@ -196,16 +193,24 @@ end)
 
 ecs.registerComponent("Animation", 0, function(self, a)
     self.action = a
+
+    self.accumulatedTime = 0
+
     self.delayCounter = 0
-    self.speed = 1
     self.timeLine = 0
     self.localTimeLine = 0
+
+    self.speed = 1
 end, function(self)
     self.action = nil
+
+    self.accumulatedTime = nil
+
     self.delayCounter = nil
-    self.speed = nil
     self.timeLine = nil
     self.localTimeLine = nil
+
+    self.speed = nil
 end)
 
 ecs.registerComponent("State", 0, function(self, s)
@@ -328,6 +333,8 @@ end, nil)
 
 ecs.registerComponent("Gravity", 0, function(self)
     local x, y, z = CS.LuaUtil.GetPhysicsGravity()
+    z = -y
+    y = 0
     self.gravity = {x = x, y = y, z = z}
 end, function(self)
     self.gravity = nil

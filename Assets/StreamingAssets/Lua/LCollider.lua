@@ -67,11 +67,11 @@ end
 
 -- 设置collider
 function LCollider:setCollider(dir, x, y, width, height, depth, flag, layers, bounciness)
-	self.offset = CS.UnityEngine.Vector3((x + width / 2) / 100, -(y + height / 2) / 100, 0)
+	self.offset = CS.UnityEngine.Vector3((x + width / 2) / 100, 0, (y + height / 2) / 100)
 	if depth ~= nil then
-		self.size = CS.UnityEngine.Vector3(depth / 100, height / 100, width / 100)
+		self.size = CS.UnityEngine.Vector3(depth / 100, width / 100, height / 100)
 	else
-		self.size = CS.UnityEngine.Vector3(width / 100, height / 100, width / 100)
+		self.size = CS.UnityEngine.Vector3(width / 100, width / 100, height / 100)
 	end
 	self.collider.center = self.offset-- * dir
 	self.collider.size = self.size
@@ -406,10 +406,10 @@ function LColliderBDY:BDYFixedUpdate()
 						local offset_z = nil
 						local offset_y = nil
 						if (left or right) and (up or down) then
-							if m_x > m_z then
+							if m_x > m_y then
 								m_x = 0
 							else
-								m_z = 0
+								m_y = 0
 							end
 						end
 						if velocity_x > 0 then
@@ -418,16 +418,16 @@ function LColliderBDY:BDYFixedUpdate()
 							offset_x = velocity_x + m_x
 						end
 
-						if velocity_z > 0 then
-							offset_z = velocity_z - m_z
-						else
-							offset_z = velocity_z + m_z
-						end
-
 						if velocity_y > 0 then
 							offset_y = velocity_y - m_y
 						else
 							offset_y = velocity_y + m_y
+						end
+
+						if velocity_z > 0 then
+							offset_z = velocity_z - m_z
+						else
+							offset_z = velocity_z + m_z
 						end
 						-- 留下最小位移坐标
 						if left or right then
@@ -446,29 +446,6 @@ function LColliderBDY:BDYFixedUpdate()
 						end
 
 						if up or down then
-							if velocity_z > 0 then
-								if offset_z < finalOffset_z then
-									finalOffset_z = offset_z
-								end
-							else
-								if offset_z > finalOffset_z then
-									finalOffset_z = offset_z
-								end
-							end
-
-							isWall_updown = 1
-
-						end
-
-						if (left or right) and (up or down) then
-							if m_x > m_z then
-								isWall_leftright = -1
-							else
-								isWall_updown = -1
-							end
-						end
-
-						if above or under then
 
 							if velocity_y > 0 then
 								if offset_y < finalOffset_y then
@@ -480,7 +457,31 @@ function LColliderBDY:BDYFixedUpdate()
 								end
 							end
 
-							if isGround == -1 and m_y > 0 then
+							isWall_updown = 1
+
+						end
+
+						if (left or right) and (up or down) then
+							if m_x > m_y then
+								isWall_leftright = -1
+							else
+								isWall_updown = -1
+							end
+						end
+
+						if above or under then
+
+							if velocity_z > 0 then
+								if offset_z < finalOffset_z then
+									finalOffset_z = offset_z
+								end
+							else
+								if offset_z > finalOffset_z then
+									finalOffset_z = offset_z
+								end
+							end
+
+							if isGround == -1 and m_z > 0 then
 								isGround = 1 << tonumber(0)
 							end
 						end
@@ -501,10 +502,10 @@ function LColliderBDY:BDYFixedUpdate()
 					self.LObject.velocity.x = -self.LObject.velocity.x * self.bounciness
 				end
 				if isWall_updown == 1 then
-					self.LObject.velocity.z = -self.LObject.velocity.z * self.bounciness
+					self.LObject.velocity.y = -self.LObject.velocity.y * self.bounciness
 				end
 				if isGround == 1 then
-					self.LObject.velocity.y = -self.LObject.velocity.y * self.bounciness
+					self.LObject.velocity.z = -self.LObject.velocity.z * self.bounciness
 				end
 				if isWall_leftright == 1 or isWall_updown == 1 or isGround == 1 then
 					self.LObject.rotation_velocity = (CS.Tools.Instance:RandomRangeInt(0, 2) * 2 - 1) * self.LObject.rotation_velocity * self.bounciness
@@ -520,16 +521,16 @@ function LColliderBDY:BDYFixedUpdate()
 						self.isHit = 1
 						local dis = hitinfos[i].distance
 						finalOffset_x = dx * dis
-						finalOffset_z = dz * dis
 						finalOffset_y = dy * dis
+						finalOffset_z = dz * dis
 
 						local nx, ny, nz =  CS.LuaUtil.RaycastHitGetNormal(hitinfos[i])
 						local ddx, ddy, ddz = CS.LuaUtil.Vector3Reflect(dx, dy, dz, nx, ny, nz)
 						
 						local len = utils.GetVector3Module(self.LObject.velocity.x, self.LObject.velocity.y, self.LObject.velocity.z)
 						self.LObject.velocity.x = ddx * len * self.bounciness
-						self.LObject.velocity.z = ddz * len * self.bounciness
 						self.LObject.velocity.y = ddy * len * self.bounciness
+						self.LObject.velocity.z = ddz * len * self.bounciness
 						break
 					elseif go.name ~= "test" then
 						local object2 = utils.getObject(go:GetInstanceID())
@@ -543,16 +544,16 @@ function LColliderBDY:BDYFixedUpdate()
 								self.isHit = 16
 								local dis = hitinfos[i].distance
 								finalOffset_x = dx * dis
-								finalOffset_z = dz * dis
 								finalOffset_y = dy * dis
+								finalOffset_z = dz * dis
 
 								local nx, ny, nz =  CS.LuaUtil.RaycastHitGetNormal(hitinfos[i])
 								local ddx, ddy, ddz = CS.LuaUtil.Vector3Reflect(dx, dy, dz, nx, ny, nz)
 								
 								local len = utils.GetVector3Module(self.LObject.velocity.x, self.LObject.velocity.y, self.LObject.velocity.z)
 								self.LObject.velocity.x = ddx * len * self.bounciness
-								self.LObject.velocity.z = ddz * len * self.bounciness
 								self.LObject.velocity.y = ddy * len * self.bounciness
+								self.LObject.velocity.z = ddz * len * self.bounciness
 
 
 								if object2._bit | 1 ~= object2._bit then
@@ -560,13 +561,13 @@ function LColliderBDY:BDYFixedUpdate()
 									ecs.applyEntity(object2._eid)
 
 									object2.velocity.x = object2.velocity.x - self.LObject.velocity.x
-									object2.velocity.z = object2.velocity.z - self.LObject.velocity.z
 									object2.velocity.y = object2.velocity.y - self.LObject.velocity.y
+									object2.velocity.z = object2.velocity.z - self.LObject.velocity.z
 									object2.rotation_velocity = 0
 								else
 									object2.velocity.x = object2.velocity.x - self.LObject.velocity.x / 10
-									object2.velocity.z = object2.velocity.z - self.LObject.velocity.z / 10
 									object2.velocity.y = object2.velocity.y - self.LObject.velocity.y / 10
+									object2.velocity.z = object2.velocity.z - self.LObject.velocity.z / 10
 								end
 								break
 							else
@@ -591,8 +592,8 @@ function LColliderBDY:BDYFixedUpdate()
 	else
 
 	local velocity_x = self.LObject.velocity.x * CS.UnityEngine.Time.deltaTime * self.LObject.speed
-	local velocity_z = self.LObject.velocity.z * CS.UnityEngine.Time.deltaTime * self.LObject.speed
 	local velocity_y = self.LObject.velocity.y * CS.UnityEngine.Time.deltaTime * self.LObject.speed
+	local velocity_z = self.LObject.velocity.z * CS.UnityEngine.Time.deltaTime * self.LObject.speed
 	
 
 	-- local contactColliders = CS.UnityEngine.Physics.OverlapBox(self.collider.bounds.center + velocity, self.collider.bounds.extents, self.LObject.physics_object.transform.rotation, self.filter.layerMask.value)
@@ -607,8 +608,8 @@ function LColliderBDY:BDYFixedUpdate()
 
 	-- 最终位移坐标
 	local finalOffset_x = velocity_x
-	local finalOffset_z = velocity_z
 	local finalOffset_y = velocity_y
+	local finalOffset_z = velocity_z
 	for i = 0, contactColliders.Length - 1, 1 do
 		local k = contactColliders[i]
 		if k ~= nil and k.attachedRigidbody ~= self.collider.attachedRigidbody then
@@ -718,14 +719,14 @@ function LColliderBDY:BDYFixedUpdate()
 				if utils.GetVector3Module(m_x, m_y, m_z) > 0 then
 			
 					local offset_x = nil
-					local offset_z = nil
 					local offset_y = nil
+					local offset_z = nil
 
 					if (left or right) and (up or down) then
-						if m_x > m_z then
+						if m_x > m_y then
 							m_x = 0
 						else
-							m_z = 0
+							m_y = 0
 						end
 					end
 
@@ -735,18 +736,17 @@ function LColliderBDY:BDYFixedUpdate()
 						offset_x = velocity_x + m_x
 					end
 
-					if velocity_z > 0 then
-						offset_z = velocity_z - m_z
-					else
-						offset_z = velocity_z + m_z
-					end
-
 					if velocity_y > 0 then
 						offset_y = velocity_y - m_y
 					else
 						offset_y = velocity_y + m_y
 					end
 
+					if velocity_z > 0 then
+						offset_z = velocity_z - m_z
+					else
+						offset_z = velocity_z + m_z
+					end
 
 					-- 留下最小位移坐标
 					if left or right then
@@ -765,29 +765,6 @@ function LColliderBDY:BDYFixedUpdate()
 					end
 
 					if up or down then
-						if velocity_z > 0 then
-							if offset_z < finalOffset_z then
-								finalOffset_z = offset_z
-							end
-						else
-							if offset_z > finalOffset_z then
-								finalOffset_z = offset_z
-							end
-						end
-
-						isWall_updown = 1
-
-					end
-
-					if (left or right) and (up or down) then
-						if m_x > m_z then
-							isWall_leftright = -1
-						else
-							isWall_updown = -1
-						end
-					end
-
-					if above or under then
 
 						if velocity_y > 0 then
 							if offset_y < finalOffset_y then
@@ -799,7 +776,31 @@ function LColliderBDY:BDYFixedUpdate()
 							end
 						end
 
-						if isGround == -1 and m_y > 0 then
+						isWall_updown = 1
+
+					end
+
+					if (left or right) and (up or down) then
+						if m_x > m_y then
+							isWall_leftright = -1
+						else
+							isWall_updown = -1
+						end
+					end
+
+					if above or under then
+
+						if velocity_z > 0 then
+							if offset_z < finalOffset_z then
+								finalOffset_z = offset_z
+							end
+						else
+							if offset_z > finalOffset_z then
+								finalOffset_z = offset_z
+							end
+						end
+
+						if isGround == -1 and m_z > 0 then
 							isGround = 1 << tonumber(0)
 						end
 					end
@@ -818,10 +819,10 @@ function LColliderBDY:BDYFixedUpdate()
 			self.LObject.velocity.x = -self.LObject.velocity.x * self.bounciness
 		end
 		if isWall_updown == 1 then
-			self.LObject.velocity.z = -self.LObject.velocity.z * self.bounciness
+			self.LObject.velocity.y = -self.LObject.velocity.y * self.bounciness
 		end
 		if isGround == 1 then
-			self.LObject.velocity.y = -self.LObject.velocity.y * self.bounciness
+			self.LObject.velocity.z = -self.LObject.velocity.z * self.bounciness
 		end
 		if isWall_leftright == 1 or isWall_updown == 1 or isGround == 1 then
 			self.LObject.rotation_velocity = (CS.Tools.Instance:RandomRangeInt(0, 2) * 2 - 1) * self.LObject.rotation_velocity * self.bounciness

@@ -8,7 +8,7 @@ ecs.registerMultipleSystem("SpriteRenderSystem", function(self)
 
     local pos_x, pos_y, pos_z = CS.LuaUtil.GetPos(self.physics_object_id)
     local r_pos_x, r_pos_y, r_pos_z = CS.LuaUtil.GetPos(self.root.physics_object_id)
-    CS.LuaUtil.SetPos(self.pic_offset_object_id, pos_x, pos_y + pos_z, r_pos_z)
+    CS.LuaUtil.SetPos(self.pic_offset_object_id, pos_x, pos_y - pos_z, r_pos_z + pos_y)
 
     self.rotation = self.rotation + self.rotation_velocity * self.speed
 
@@ -37,7 +37,7 @@ ecs.registerMultipleSystem("SpineRenderSystem", function(self)
 
     local pos_x, pos_y, pos_z = CS.LuaUtil.GetPos(self.physics_object_id)
     local r_pos_x, r_pos_y, r_pos_z = CS.LuaUtil.GetPos(self.root.physics_object_id)
-    CS.LuaUtil.SetPos(self.spine_offset_object_id, pos_x, pos_y + pos_z, r_pos_z)
+    CS.LuaUtil.SetPos(self.spine_offset_object_id, pos_x, pos_y - pos_z, r_pos_z + pos_y)
 
 
     local rrr_x, rrr_y, rrr_z = CS.LuaUtil.GetEulerAngles(self.physics_object_id)
@@ -55,7 +55,7 @@ ecs.registerMultipleSystem("AnimationSystem1", function(self)
     local frameDeltaTime = 1 / 60
     local maxFrameSkip = 4
     
-    self.accumulatedTime = CS.UnityEngine.Time.deltaTime
+    self.accumulatedTime = self.accumulatedTime + CS.UnityEngine.Time.deltaTime
     local frames = 0
     while self.accumulatedTime >= frameDeltaTime do
         frames = frames + 1
@@ -65,13 +65,23 @@ ecs.registerMultipleSystem("AnimationSystem1", function(self)
         self.accumulatedTime = self.accumulatedTime - frameDeltaTime
     end
 
-    if self.runtimeSkeletonAnimation.AnimationState:GetCurrent(0) ~= nil and frames > 0 then
-        local c = self.database.animations[self.action].keyframes[self.delayCounter + 1]
+    if frames > 0 then
+
+        self.timeLine = self.timeLine + frames * frameDeltaTime * self.speed
+        self.localTimeLine = self.localTimeLine + frames * frameDeltaTime * self.speed
+
+        local kfs = self.database.animations[self.action].keyframes
+        local c = kfs[self.delayCounter + 1]
         if c == nil then
-            self.timeLine = self.timeLine - self.runtimeSkeletonAnimation.AnimationState:GetCurrent(0).Animation.Duration
+            local ani = self.runtimeSkeletonAnimation.AnimationState:GetCurrent(0)
+            if ani ~= nil then
+                self.timeLine = self.timeLine - ani.Animation.Duration
+            else
+                self.timeLine = kfs[#kfs] * frameDeltaTime
+            end
             self.delayCounter = 0
             self.localTimeLine = 0
-            c = self.database.animations[self.action].keyframes[self.delayCounter + 1]
+            c = kfs[self.delayCounter + 1]
         end
 
         if self.timeLine >= c * frameDeltaTime then
@@ -87,14 +97,56 @@ ecs.registerMultipleSystem("AnimationSystem1", function(self)
             end
         end
 
-        self.timeLine = self.timeLine + frames * frameDeltaTime * self.speed
-        self.localTimeLine = self.timeLine + frames * frameDeltaTime * self.speed
-
         self.runtimeSkeletonAnimation:Update(frames * frameDeltaTime * self.speed)
         self.requiresNewMesh = true
     end
 
 end, ecs.allOf("Active", "DataBase", "Animation", "SpineRenderer"))
+
+-- 动画1
+ecs.registerMultipleSystem("AnimationSystem11", function(self)
+    local frameDeltaTime = 1 / 60
+    local maxFrameSkip = 4
+    
+    self.accumulatedTime = self.accumulatedTime + CS.UnityEngine.Time.deltaTime
+    local frames = 0
+    while self.accumulatedTime >= frameDeltaTime do
+        frames = frames + 1
+        if frames > maxFrameSkip then
+            break
+        end
+        self.accumulatedTime = self.accumulatedTime - frameDeltaTime
+    end
+
+    if frames > 0 then
+
+        self.timeLine = self.timeLine + frames * frameDeltaTime * self.speed
+        self.localTimeLine = self.localTimeLine + frames * frameDeltaTime * self.speed
+
+        local kfs = self.database.animations[self.action].keyframes
+        local c = kfs[self.delayCounter + 1]
+        if c == nil then
+            self.timeLine = kfs[#kfs] * frameDeltaTime
+            self.delayCounter = 0
+            self.localTimeLine = 0
+            c = kfs[self.delayCounter + 1]
+        end
+
+        if self.timeLine >= c * frameDeltaTime then
+
+            local f = self.database.animations[self.action].eventQueue[c]
+            self.delayCounter = self.delayCounter + 1
+            self.localTimeLine = 0
+            if f ~= nil then
+                for _, v in ipairs(f) do
+                    -- self.database:invokeEvent(v.category, self, v)
+                    ecs.processSingleSystem(v.category, self, v)
+                end
+            end
+        end
+    end
+
+end, ecs.allOf("Active", "DataBase", "Animation", "SpriteRenderer"))
 
 ecs.registerMultipleSystem("SpineLateUpdate", function(self)
 
@@ -119,6 +171,11 @@ end, ecs.allOf("Active", "DataBase", "Animation"))
 -- 状态更新
 ecs.registerMultipleSystem("StateUpdateSystem", function(self)
     if self.state ~= nil then
+
+        -- if self.state == "spine_gun_shoot" or self.state == "spine_gun_idle" then
+        --     print(self.state, self.delayCounter, self.timeLine, self.localTimeLine)
+        -- end
+
         local st = self.database.characters_state[self.state]
         for _, v in ipairs(st.update) do
             if v.func == nil or v.func(self) then
@@ -253,12 +310,12 @@ end, ecs.allOf("Active", "Physics", "ATK"))
 
 -- 休眠
 ecs.registerMultipleSystem("SleepSystem", function(self)
-    if utils.GetVector3Module(self.velocity.x, self.velocity.y, self.velocity.z) <= 0.3 then
+    if self.isOnGround ~= -1 and utils.GetVector3Module(self.velocity.x, self.velocity.y, self.velocity.z) <= 0.3 then
         self.sleep = true
         ecs.removeComponent(self._eid, "Active")
         ecs.applyEntity(self._eid)
     end
-end, ecs.allOf("Active", "DataBase", "Sleep"))
+end, ecs.allOf("Active", "DataBase", "Physics", "Sleep"))
 
 -- AI
 ecs.registerMultipleSystem("JudgeAISystem", function(self)
@@ -336,8 +393,8 @@ end, ecs.allOf("Active", "Physics", "Gravity"))
 ecs.registerSingleSystem("Ground", function(this, value)
     -- if this.isOnGround ~= 1 then
         local f_x = this.velocity.x * 0.2 -- 摩擦系数
-        -- local f_y = this.velocity.y * 0.2 -- 摩擦系数
-        local f_z = this.velocity.z * 0.2 -- 摩擦系数
+        local f_y = this.velocity.y * 0.2 -- 摩擦系数
+
         if this.velocity.x > 0 then
             this.velocity.x = this.velocity.x - f_x
             if this.velocity.x < 0 then
@@ -350,15 +407,15 @@ ecs.registerSingleSystem("Ground", function(this, value)
             end
         end
 
-        if this.velocity.z > 0 then
-            this.velocity.z = this.velocity.z - f_z
-            if this.velocity.z < 0 then
-                this.velocity.z = 0
+        if this.velocity.y > 0 then
+            this.velocity.y = this.velocity.y - f_y
+            if this.velocity.y < 0 then
+                this.velocity.y = 0
             end
-        elseif this.velocity.z < 0 then
-            this.velocity.z = this.velocity.z - f_z
-            if this.velocity.z > 0 then
-                this.velocity.z = 0
+        elseif this.velocity.y < 0 then
+            this.velocity.y = this.velocity.y - f_y
+            if this.velocity.y > 0 then
+                this.velocity.y = 0
             end
         end
     -- end
@@ -372,7 +429,7 @@ ecs.registerSingleSystem("Ground", function(this, value)
     --         this.sleep = true
     --     end
     -- end
-end, ecs.allOf("Active", "SpineRenderer"))
+end, ecs.allOf("Active", "Physics"))
 
 ecs.registerSingleSystem("Sprite", function(this, value)
     if value.sprite == nil and value.id ~= nil then
@@ -606,6 +663,7 @@ end)
 
 ecs.registerSingleSystem("State", function(this, value)
     utils.changeState(this, value.state, value.spineAnimation)
+    print(value.state)
 end, ecs.allOf("Active", "Animation", "State", "SpineRenderer"))
 
 ecs.registerSingleSystem("Aim", function(this, value)
@@ -697,7 +755,7 @@ ecs.registerSingleSystem("Bone", function(this, value)
         local r = rotation.eulerAngles
         CS.LuaUtil.SetRotationByEuler(object.physics_object_id, r.x, r.y, r.z)
 
-        CS.LuaUtil.SetLocalPos(object.physics_object_id, pos.x, pos.y, 0)
+        CS.LuaUtil.SetLocalPos(object.physics_object_id, pos.x, 0, -pos.y)
 
         -- print(pos.x, pos.y)
 
@@ -903,13 +961,28 @@ ecs.registerSingleSystem("Object", function(this, value)
             offset = 0
         end
 
-        local randomvector = CS.UnityEngine.Vector3(0, CS.Tools.Instance:RandomRangeFloat(0, 1), CS.Tools.Instance:RandomRangeFloat(0, 1)).normalized
+        local randomvector_x = 0
+        local randomvector_y = CS.Tools.Instance:RandomRangeFloat(0, 1)
+        local randomvector_z = CS.Tools.Instance:RandomRangeFloat(0, 1)
 
-        rot = CS.UnityEngine.Quaternion.AngleAxis(r, randomvector) * this.physics_object.transform.rotation 
+        local length = utils.GetVector3Module(randomvector_x, randomvector_y, randomvector_z) -- 射线的长度
+		local dx = randomvector_x / length -- 方向
+		local dy = randomvector_y / length -- 方向
+        local dz = randomvector_z / length -- 方向
 
-        velocityyy = rot * (CS.UnityEngine.Vector3(value.x2 - offset, value.y2, value.z2) * CS.Tools.Instance:RandomRangeFloat(0.9, 1))
+        local rot_x, rot_y, rot_z, rot_w = CS.LuaUtil.QuaternionAngleAxis(r, dx, dy, dz)
 
-        local pos = this.physics_object.transform.rotation * CS.UnityEngine.Vector3(value.x / 100 * 2, -value.y / 100 * 2, 0)
+        local rx, ry, rw, rz = CS.LuaUtil.GetRotation(this.physics_object_id)
+        rot_x, rot_y, rot_z, rot_w = CS.LuaUtil.QuaternionMultiplyQuaternion(rot_x, rot_y, rot_z, rot_w, rx, ry, rw, rz)
+
+
+        local rrr = CS.Tools.Instance:RandomRangeFloat(0.9, 1)
+        local rrr_x = (value.x2 - offset) * rrr
+        local rrr_y = value.y2 * rrr
+        local rrr_z = value.z2 * rrr
+        local velocityyy_x, velocityyy_y, velocityyy_z = CS.LuaUtil.QuaternionMultiplyVector3(rot_x, rot_y, rot_z, rot_w, rrr_x, rrr_y, rrr_z)
+
+        local pos_x, pos_y, pos_z = CS.LuaUtil.QuaternionMultiplyVector3(rx, ry, rw, rz, value.x / 100 * 2, -value.z / 100 * 2, value.y / 100 * 2)
 
         -- local kk = nil
         -- if value.animation == "shell1" or value.animation == "shell2" then
@@ -929,8 +1002,9 @@ ecs.registerSingleSystem("Object", function(this, value)
         -- ecs.addComponent(id2, "BDY")
         -- ecs.addComponent(id2, "Sleep")
         -- local object = ecs.applyEntity(id2)
-        local object = this.database.groups[value.animation](this.rigidbody.position.x + pos.x, this.rigidbody.position.y + pos.y, this.rigidbody.position.z + pos.z, velocityyy.x, velocityyy.y, velocityyy.z, this.team, this.root.target)
-        object.spriteRenderer.material = this.spriteRenderer.material
+        local object = this.database.groups[value.animation](this.rigidbody.position.x + pos_x, this.rigidbody.position.y + pos_y, this.rigidbody.position.z + pos_z, velocityyy_x, velocityyy_y, velocityyy_z, this.team, this.root.target)
+        -- object.spriteRenderer.material = this.spriteRenderer.material
+
 
 
 
@@ -951,7 +1025,7 @@ ecs.registerSingleSystem("Object", function(this, value)
 
         object.direction.x = d
 
-        object.physics_object.transform.rotation = rot
+        CS.LuaUtil.SetRotation(object.physics_object_id, rot_x, rot_y, rot_z, rot_w)
 
         -- object.rotation = rot.eulerAngles.z
         

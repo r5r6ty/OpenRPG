@@ -2359,7 +2359,7 @@
 							"x": 0,
 							"y": 0,
 							"category": "Sprite",
-							"id": "18,34,82,98"
+							"id": "17,33,113,129"
 						}
 					]
 				},
@@ -2379,7 +2379,7 @@
 							"layers": "16"
 						},
 						{
-							"sprite": "52c3a3ff78f2d5ee224f9e794be9d923",
+							"sprite": "ab633304eaa8b2d363282c0b42199fad",
 							"category": "Sprite",
 							"x": -2,
 							"wait": 600,
@@ -2403,7 +2403,7 @@
 							"layers": "16"
 						},
 						{
-							"sprite": "952ff89bc127d28b14479be282e68ed3",
+							"sprite": "f6494939774b8d7bb40e12af862a4528",
 							"category": "Sprite",
 							"x": -2,
 							"wait": 600,
@@ -2420,28 +2420,28 @@
 						},
 						{
 							"category": "Sprite",
-							"sprite": "5c6d7a131406a28e3617d89f74f01abd",
+							"sprite": "7fb38e53a584d0deb821756af8610c12",
 							"x": 0,
 							"y": -6,
 							"wait": 3
 						},
 						{
 							"category": "Sprite",
-							"sprite": "178bb64bfeafd6cf74bc8153ea926838",
+							"sprite": "fb0da22889f4afa1a4e04412273d1f80",
 							"wait": 3,
 							"x": 0,
 							"y": -7
 						},
 						{
 							"category": "Sprite",
-							"sprite": "e2d64c9b65fb56bdba688e2a73382a2d",
+							"sprite": "a512a3204c5fafd2bdaf6d57a77da929",
 							"wait": 3,
 							"x": 1,
 							"y": -9
 						},
 						{
 							"category": "Sprite",
-							"sprite": "c2678c95386d250a94c5dd62fbdc2ac8",
+							"sprite": "eee889969ff3a5dfa7df1d777f39f9c0",
 							"wait": 3,
 							"x": 4,
 							"y": -10
@@ -2656,28 +2656,28 @@
 						},
 						{
 							"category": "Sprite",
-							"sprite": "5c6d7a131406a28e3617d89f74f01abd",
+							"sprite": "7fb38e53a584d0deb821756af8610c12",
 							"x": 0,
 							"y": -6,
 							"wait": 3
 						},
 						{
 							"category": "Sprite",
-							"sprite": "178bb64bfeafd6cf74bc8153ea926838",
+							"sprite": "fb0da22889f4afa1a4e04412273d1f80",
 							"wait": 3,
 							"x": 0,
 							"y": -7
 						},
 						{
 							"category": "Sprite",
-							"sprite": "e2d64c9b65fb56bdba688e2a73382a2d",
+							"sprite": "a512a3204c5fafd2bdaf6d57a77da929",
 							"wait": 3,
 							"x": 1,
 							"y": -9
 						},
 						{
 							"category": "Sprite",
-							"sprite": "c2678c95386d250a94c5dd62fbdc2ac8",
+							"sprite": "eee889969ff3a5dfa7df1d777f39f9c0",
 							"wait": 3,
 							"x": 4,
 							"y": -10
@@ -4385,7 +4385,7 @@
 					"clips": [
 						{
 							"category": "Sound",
-							"sfx": "bullet_hit1"
+							"sfx": "run1"
 						},
 						{
 							"category": "Wait",
@@ -4393,7 +4393,7 @@
 						},
 						{
 							"category": "Sound",
-							"sfx": "bullet_hit1"
+							"sfx": "run2"
 						},
 						{
 							"category": "Wait",
@@ -4419,11 +4419,7 @@
 						},
 						{
 							"category": "Wait",
-							"wait": 1
-						},
-						{
-							"category": "Wait",
-							"wait": 598
+							"wait": 599
 						}
 					]
 				}
@@ -4540,11 +4536,29 @@
 						{
 							"category": "SpineAnimation",
 							"active": true,
+							"trigger": "6",
+							"json": {
+								"spineAnimation": "aimR",
+								"trackIndex": 2
+							}
+						},
+						{
+							"category": "SpineAnimation",
+							"active": true,
 							"json": {
 								"spineAnimation": "123",
 								"trackIndex": 1
 							},
 							"trigger": "this.controller ~= nil and this.controller.commands[\"shoot_right_l\"].UIActive == nil"
+						},
+						{
+							"category": "SpineAnimation",
+							"active": true,
+							"trigger": "8",
+							"json": {
+								"spineAnimation": "123",
+								"trackIndex": 2
+							}
 						}
 					],
 					"Exit": [],
@@ -5085,6 +5099,7 @@
 							"json": {
 								"x": 0,
 								"y": 0,
+								"z": 0,
 								"x2": 0,
 								"y2": 0,
 								"z2": 0,
@@ -5097,12 +5112,12 @@
 						},
 						{
 							"category": "Destory",
-							"active": false,
+							"active": true,
 							"trigger": "(this.bodyArray[\"0\"] ~= nil and this.bodyArray[\"0\"].isHit ~= -1) or this.timeLine >= 1"
 						},
 						{
 							"category": "Destory",
-							"active": true,
+							"active": false,
 							"trigger": "(this.bodyArray[\"0\"] ~= nil and this.bodyArray[\"0\"].isHit == 16) or this.timeLine >= 10"
 						},
 						{
@@ -5854,6 +5869,14 @@
 								"bone": "grabR",
 								"id": "gun"
 							}
+						},
+						{
+							"category": "Bone",
+							"active": true,
+							"json": {
+								"bone": "grabL",
+								"id": "gun2"
+							}
 						}
 					],
 					"fixedUpdate": [
@@ -5881,6 +5904,14 @@
 								"bone": "grabR",
 								"id": "gun"
 							}
+						},
+						{
+							"category": "Bone",
+							"active": true,
+							"json": {
+								"bone": "grabL",
+								"id": "gun2"
+							}
 						}
 					],
 					"fixedUpdate": [
@@ -5905,7 +5936,7 @@
 							"active": true,
 							"trigger": "this.controller ~= nil and this.controller.commands[\"walkU\"].UIActive ~= nil",
 							"json": {
-								"z": 1
+								"y": 1
 							}
 						},
 						{
@@ -5913,7 +5944,7 @@
 							"active": true,
 							"trigger": "this.controller ~= nil and this.controller.commands[\"walkD\"].UIActive ~= nil",
 							"json": {
-								"z": -1
+								"y": -1
 							}
 						}
 					],
@@ -5942,11 +5973,21 @@
 					"Exit": [],
 					"update": [
 						{
-							"category": "Sound",
+							"category": "Object",
 							"active": true,
 							"trigger": "this.delayCounter == 1 and this.localTimeLine == 0",
 							"json": {
-								"sfx": "A9mm"
+								"x": 27,
+								"y": 0,
+								"z": -4,
+								"x2": 0,
+								"y2": 0,
+								"z2": 0,
+								"state": "fire_effect2",
+								"animation": "fire_effect2",
+								"id": "9",
+								"amount": 1,
+								"precise": 0
 							}
 						},
 						{
@@ -5954,24 +5995,43 @@
 							"active": true,
 							"trigger": "0",
 							"json": {
-								"x": 11,
-								"y": -4,
+								"x": 27,
+								"y": 0,
+								"z": -4,
 								"x2": 40,
 								"y2": 0,
 								"z2": 0,
 								"state": "bullet",
 								"animation": "bullet",
 								"id": "9",
-								"amount": 5,
-								"precise": 10
+								"amount": 1,
+								"precise": 5
+							}
+						},
+						{
+							"category": "Object",
+							"active": true,
+							"trigger": "0",
+							"json": {
+								"x": 3,
+								"y": 0,
+								"z": -4,
+								"x2": 1,
+								"y2": -0.5,
+								"z2": -3,
+								"state": "shell2",
+								"animation": "shell2",
+								"id": "9",
+								"amount": 1,
+								"precise": 50
 							}
 						},
 						{
 							"category": "State",
 							"active": true,
-							"trigger": "this.timeLine >= 5 / 60",
+							"trigger": "this.timeLine >= 60 / 12 / 60",
 							"json": {
-								"state": "weapon_idle_J"
+								"state": "spine_gun_idle"
 							}
 						}
 					],

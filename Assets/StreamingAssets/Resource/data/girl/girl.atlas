@@ -4,23 +4,9 @@ size: 1024,1024
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-body_f
+leg1
   rotate: false
-  xy: 1014, 953
-  size: 9, 9
-  orig: 9, 9
-  offset: 0, 0
-  index: -1
-hand1
-  rotate: false
-  xy: 982, 962
-  size: 6, 2
-  orig: 6, 2
-  offset: 0, 0
-  index: -1
-hand2
-  rotate: false
-  xy: 976, 962
+  xy: 964, 962
   size: 6, 2
   orig: 6, 2
   offset: 0, 0
@@ -32,7 +18,7 @@ magazine
   orig: 6, 7
   offset: 0, 0
   index: -1
-leg1
+hand1
   rotate: false
   xy: 952, 962
   size: 6, 2
@@ -46,17 +32,31 @@ barrel
   orig: 40, 17
   offset: 0, 0
   index: -1
-leg2
-  rotate: false
-  xy: 973, 947
-  size: 6, 2
-  orig: 6, 2
-  offset: 0, 0
-  index: -1
 head_f
   rotate: false
   xy: 983, 926
   size: 16, 15
   orig: 16, 15
+  offset: 0, 0
+  index: -1
+leg2
+  rotate: false
+  xy: 970, 962
+  size: 6, 2
+  orig: 6, 2
+  offset: 0, 0
+  index: -1
+body_f
+  rotate: false
+  xy: 1014, 953
+  size: 9, 9
+  orig: 9, 9
+  offset: 0, 0
+  index: -1
+hand2
+  rotate: false
+  xy: 982, 962
+  size: 6, 2
+  orig: 6, 2
   offset: 0, 0
   index: -1

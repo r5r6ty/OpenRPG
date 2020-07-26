@@ -458,6 +458,11 @@ public class LuaUtil
         z = pos.z;
     }
 
+    public static void SetRotation(int id, float x, float y, float z, float w)
+    {
+        m_gameObjects[id].transform.rotation = new Quaternion(x, y, z, w);
+    }
+
     public static void GetRotation(int id, out float x, out float y, out float z, out float w)
     {
         Quaternion quaternion = m_gameObjects[id].transform.rotation;
@@ -557,9 +562,30 @@ public class LuaUtil
         z = g.z;
     }
 
-    public static Vector3 QuaternionMultiplyVector3(float qx, float qy, float qz, float qw, float vx, float vy, float vz)
+    public static void QuaternionAngleAxis(float r, float vx, float vy, float vz, out float x, out float y, out float z, out float w)
     {
-        return new Quaternion(qx, qy, qz, qw) * new Vector3(vx, vy, vz);
+        Quaternion quaternion = Quaternion.AngleAxis(r, new Vector3(vx, vy, vz));
+        x = quaternion.x;
+        y = quaternion.y;
+        z = quaternion.z;
+        w = quaternion.w;
+    }
+
+    public static void QuaternionMultiplyVector3(float qx, float qy, float qz, float qw, float vx, float vy, float vz, out float x, out float y, out float z)
+    {
+        Vector3 vector3 = new Quaternion(qx, qy, qz, qw) * new Vector3(vx, vy, vz);
+        x = vector3.x;
+        y = vector3.y;
+        z = vector3.z;
+    }
+
+    public static void QuaternionMultiplyQuaternion(float lqx, float lqy, float lqz, float lqw, float rqx, float rqy, float rqz, float rqw, out float x, out float y, out float z, out float w)
+    {
+        Quaternion quaternion = new Quaternion(lqx, lqy, lqz, lqw) * new Quaternion(rqx, rqy, rqz, rqw);
+        x = quaternion.x;
+        y = quaternion.y;
+        z = quaternion.z;
+        w = quaternion.w;
     }
 
     public static void DrawLine(float sx, float sy, float sz, float ex, float ey, float ez, float r, float g, float b, float a)

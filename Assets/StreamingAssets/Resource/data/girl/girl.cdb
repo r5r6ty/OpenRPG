@@ -204,10 +204,10 @@
 							"component": "BDY"
 						},
 						{
-							"component": "Sleep"
+							"component": "Gravity"
 						},
 						{
-							"component": "Gravity"
+							"component": "PointLight"
 						}
 					],
 					"name": "shell2",
@@ -248,9 +248,6 @@
 						},
 						{
 							"component": "BDY"
-						},
-						{
-							"component": "Sleep"
 						},
 						{
 							"component": "Gravity"
@@ -401,6 +398,9 @@
 						},
 						{
 							"component": "BDY"
+						},
+						{
+							"component": "PointLight"
 						}
 					],
 					"active": true
@@ -513,7 +513,7 @@
 						{
 							"component": "State",
 							"value": [
-								"hong_effect"
+								"spine_hong_effect"
 							]
 						},
 						{
@@ -1088,7 +1088,7 @@
 				},
 				{
 					"name": "changeWeapon",
-					"command": "q",
+					"command": "/q",
 					"time": 1,
 					"action": "standing",
 					"frame": 0,
@@ -1880,11 +1880,53 @@
 					"comment": "",
 					"necessary": [],
 					"optional": []
+				},
+				{
+					"id": "TestFinder",
+					"color": 0,
+					"comment": "",
+					"necessary": [],
+					"optional": []
+				},
+				{
+					"id": "DetachChild",
+					"color": 0,
+					"comment": "",
+					"necessary": [],
+					"optional": []
+				},
+				{
+					"id": "TestGravity",
+					"color": 0,
+					"comment": "",
+					"necessary": [],
+					"optional": []
+				},
+				{
+					"id": "TestGravity2",
+					"color": 0,
+					"comment": "",
+					"necessary": [],
+					"optional": []
+				},
+				{
+					"id": "Sleep",
+					"color": 0,
+					"comment": "",
+					"necessary": [],
+					"optional": []
+				},
+				{
+					"id": "Collision",
+					"color": 0,
+					"comment": "",
+					"necessary": [],
+					"optional": []
 				}
 			],
 			"props": [],
 			"separators": [
-				39
+				45
 			],
 			"name": "frameType",
 			"columns": [
@@ -2398,9 +2440,11 @@
 							"width": 2,
 							"height": 2,
 							"id": "0",
-							"bodyFlags": 1,
+							"bodyFlags": 3,
 							"bounciness": 0.7,
-							"layers": "16"
+							"attackFlags": 1,
+							"layers": "15",
+							"layer": 15
 						},
 						{
 							"sprite": "f6494939774b8d7bb40e12af862a4528",
@@ -2468,8 +2512,8 @@
 							"width": 104,
 							"height": 120,
 							"id": "0",
-							"bodyFlags": 1,
-							"bounciness": 999
+							"bounciness": 999,
+							"attackFlags": 2
 						},
 						{
 							"category": "Sprite",
@@ -4365,14 +4409,15 @@
 					"clips": [
 						{
 							"category": "Body",
-							"wait": 600,
 							"x": -4,
 							"y": -25,
 							"width": 8,
 							"height": 25,
 							"id": "0",
+							"attackFlags": 1,
 							"bodyFlags": 3,
-							"layers": "16"
+							"layer": 16,
+							"layers": "15"
 						},
 						{
 							"category": "Wait",
@@ -4402,8 +4447,35 @@
 					]
 				},
 				{
+					"name": "spine_gun_air",
+					"clips": [
+						{
+							"category": "Body",
+							"x": -8,
+							"y": -8,
+							"width": 26,
+							"height": 13,
+							"id": "0",
+							"bodyFlags": 1,
+							"layer": 16
+						},
+						{
+							"category": "Wait",
+							"wait": 20
+						}
+					]
+				},
+				{
 					"name": "spine_gun_idle",
 					"clips": [
+						{
+							"category": "Body",
+							"id": "0",
+							"x": -8,
+							"y": -8,
+							"width": 26,
+							"height": 13
+						},
 						{
 							"category": "Wait",
 							"wait": 20
@@ -4526,7 +4598,7 @@
 						},
 						{
 							"category": "SpineAnimation",
-							"active": true,
+							"active": false,
 							"trigger": "this.controller ~= nil and this.controller.commands[\"shoot_right_l\"].UIActive ~= nil",
 							"json": {
 								"spineAnimation": "aimL",
@@ -4536,7 +4608,7 @@
 						{
 							"category": "SpineAnimation",
 							"active": true,
-							"trigger": "6",
+							"trigger": "this.controller ~= nil and this.controller.commands[\"shoot_right_l\"].UIActive ~= nil",
 							"json": {
 								"spineAnimation": "aimR",
 								"trackIndex": 2
@@ -4544,7 +4616,7 @@
 						},
 						{
 							"category": "SpineAnimation",
-							"active": true,
+							"active": false,
 							"json": {
 								"spineAnimation": "123",
 								"trackIndex": 1
@@ -4554,7 +4626,7 @@
 						{
 							"category": "SpineAnimation",
 							"active": true,
-							"trigger": "8",
+							"trigger": "this.controller ~= nil and this.controller.commands[\"shoot_right_l\"].UIActive == nil",
 							"json": {
 								"spineAnimation": "123",
 								"trackIndex": 2
@@ -5334,6 +5406,37 @@
 							"json": {
 								"sfx": "shell2"
 							}
+						},
+						{
+							"category": "Object",
+							"active": true,
+							"trigger": "1",
+							"json": {
+								"x": 0,
+								"y": 0,
+								"z": 0,
+								"x2": 0,
+								"y2": 0,
+								"z2": 0,
+								"state": "spine_hong_effect",
+								"animation": "hong_effect",
+								"id": "9",
+								"amount": 1,
+								"precise": 5,
+								"rotation": 0
+							}
+						},
+						{
+							"category": "Move",
+							"active": false,
+							"trigger": "1",
+							"json": {
+								"z": 0
+							}
+						},
+						{
+							"category": "Sleep",
+							"active": true
 						}
 					],
 					"Exit": [],
@@ -5864,10 +5967,11 @@
 						},
 						{
 							"category": "Bone",
-							"active": true,
+							"active": false,
 							"json": {
 								"bone": "grabR",
-								"id": "gun"
+								"id": "gun",
+								"order": 1
 							}
 						},
 						{
@@ -5875,7 +5979,8 @@
 							"active": true,
 							"json": {
 								"bone": "grabL",
-								"id": "gun2"
+								"id": "gun2",
+								"order": 1
 							}
 						}
 					],
@@ -5884,6 +5989,46 @@
 							"category": "Move",
 							"active": true,
 							"json": {}
+						},
+						{
+							"category": "TestFinder",
+							"active": false,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"reload\"].UIActive ~= nil and this.children[\"gun2\"] == nil",
+							"json": {
+								"state": "spine_gun_idle",
+								"test": "spine_gun_idle"
+							}
+						},
+						{
+							"category": "TestFinder",
+							"active": false,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"changeWeapon\"].UIActive ~= nil and this.children[\"gun2\"] == nil",
+							"json": {
+								"state": "spine_gun_idle",
+								"test": "shell2"
+							}
+						},
+						{
+							"category": "DetachChild",
+							"active": false,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"jump\"].UIActive ~= nil and this.children[\"gun2\"] ~= nil",
+							"json": {
+								"id": "gun2",
+								"x2": 2,
+								"y2": 0,
+								"z2": -2,
+								"state": "spine_gun_air"
+							}
+						},
+						{
+							"category": "TestGravity",
+							"active": false,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"changeWeapon\"].UIActive ~= nil"
+						},
+						{
+							"category": "TestGravity2",
+							"active": false,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"changeWeapon\"].UIActive == nil"
 						}
 					],
 					"animation": "spine_idle"
@@ -5899,10 +6044,11 @@
 						},
 						{
 							"category": "Bone",
-							"active": true,
+							"active": false,
 							"json": {
 								"bone": "grabR",
-								"id": "gun"
+								"id": "gun",
+								"order": 1
 							}
 						},
 						{
@@ -5910,7 +6056,8 @@
 							"active": true,
 							"json": {
 								"bone": "grabL",
-								"id": "gun2"
+								"id": "gun2",
+								"order": 1
 							}
 						}
 					],
@@ -5946,9 +6093,48 @@
 							"json": {
 								"y": -1
 							}
+						},
+						{
+							"category": "TestFinder",
+							"active": false,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"changeWeapon\"].UIActive ~= nil and this.children[\"gun2\"] == nil",
+							"json": {
+								"state": "spine_gun_idle",
+								"test": "shell2"
+							}
+						},
+						{
+							"category": "DetachChild",
+							"active": false,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"jump\"].UIActive ~= nil and this.children[\"gun2\"] ~= nil",
+							"json": {
+								"id": "gun2",
+								"x2": 2,
+								"y2": 0,
+								"z2": -2,
+								"state": "spine_gun_air"
+							}
+						},
+						{
+							"category": "TestGravity",
+							"active": false,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"changeWeapon\"].UIActive ~= nil"
+						},
+						{
+							"category": "TestGravity2",
+							"active": false,
+							"trigger": "this.controller ~= nil and this.controller.commands[\"changeWeapon\"].UIActive == nil"
 						}
 					],
 					"animation": "spine_run"
+				},
+				{
+					"name": "spine_gun_air",
+					"entry": [],
+					"Exit": [],
+					"update": [],
+					"fixedUpdate": [],
+					"animation": "spine_gun_air"
 				},
 				{
 					"name": "spine_gun_idle",
@@ -5959,7 +6145,7 @@
 						{
 							"category": "State",
 							"active": true,
-							"trigger": "this.root.controller ~= nil and this.root.controller.commands[\"punch_l\"].UIActive ~= nil",
+							"trigger": "this.root ~= nil and this.root.controller ~= nil and this.root.controller.commands[\"punch_l\"].UIActive ~= nil",
 							"json": {
 								"state": "spine_gun_shoot"
 							}
@@ -5987,12 +6173,13 @@
 								"animation": "fire_effect2",
 								"id": "9",
 								"amount": 1,
-								"precise": 0
+								"precise": 0,
+								"rotation": 0
 							}
 						},
 						{
 							"category": "Object",
-							"active": true,
+							"active": false,
 							"trigger": "0",
 							"json": {
 								"x": 27,
@@ -6005,7 +6192,27 @@
 								"animation": "bullet",
 								"id": "9",
 								"amount": 1,
-								"precise": 5
+								"precise": 5,
+								"rotation": 0
+							}
+						},
+						{
+							"category": "Object",
+							"active": false,
+							"trigger": "0",
+							"json": {
+								"x": 27,
+								"y": 0,
+								"z": -4,
+								"x2": 0,
+								"y2": 0,
+								"z2": 0,
+								"state": "spine_hong_effect",
+								"animation": "hong_effect",
+								"id": "9",
+								"amount": 1,
+								"precise": 5,
+								"rotation": -90
 							}
 						},
 						{
@@ -6023,7 +6230,8 @@
 								"animation": "shell2",
 								"id": "9",
 								"amount": 1,
-								"precise": 50
+								"precise": 50,
+								"rotation": 0
 							}
 						},
 						{
@@ -6037,6 +6245,25 @@
 					],
 					"fixedUpdate": [],
 					"animation": "spine_gun_shoot"
+				},
+				{
+					"name": "spine_hong_effect",
+					"entry": [],
+					"Exit": [],
+					"update": [],
+					"fixedUpdate": [
+						{
+							"category": "Attack",
+							"active": true,
+							"trigger": "this.delayCounter == 1"
+						},
+						{
+							"category": "Destory",
+							"active": true,
+							"trigger": "this.delayCounter == 13"
+						}
+					],
+					"animation": "hong_effect"
 				}
 			],
 			"separators": [],
@@ -6111,7 +6338,7 @@
 					"opt": true
 				},
 				{
-					"typeStr": "10:CanNotDefence,Catch",
+					"typeStr": "10:Collide,Attack",
 					"name": "attackFlags",
 					"opt": true
 				},
@@ -6382,6 +6609,12 @@
 					"name": "SpriteRenderer"
 				},
 				{
+					"name": "SpineRenderer"
+				},
+				{
+					"name": "ShadowRenderer"
+				},
+				{
 					"name": "TrailRenderer"
 				},
 				{
@@ -6428,6 +6661,9 @@
 				},
 				{
 					"name": "Gravity"
+				},
+				{
+					"name": "PointLight"
 				}
 			],
 			"separators": [],

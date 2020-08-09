@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Spine.Unity.Modules;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -485,9 +486,9 @@ public class LuaUtil
         z = pos.z;
     }
 
-    public static bool RigidbodySweepTest(Rigidbody rigidbody, float dx, float dy, float dz, float dis, out RaycastHit hit)
+    public static void RigidbodySweepTest(Rigidbody rigidbody, float dx, float dy, float dz, float dis, out RaycastHit hit)
     {
-        return rigidbody.SweepTest(new Vector3(dx, dy, dz), out hit, dis);
+        rigidbody.SweepTest(new Vector3(dx, dy, dz), out hit, dis);
     }
 
     public static void RigidbodyClosestPointOnBounds(Rigidbody rigidbody, float px, float py, float pz, out float x, out float y, out float z)
@@ -528,14 +529,19 @@ public class LuaUtil
         return m_RaycastHits;
     }
 
-    public static Collider[] PhysicsOverlapBox(float cx, float cy, float cz, float ex, float ey, float ez, float rx, float ry, float rz, float rw, int mask)
+    public static Collider[] PhysicsOverlapBox(float cx, float cy, float cz, float ex, float ey, float ez, float rx, float ry, float rz, float rw, int mask, QueryTriggerInteraction q)
     {
-        return Physics.OverlapBox(new Vector3(cx, cy, cz), new Vector3(ex, ey, ez), new Quaternion(rx, ry, rz, rw), mask);
+        return Physics.OverlapBox(new Vector3(cx, cy, cz), new Vector3(ex, ey, ez), new Quaternion(rx, ry, rz, rw), mask, q);
     }
 
     public static RaycastHit[] PhysicsRaycastAll(float ox, float oy, float oz, float dx, float dy, float dz, float dis, int m)
     {
         return Physics.RaycastAll(new Vector3(ox, oy, oz), new Vector3(dx, dy, dz), dis, m);
+    }
+
+    public static void PhysicsRaycast(float ox, float oy, float oz, float dx, float dy, float dz, float dis, int m, out RaycastHit hit)
+    {
+        Physics.Raycast(new Vector3(ox, oy, oz), new Vector3(dx, dy, dz), out hit, dis, m);
     }
 
     public static void GetColliderBoundsCenter(int id, out float x, out float y, out float z)

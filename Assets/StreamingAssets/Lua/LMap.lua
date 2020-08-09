@@ -982,6 +982,8 @@ function tool2_castleDB.createMapObject(parent, name, p, k, gameMap, n, ts, spri
 	sr2.material = castleDBInstance.palettes[1]
 	sr2.sortingOrder = sort
 
+	sr2.receiveShadows = true
+
 	-- if flag == "block" or flag == "background" then
 		-- local boxCollider2D = CS.UnityEngine.GameObject("boxCollider2D")
 		-- boxCollider2D.transform:SetParent(unityobject_child.transform)

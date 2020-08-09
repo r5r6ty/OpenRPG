@@ -8,9 +8,9 @@ ecs.registerComponent("DataBase", 0, function(self, id)
     self.database = utils.getIDData(id)
     self.id = id
 
-    self.root = self
-    self.parent = self
-    self.children = {}
+    -- self.root = self
+    -- self.parent = self
+    -- self.children = {}
 
     self.direction = {x = 1, y = -1, z = 1}
 
@@ -24,9 +24,9 @@ end, function (self)
     self.database = nil
     self.id = nil
 
-    self.root = nil
-    self.parent = nil
-    self.children = nil
+    -- self.root = nil
+    -- self.parent = nil
+    -- self.children = nil
 
     self.direction = nil
 
@@ -57,6 +57,8 @@ ecs.registerComponent("SpriteRenderer", ecs.allOf("DataBase"), function(self)
     self.spriteRenderer = self.pic_object:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
     self.spriteRenderer.material = self.database.palettes[1]
 
+    self.spriteRenderer.shadowCastingMode = CS.UnityEngine.Rendering.ShadowCastingMode.On
+
     self.rotation = 0
     self.rotation_velocity = 0
 end, function (self)
@@ -80,30 +82,33 @@ ecs.registerComponent("SpineRenderer", ecs.allOf("DataBase"), function(self, nam
     CS.LuaUtil.AddGameObjectID(self.spine_offset_object_id, self.spine_offset_object)
     CS.LuaUtil.SetlocalScale(self.spine_offset_object_id, 2, 2, 2)
 
-    self.runtimeSkeletonAnimation = CS.Spine.Unity.SkeletonAnimation.NewSkeletonAnimationGameObject(self.database.spines[name])
+    self.skeletonAnimation = CS.Spine.Unity.SkeletonAnimation.NewSkeletonAnimationGameObject(self.database.spines[name])
 
     if name == "girl" then
-        self.bone = self.runtimeSkeletonAnimation.Skeleton:FindBone("crosshair")
+        self.bone = self.skeletonAnimation.Skeleton:FindBone("crosshair")
 
-        print(self.bone.Data.Name, self.bone.ScaleX, self.bone.ScaleY)
+        -- print(self.bone.Data.Name, self.bone.ScaleX, self.bone.ScaleY)
     end
 
-    self.runtimeSkeletonAnimation.enabled = false
+    self.skeletonAnimation.enabled = false
     -- Extra Stuff
-    self.runtimeSkeletonAnimation:Initialize(false)
-    -- self.runtimeSkeletonAnimation.Skeleton:SetSkin("base")
-    self.runtimeSkeletonAnimation.Skeleton:SetSlotsToSetupPose()
+    self.skeletonAnimation:Initialize(false)
+    -- self.skeletonAnimation.Skeleton:SetSkin("base")
+    self.skeletonAnimation.Skeleton:SetSlotsToSetupPose()
     if name == "girl" then
-        self.runtimeSkeletonAnimation.AnimationState:SetAnimation(0, "idle", true)
+        self.skeletonAnimation.AnimationState:SetAnimation(0, "idle", true)
     end
-    -- self.runtimeSkeletonAnimation:GetComponent(typeof(CS.UnityEngine.MeshRenderer)).sortingOrder = 10
-    -- self.runtimeSkeletonAnimation.transform.Translate(Vector3.down * 2)
+    -- self.skeletonAnimation:GetComponent(typeof(CS.UnityEngine.MeshRenderer)).sortingOrder = 10
+    -- self.skeletonAnimation.transform.Translate(Vector3.down * 2)
 
-    self.pic_object = self.runtimeSkeletonAnimation.gameObject
+    self.pic_object = self.skeletonAnimation.gameObject
     self.pic_object.name = "spine"
     self.pic_object_id = self.pic_object:GetInstanceID()
     CS.LuaUtil.AddGameObjectID(self.pic_object_id, self.pic_object)
     self.pic_object.transform:SetParent(self.spine_offset_object.transform, false)
+
+    self.meshRenderer = self.pic_object:GetComponent(typeof(CS.UnityEngine.MeshRenderer))
+    -- self.meshRenderer.sortingOrder = 10
 
     self.requiresNewMesh = true
 end, function (self)
@@ -115,10 +120,95 @@ end, function (self)
     self.pic_object = nil
     CS.LuaUtil.RemoveGameObjectID(self.pic_object_id)
     self.pic_object_id = nil
-    self.runtimeSkeletonAnimation = nil
+    self.skeletonAnimation = nil
+
+    self.meshRenderer = nil
 
     self.requiresNewMesh = nil
-end) 
+end)
+
+ecs.registerComponent("SkeletonRenderSeparator", ecs.allOf("SpineRenderer"), function(self)
+
+    -- self.skeletonRenderSeparator = CS.Spine.Unity.Modules.SkeletonRenderSeparator.AddToSkeletonRenderer(self.skeletonAnimation, 0, 0, 5, 5)
+
+    self.skeletonRenderSeparator = self.pic_object:AddComponent(typeof(CS.Spine.Unity.Modules.SkeletonRenderSeparator))
+    self.skeletonRenderSeparator.SkeletonRenderer  = self.skeletonAnimation
+
+    local t = {}
+    table.insert(t, "hand1")
+    table.insert(t, "leg2")
+    self.skeletonAnimation.separatorSlotNames = t
+
+    self.skeletonAnimation.separatorSlots:Clear()
+    for i = 1, self.skeletonAnimation.separatorSlotNames.Length, 1 do
+        self.skeletonAnimation.separatorSlots:Add(self.skeletonAnimation.Skeleton:FindSlot(self.skeletonAnimation.separatorSlotNames[i - 1]))
+
+
+        -- print(i, self.skeletonAnimation.separatorSlotNames[i - 1])
+    end
+
+    -- self.skeletonRenderSeparator = CS.Spine.Unity.Modules.SkeletonRenderSeparator.AddToSkeletonRenderer(self.skeletonAnimation, 0, 0, 5, 5)
+
+
+    -- self.skeletonAnimation:Initialize(false)
+
+    self.skeletonRenderSeparator:AddPartsRenderer(1)
+    self.skeletonRenderSeparator:AddPartsRenderer(1)
+    self.skeletonRenderSeparator:AddPartsRenderer(1)
+
+    self.skeletonRenderSeparator.enabled = true
+
+
+end, function (self)
+    CS.UnityEngine.GameObject.Destroy(self.skeletonRenderSeparator)
+    self.skeletonRenderSeparator = nil
+end)
+
+ecs.registerComponent("ShadowRenderer", ecs.allOf("SpriteRenderer"), function(self)
+    self.shadow_offset_object = CS.UnityEngine.GameObject("shadow_offset")
+    self.shadow_offset_object_id = self.shadow_offset_object:GetInstanceID()
+    CS.LuaUtil.AddGameObjectID(self.shadow_offset_object_id, self.shadow_offset_object)
+    CS.LuaUtil.SetlocalScale(self.shadow_offset_object_id, 2, 2, 2)
+
+    self.shadow_object = CS.UnityEngine.GameObject("shadow")
+    self.shadow_object_id = self.shadow_object:GetInstanceID()
+    CS.LuaUtil.AddGameObjectID(self.shadow_object_id, self.shadow_object)
+    self.shadow_object.transform:SetParent(self.shadow_offset_object.transform, false)
+    self.shadowRenderer = self.shadow_object:AddComponent(typeof(CS.UnityEngine.SpriteRenderer))
+    self.shadowRenderer.material = utils.getShadowMaterial()
+end, function (self)
+    CS.UnityEngine.GameObject.Destroy(self.shadow_offset_object)
+    self.shadow_offset_object = nil
+    CS.LuaUtil.RemoveGameObjectID(self.shadow_offset_object_id)
+    self.shadow_offset_object_id = nil
+    CS.UnityEngine.GameObject.Destroy(self.shadow_object)
+    self.shadow_object = nil
+    CS.LuaUtil.RemoveGameObjectID(self.shadow_object_id)
+    self.shadow_object_id = nil
+
+    self.shadowRenderer = nil
+end)
+
+ecs.registerComponent("PointLight", 0, function(self)
+
+    -- self.pointLight_offset_object = CS.UnityEngine.GameObject("pointLight_offset")
+    -- self.pointLight_offset_object_id = self.shadow_offset_object:GetInstanceID()
+    -- CS.LuaUtil.AddGameObjectID(self.pointLight_offset_object_id, self.pointLight_offset_object)
+    -- CS.LuaUtil.SetlocalScale(self.pointLight_offset_object_id, 2, 2, 2)
+
+    self.pointLight = self.pic_object:AddComponent(typeof(CS.UnityEngine.Experimental.Rendering.Universal.Light2D))
+    self.pointLight.lightType = CS.UnityEngine.Experimental.Rendering.Universal.Light2D.LightType.Point
+    self.pointLight.pointLightInnerRadius = 1
+    self.pointLight.pointLightOuterRadius = 1
+
+    -- self.pointLight.alphaBlendOnOverlap = true
+
+end, function (self)
+    -- CS.UnityEngine.GameObject.Destroy(self.pointLight_offset_object)
+    -- self.pointLight_offset_object = nil
+    -- CS.LuaUtil.RemoveGameObjectID(self.pointLight_offset_object_id)
+    -- self.pointLight_offset_object_id = nil
+end)
 
 ecs.registerComponent("TrailRenderer", ecs.allOf("SpriteRenderer"), function(self)
 	self.trailRenderer = self.pic_offset_object:AddComponent(typeof(CS.UnityEngine.TrailRenderer))
@@ -282,9 +372,9 @@ ecs.registerComponent("BDY", ecs.allOf("Physics"), function(self)
     self.bodyArray = {}
     self.bodyArray_InstanceID = {}
 
-    self.bdy_object = CS.UnityEngine.GameObject("bdy[16]")
+    self.bdy_object = CS.UnityEngine.GameObject("bdy")
     self.bdy_object.transform:SetParent(self.physics_object.transform, false)
-    self.bdy_object.layer = 16 -- bdy的layer暂定16
+    -- self.bdy_object.layer = 16 -- bdy的layer暂定16
 end, function(self)
     self.bodyArray = nil
     CS.UnityEngine.GameObject.Destroy(self.bdy_object)
@@ -306,16 +396,21 @@ end, function (self)
     self.lineRenderer = nil
 end)
 
-ecs.registerComponent("Parent", ecs.allOf("Physics", "SpineRenderer"), function(self, parent, id)
+ecs.registerComponent("Parent", ecs.allOf("Physics"), function(self, parent, id)
     self.root = self
     self.parent = self
 
     utils.SetParentAndRoot(self, parent, id)
-end, nil)
+end, function (self)
+    self.root = nil
+    self.parent = nil
+end)
 
 ecs.registerComponent("Children", 0, function(self)
     self.children = {}
-end, nil)
+end, function (self)
+    self.children = nil
+end)
 
 ecs.registerComponent("Player", 0, function(self)
     self.controller = utils.PLAYER

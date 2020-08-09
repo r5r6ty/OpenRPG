@@ -35,10 +35,15 @@ local LFontMaterial = nil
 
 -- local LObjectShader = CS.UnityEngine.Shader.Find("Sprites/Beat/Diffuse-Shadow")
 local LUIObjectShader = CS.UnityEngine.Shader.Find("Tutorial/007_Sprite")
-local LObjectShader = CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph")
+-- local LObjectShader = CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph Unlit")
+-- local LObjectShader = CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph Unlit 1")
+local LObjectShader = CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph Lit")
+-- local LObjectShader = CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph PBR")
 -- local LObjectShader = CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph 1")
 -- local LObjectShader = CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph 3D")
 -- local LObjectShader = CS.UnityEngine.Shader.Find("Tutorial/007_Sprite-Lit-Default")
+
+local LObjectShadowMaterial = CS.UnityEngine.Material(CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph Unlit 1S"))
 
 local LDatas = {}
 local objects = {}
@@ -327,6 +332,10 @@ end
 
 function utils.getUIShader()
 	return LUIObjectShader
+end
+
+function utils.getShadowMaterial()
+	return LObjectShadowMaterial
 end
 
 function utils.setLCanvas(cvs)
@@ -722,9 +731,9 @@ function utils.changeState(self, state, spineAnimation)
 		self.delayCounter = 0
 		self.timeLine = 0
 		if spineAnimation ~= nil then
-			local ani = self.runtimeSkeletonAnimation.skeleton.Data:FindAnimation(spineAnimation)
+			local ani = self.skeletonAnimation.skeleton.Data:FindAnimation(spineAnimation)
 			if ani ~= nil then
-				self.runtimeSkeletonAnimation.AnimationState:SetAnimation(0, ani, true)
+				self.skeletonAnimation.AnimationState:SetAnimation(0, ani, true)
 			end
 		end
 		return true
@@ -751,7 +760,8 @@ function utils.SetParentAndRoot(self, object, id)
 		else
 			self.root = object
 		end
-		object.children[id] = self
+		object.children[id] = object.children[id] or {}
+		object.children[id][self._eid] = self
 		-- self.physics_object.transform.localEulerAngles = CS.UnityEngine.Vector3(0, 0, 0)
 
 		self.team = object.team

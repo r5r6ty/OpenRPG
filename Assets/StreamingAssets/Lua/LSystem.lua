@@ -7,8 +7,8 @@ local ecs = require "ecs"
 ecs.registerMultipleSystem("SpriteRenderSystem", function(self)
 
     local pos_x, pos_y, pos_z = CS.LuaUtil.GetPos(self.physics_object_id)
-    local r_pos_x, r_pos_y, r_pos_z = CS.LuaUtil.GetPos(self.root.physics_object_id)
-    CS.LuaUtil.SetPos(self.pic_offset_object_id, pos_x, pos_y - pos_z, r_pos_z + pos_y)
+    -- local r_pos_x, r_pos_y, r_pos_z = CS.LuaUtil.GetPos(self.root.physics_object_id)
+    CS.LuaUtil.SetPos(self.pic_offset_object_id, pos_x, pos_y - pos_z, pos_z + pos_y)
 
     self.rotation = self.rotation + self.rotation_velocity * self.speed
 
@@ -32,12 +32,66 @@ ecs.registerMultipleSystem("SpriteRenderSystem", function(self)
     CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, rrr_y, self.rotation + rrr_z)
 end, ecs.allOf("Active", "DataBase", "SpriteRenderer", "Physics"))
 
+ecs.registerMultipleSystem("PointLightRenderSystem", function(self)
+
+    ecs.processMultipleSystem("ShadowRenderSystem", self)
+
+end, ecs.allOf("Active", "DataBase", "PointLight"))
+
+ecs.registerMultipleSystem("ShadowRenderSystem", function(self, light)
+
+    local pos_x, pos_y, pos_z = CS.LuaUtil.GetPos(self.physics_object_id)
+    local lpos_x, lpos_y, lpos_z = CS.LuaUtil.GetPos(light.physics_object_id)
+    local xx = pos_x - lpos_x
+    local yy = pos_y - lpos_y
+    local zz = pos_z - lpos_z
+    local length = utils.GetVector3Module(xx, yy, zz)
+    if length <= light.shadowRenderer.pointLightOuterRadius then
+        if not self.shadow_offset_object.activeSelf then
+            self.shadow_offset_object:SetActive(true)
+        end
+        self.shadowRenderer.sprite = self.spriteRenderer.sprite
+        local lpsx, lpsy, lpsz = CS.LuaUtil.GetLocalPos(self.pic_object_id)
+        CS.LuaUtil.SetLocalPos(self.shadow_object_id, lpsx, lpsy, 0)
+
+        local pos_x, pos_y, pos_z = CS.LuaUtil.GetPos(self.physics_object_id)
+        local r_pos_x, r_pos_y, r_pos_z = CS.LuaUtil.GetPos(self.pic_object_id)
+        local hit = CS.LuaUtil.PhysicsRaycast(pos_x, pos_y, r_pos_z, 0, 0, 1, 999, 65535)
+        if hit ~= nil then
+
+            local hx, hy, hz = CS.LuaUtil.RaycastHitGetPoint(hit)
+            -- local dx = xx / length -- 方向
+            -- local dy = yy / length -- 方向
+            -- local dz = zz / length -- 方向
+
+            hx = hx + xx / 20
+            hy = hy + yy / 20
+            hz = hz + zz / 20
+
+
+            CS.LuaUtil.SetPos(self.shadow_offset_object_id, hx, hy - hz, hz + hy)
+
+
+
+            local rrr_x, rrr_y, rrr_z = CS.LuaUtil.GetEulerAngles(self.pic_offset_object_id)
+        
+        
+            CS.LuaUtil.SetRotationByEuler(self.shadow_offset_object_id, rrr_x, rrr_y, rrr_z)
+        end
+    else
+        if self.shadow_offset_object.activeSelf then
+            self.shadow_offset_object:SetActive(false)
+        end
+    end
+
+end, ecs.allOf("DataBase", "SpriteRenderer", "ShadowRenderer"))
+
 -- 渲染spine
 ecs.registerMultipleSystem("SpineRenderSystem", function(self)
 
     local pos_x, pos_y, pos_z = CS.LuaUtil.GetPos(self.physics_object_id)
-    local r_pos_x, r_pos_y, r_pos_z = CS.LuaUtil.GetPos(self.root.physics_object_id)
-    CS.LuaUtil.SetPos(self.spine_offset_object_id, pos_x, pos_y - pos_z, r_pos_z + pos_y)
+    -- local r_pos_x, r_pos_y, r_pos_z = CS.LuaUtil.GetPos(self.root.physics_object_id)
+    CS.LuaUtil.SetPos(self.spine_offset_object_id, pos_x, pos_y - pos_z, pos_z + pos_y)
 
 
     local rrr_x, rrr_y, rrr_z = CS.LuaUtil.GetEulerAngles(self.physics_object_id)
@@ -73,7 +127,7 @@ ecs.registerMultipleSystem("AnimationSystem1", function(self)
         local kfs = self.database.animations[self.action].keyframes
         local c = kfs[self.delayCounter + 1]
         if c == nil then
-            local ani = self.runtimeSkeletonAnimation.AnimationState:GetCurrent(0)
+            local ani = self.skeletonAnimation.AnimationState:GetCurrent(0)
             if ani ~= nil then
                 self.timeLine = self.timeLine - ani.Animation.Duration
             else
@@ -97,7 +151,7 @@ ecs.registerMultipleSystem("AnimationSystem1", function(self)
             end
         end
 
-        self.runtimeSkeletonAnimation:Update(frames * frameDeltaTime * self.speed)
+        self.skeletonAnimation:Update(frames * frameDeltaTime * self.speed)
         self.requiresNewMesh = true
     end
 
@@ -151,7 +205,7 @@ end, ecs.allOf("Active", "DataBase", "Animation", "SpriteRenderer"))
 ecs.registerMultipleSystem("SpineLateUpdate", function(self)
 
     if self.requiresNewMesh then
-        self.runtimeSkeletonAnimation:LateUpdate()
+        self.skeletonAnimation:LateUpdate()
         self.requiresNewMesh = false
     end
 
@@ -214,9 +268,18 @@ end, ecs.allOf("Active", "DataBase", "State"))
 
 -- 碰撞盒
 ecs.registerMultipleSystem("BDYSystem", function(self)
+
+    self.isOnGround = -1
+
     local f = 0
+    local x, y, z = nil
     for _, v in pairs(self.bodyArray) do
-        self.isOnGround = v:BDYFixedUpdate()
+        
+        if v.isBDY then
+            self.isOnGround, x, y, z = v:Test2()
+        end
+
+
 
         -- if self.isOnGround ~= -1 then
 
@@ -229,59 +292,39 @@ ecs.registerMultipleSystem("BDYSystem", function(self)
     if f == 0 then
         local dt = CS.UnityEngine.Time.deltaTime * self.speed
         CS.LuaUtil.RigidbodyMovePosition(self.rigidbody, self.velocity.x * dt, self.velocity.y * dt, self.velocity.z * dt)
+    else
+        CS.LuaUtil.RigidbodyMovePosition(self.rigidbody, x, y, z)
     end
-    -- self.isOnGround = -1
-    -- local dt = CS.UnityEngine.Time.deltaTime * self.speed
-    -- local length = utils.GetVector3Module(self.velocity.x * dt, self.velocity.y * dt, self.velocity.z * dt) -- 射线的长度
-    -- local dx = self.velocity.x * dt / length -- 方向
-    -- local dy = self.velocity.y * dt / length -- 方向
-    -- local dz = self.velocity.z * dt / length -- 方向
 
-    -- local ishit, hitinfo = CS.LuaUtil.RigidbodySweepTest(self.rigidbody, dx, dy, dz, length)
-    -- if ishit then
-    --     local hx, hy, hz = CS.LuaUtil.RaycastHitGetPoint(hitinfo)
-    --     local x, y, z = CS.LuaUtil.RigidbodyClosestPointOnBounds(self.rigidbody, hx, hy, hz)
-    --     CS.LuaUtil.RigidbodyMovePosition(self.rigidbody, hx - x, hy - y, hz - z)
-    --     local up, down, left, right, above, under = false, false, false, false, false, false
-    --     local go = hitinfo.collider.attachedRigidbody.gameObject
-    --     if go.name == "test" then -- 如果是地图块
-    --         local name = utils.split(hitinfo.collider.name, ",")
-    --         local num = tonumber(name[#name]) -- 地图块最后一个数字作为bit
-    --         if num & 1 == 1 then --位操作，算出这个方块朝哪个方向进行碰撞，一个方块可以有多个碰撞方向，这部分随意设计，只需要能知道这个collider的判定方向，用layermask什么都行
-    --             up = true
-    --         end
-    --         if num & 2 == 2 then --位操作
-    --             down = true
-    --         end
-    --         if num & 4 == 4 then --位操作
-    --             left = true
-    --         end
-    --         if num & 8 == 8 then --位操作
-    --             right = true
-    --         end
-    --         if num & 16 == 16 then --位操作
-    --             above = true
-    --         end
-    --         if num & 32 == 32 then --位操作
-    --             under = true
-    --         end
+    -- local f = 0
+    -- for _, v in pairs(self.bodyArray) do
+    --     self.isOnGround = v:BDYFixedUpdate()
 
-    --         if up or down or left or right or above or under then
-    --             if above or under then
-    --                 self.isOnGround = 1
-    --                 self.velocity.y = 0
-    --             end
-    --         end
-    --     end
-    -- else
+    --     -- if self.isOnGround ~= -1 then
+
+    --     --     if self.kind ~= 99 then
+    --     --         self.velocity.y = -0.01
+    --     --     end
+    --     -- end
+    --     f = f + 1
+    -- end
+    -- if f == 0 then
     --     local dt = CS.UnityEngine.Time.deltaTime * self.speed
     --     CS.LuaUtil.RigidbodyMovePosition(self.rigidbody, self.velocity.x * dt, self.velocity.y * dt, self.velocity.z * dt)
+    -- else
+    --     CS.LuaUtil.RigidbodyMovePosition(self.rigidbody, self.velocity.x, self.velocity.y, self.velocity.z)
     -- end
 
     if self.isOnGround ~= -1 then
         ecs.processSingleSystem("Ground", self)
     else
         ecs.processSingleSystem("Flying", self)
+    end
+end, ecs.allOf("Active", "Physics", "BDY"))
+
+ecs.registerMultipleSystem("ColliderSystem", function(self)
+    for _, v in pairs(self.bodyArray) do
+        v:Test()
     end
 end, ecs.allOf("Active", "Physics", "BDY"))
 
@@ -309,13 +352,13 @@ ecs.registerMultipleSystem("ATKSystem", function(self)
 end, ecs.allOf("Active", "Physics", "ATK"))
 
 -- 休眠
-ecs.registerMultipleSystem("SleepSystem", function(self)
-    if self.isOnGround ~= -1 and utils.GetVector3Module(self.velocity.x, self.velocity.y, self.velocity.z) <= 0.3 then
-        self.sleep = true
-        ecs.removeComponent(self._eid, "Active")
-        ecs.applyEntity(self._eid)
-    end
-end, ecs.allOf("Active", "DataBase", "Physics", "Sleep"))
+-- ecs.registerMultipleSystem("SleepSystem", function(self)
+--     if self.isOnGround ~= -1 and utils.GetVector3Module(self.velocity.x, self.velocity.y, self.velocity.z) <= 1 then
+--         self.sleep = true
+--         ecs.removeComponent(self._eid, "Active")
+--         ecs.applyEntity(self._eid)
+--     end
+-- end, ecs.allOf("Active", "DataBase", "Physics", "Sleep"))
 
 -- AI
 ecs.registerMultipleSystem("JudgeAISystem", function(self)
@@ -572,9 +615,9 @@ end, ecs.allOf("Active", "DataBase", "Sound"))
 -- end)
 
 ecs.registerSingleSystem("Body", function(this, value)
-    if this.bodyArray[value.id] == nil and not (value.width == 0 or value.height == 0) then
+    if this.bodyArray[value.id] == nil and not (value.width == 0 or value.height == 0) and (value.bodyFlags ~= nil or value.attackFlags ~= nil) then
         this.bodyArray[value.id] = LColliderBDY:new(this, this.bdy_object, value.id)
-        this.bodyArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.bodyFlags, value.layers, value.bounciness)
+        this.bodyArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.bodyFlags, value.layers, value.bounciness, value.attackFlags, value.layer)
         -- this.bodyArray_InstanceID[this.bodyArray[value.id].collider2:GetInstanceID()] = this.bodyArray[value.id]
         this.bodyArray_InstanceID[this.bodyArray[value.id].collider:GetInstanceID()] = this.bodyArray[value.id]
 
@@ -594,25 +637,25 @@ ecs.registerSingleSystem("Body", function(this, value)
     end
 end, ecs.allOf("Active", "BDY"))
 
-ecs.registerSingleSystem("Attack", function(this, value)
-    if this.attckArray[value.id] == nil and not (value.width == 0 or value.height == 0) then
-        this.attckArray[value.id] = LColliderATK:new(this, this.atk_object, value.id)
-        this.attckArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.attackFlags,
-                                                    value.damage, value.fall, value.defence, value.frequency, value.directionX, value.directionY, false, value.var,
-                                                    value.action, value.frame)
-    else
-        if this.attckArray[value.id] ~= nil then
-            if value.width == 0 or value.height == 0 then
-                this.attckArray[value.id]:deleteCollider()
-                this.attckArray[value.id] = nil
-            else
-                -- this.attckArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.attackFlags,
-                -- 										value.damage, value.fall, value.defence, value.frequency, value.directionX, value.directionY, value.ignoreFlag, value.var,
-                -- 										value.action, value.frame)
-            end
-        end
-    end
-end, ecs.allOf("Active", "ATK"))
+-- ecs.registerSingleSystem("Attack", function(this, value)
+--     if this.attckArray[value.id] == nil and not (value.width == 0 or value.height == 0) then
+--         this.attckArray[value.id] = LColliderATK:new(this, this.atk_object, value.id)
+--         this.attckArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.attackFlags,
+--                                                     value.damage, value.fall, value.defence, value.frequency, value.directionX, value.directionY, false, value.var,
+--                                                     value.action, value.frame)
+--     else
+--         if this.attckArray[value.id] ~= nil then
+--             if value.width == 0 or value.height == 0 then
+--                 this.attckArray[value.id]:deleteCollider()
+--                 this.attckArray[value.id] = nil
+--             else
+--                 -- this.attckArray[value.id]:setCollider(value.direction, value.x, value.y, value.width, value.height, value.depth, value.attackFlags,
+--                 -- 										value.damage, value.fall, value.defence, value.frequency, value.directionX, value.directionY, value.ignoreFlag, value.var,
+--                 -- 										value.action, value.frame)
+--             end
+--         end
+--     end
+-- end, ecs.allOf("Active", "ATK"))
 
 ecs.registerSingleSystem("Force", function(this, value)
     -- this.velocity.x = this.velocity.x + value.x
@@ -663,15 +706,15 @@ end)
 
 ecs.registerSingleSystem("State", function(this, value)
     utils.changeState(this, value.state, value.spineAnimation)
-    print(value.state)
+    -- print(value.state)
 end, ecs.allOf("Active", "Animation", "State", "SpineRenderer"))
 
 ecs.registerSingleSystem("Aim", function(this, value)
     local mousePosition = CS.UnityEngine.Input.mousePosition
     local worldMousePosition = CS.UnityEngine.Camera.main:ScreenToWorldPoint(mousePosition)
 
-    local skeletonSpacePoint = this.runtimeSkeletonAnimation.transform:InverseTransformPoint(worldMousePosition);
-    if  this.runtimeSkeletonAnimation.Skeleton.FlipX then
+    local skeletonSpacePoint = this.skeletonAnimation.transform:InverseTransformPoint(worldMousePosition);
+    if  this.skeletonAnimation.Skeleton.FlipX then
         skeletonSpacePoint.x = skeletonSpacePoint.x * -1
     end
     -- print(this.bone.Data.Name, this.bone.ScaleX, this.bone.ScaleY, skeletonSpacePoint)
@@ -686,13 +729,13 @@ end, ecs.allOf("Active", "Animation"))
 
 ecs.registerSingleSystem("SpineAnimation", function(this, value)
     
-    local ani = this.runtimeSkeletonAnimation.skeleton.Data:FindAnimation(value.spineAnimation)
+    local ani = this.skeletonAnimation.skeleton.Data:FindAnimation(value.spineAnimation)
     if ani ~= nil then
-        local aimTrack = this.runtimeSkeletonAnimation.AnimationState:SetAnimation(value.trackIndex, ani, true)
+        local aimTrack = this.skeletonAnimation.AnimationState:SetAnimation(value.trackIndex, ani, true)
         aimTrack.AttachmentThreshold = 1
         aimTrack.MixDuration = 0
     else
-        local empty = this.runtimeSkeletonAnimation.state:AddEmptyAnimation(value.trackIndex, 0.5, 0.1)
+        local empty = this.skeletonAnimation.state:AddEmptyAnimation(value.trackIndex, 0.5, 0.1)
         empty.AttachmentThreshold = 1
     end
     
@@ -727,39 +770,54 @@ end)
 
 ecs.registerSingleSystem("Bone", function(this, value)
 
-    local bone = this.runtimeSkeletonAnimation.Skeleton:FindBone(value.bone)
+    local bone = this.skeletonAnimation.Skeleton:FindBone(value.bone)
 
-    local object = this.children[value.id]
-    if object ~= nil and bone ~= nil then
-        -- if value.rotation ~= nil then
-        --     object.rotation = value.rotation
-        -- end
+--    print(this.skeletonAnimation.Skeleton:FindBone(value.bone).Children)
 
-        -- if value.direction_x ~= nil then
-        --     object.direction.x = value.direction_x
-        -- end
+    if this.children[value.id] ~= nil and bone ~= nil then
+        for _, object in pairs(this.children[value.id]) do
+            if object ~= nil then
+                -- if value.rotation ~= nil then
+                --     object.rotation = value.rotation
+                -- end
 
-        -- if value.animation ~= nil then
-        --     utils.changeAnimation(object, value.animation)
-        -- end
+                -- if value.direction_x ~= nil then
+                --     object.direction.x = value.direction_x
+                -- end
 
-        -- local z = value.layer / 100
-        -- if this.root.direction.x == -1 then
-        -- 	z = -z
-        -- end
-        -- object.gameObject.transform.localPosition = CS.UnityEngine.Vector3(value.x / 100, value.y / 100, z)
+                -- if value.animation ~= nil then
+                --     utils.changeAnimation(object, value.animation)
+                -- end
 
-        local pos = CS.Spine.Unity.SkeletonExtensions.GetSkeletonSpacePosition(bone)
-        local rotation = CS.Spine.Unity.SkeletonExtensions.GetQuaternion(bone)
-        -- object.rotation = value.rotation
-        local r = rotation.eulerAngles
-        CS.LuaUtil.SetRotationByEuler(object.physics_object_id, r.x, r.y, r.z)
+                -- local z = value.layer / 100
+                -- if this.root.direction.x == -1 then
+                -- 	z = -z
+                -- end
+                -- object.gameObject.transform.localPosition = CS.UnityEngine.Vector3(value.x / 100, value.y / 100, z)
 
-        CS.LuaUtil.SetLocalPos(object.physics_object_id, pos.x, 0, -pos.y)
+                local pos = CS.Spine.Unity.SkeletonExtensions.GetSkeletonSpacePosition(bone)
+                local rotation = CS.Spine.Unity.SkeletonExtensions.GetQuaternion(bone)
+                -- object.rotation = value.rotation
+                local r = rotation.eulerAngles
+                CS.LuaUtil.SetRotationByEuler(object.physics_object_id, r.x, r.y, r.z)
 
-        -- print(pos.x, pos.y)
+                CS.LuaUtil.SetLocalPos(object.physics_object_id, pos.x, 0, -pos.y)
 
-        -- object.spriteRenderer.sortingOrder = -(value.layer * this.root.direction.z - this.spriteRenderer.sortingOrder)
+                -- print(pos.x, pos.y)
+
+                -- object.spriteRenderer.sortingOrder = -(value.layer * this.root.direction.z - this.spriteRenderer.sortingOrder)
+
+                if object.meshRenderer ~= nil then
+                    if value.order ~= nil and object.meshRenderer.sortingOrder ~= value.order then
+                        object.meshRenderer.sortingOrder = value.order
+                    end
+                else
+                    if value.order ~= nil and object.spriteRenderer.sortingOrder ~= value.order then
+                        object.spriteRenderer.sortingOrder = value.order
+                    end
+                end
+            end
+        end
     end
 end, ecs.allOf("Active", "Animation", "SpineRenderer"))
 
@@ -946,7 +1004,7 @@ ecs.registerSingleSystem("Ray", function(this, value)
 end)
 
 ecs.registerSingleSystem("Object", function(this, value)
-    local d = this.root.direction.x
+    -- local d = this.root.direction.x
     
     for i2 = 1, value.amount, 1 do
 
@@ -975,6 +1033,10 @@ ecs.registerSingleSystem("Object", function(this, value)
         local rx, ry, rw, rz = CS.LuaUtil.GetRotation(this.physics_object_id)
         rot_x, rot_y, rot_z, rot_w = CS.LuaUtil.QuaternionMultiplyQuaternion(rot_x, rot_y, rot_z, rot_w, rx, ry, rw, rz)
 
+        local rrrrrx, rrrrry, rrrrrz, rrrrrw = CS.LuaUtil.QuaternionAngleAxis(value.rotation, 0, 0, 1)
+
+        rot_x, rot_y, rot_z, rot_w = CS.LuaUtil.QuaternionMultiplyQuaternion(rot_x, rot_y, rot_z, rot_w, rrrrrx, rrrrry, rrrrrz, rrrrrw)
+
 
         local rrr = CS.Tools.Instance:RandomRangeFloat(0.9, 1)
         local rrr_x = (value.x2 - offset) * rrr
@@ -1002,7 +1064,7 @@ ecs.registerSingleSystem("Object", function(this, value)
         -- ecs.addComponent(id2, "BDY")
         -- ecs.addComponent(id2, "Sleep")
         -- local object = ecs.applyEntity(id2)
-        local object = this.database.groups[value.animation](this.rigidbody.position.x + pos_x, this.rigidbody.position.y + pos_y, this.rigidbody.position.z + pos_z, velocityyy_x, velocityyy_y, velocityyy_z, this.team, this.root.target)
+        local object = this.database.groups[value.animation](this.rigidbody.position.x + pos_x, this.rigidbody.position.y + pos_y, this.rigidbody.position.z + pos_z, velocityyy_x, velocityyy_y, velocityyy_z, this.team, nil) -- this.root.target
         -- object.spriteRenderer.material = this.spriteRenderer.material
 
 
@@ -1023,7 +1085,7 @@ ecs.registerSingleSystem("Object", function(this, value)
         -- lr.numCapVertices = 90
         -- lr.material = utils.LEGACYSHADERSPARTICLESALPHABLENDEDPREMULTIPLY
 
-        object.direction.x = d
+        -- object.direction.x = d
 
         CS.LuaUtil.SetRotation(object.physics_object_id, rot_x, rot_y, rot_z, rot_w)
 
@@ -1052,7 +1114,233 @@ ecs.registerSingleSystem("OnClick", function(this, value)
     utils.invokeEvent("OnClick", this)
 end)
 
+ecs.registerSingleSystem("Sleep", function(self)
+    if self.isOnGround ~= -1 and utils.GetVector3Module(self.velocity.x, self.velocity.y, self.velocity.z) <= 1 then
+        -- self.sleep = true
+        ecs.removeComponent(self._eid, "Active")
+        ecs.applyEntity(self._eid)
+    end
+end, ecs.allOf("Active", "Gravity", "DataBase", "Physics"))
 
+ecs.registerSingleSystem("TestGravity", function(this, value)
+
+    local bone = this.skeletonAnimation.Skeleton:FindBone("grabL")
+
+    if bone ~= nil then
+        local pos = CS.Spine.Unity.SkeletonExtensions.GetSkeletonSpacePosition(bone)
+
+        print("wocao1")
+
+        for _, v in pairs(ecs.entities) do -- ecs.getCache()[ecs.allOf("Active", "Physics", "BDY")]
+            if this ~= v then
+                if v._bit | ecs.allOf("Gravity") == v._bit then
+
+                    ecs.removeComponent(v._eid, "Gravity")
+                    ecs.applyEntity(v._eid)
+                end
+
+                if v._bit | ecs.allOf("Active") ~= v._bit then
+                    ecs.addComponent(v._eid, "Active")
+                    ecs.applyEntity(v._eid)
+                    v.rotation_velocity = 0
+                end
+
+                local a_x, a_y, a_z = CS.LuaUtil.GetPos(v.physics_object_id)
+                local m_x, m_y, m_z = CS.LuaUtil.GetPos(this.physics_object_id)
+
+                local xxx = (m_x + pos.x) - a_x
+                local yyy = m_y - a_y
+                local zzz = (m_z - pos.y) - a_z
+
+                local length = utils.GetVector3Module(xxx, yyy, zzz) -- 射线的长度
+                local dx = xxx / length -- 方向
+                local dy = yyy / length -- 方向
+                local dz = zzz / length -- 方向
+
+                v.velocity.x = dx
+                v.velocity.y = dy
+                v.velocity.z = dz
+            end
+        end
+    end
+end, ecs.allOf("Active", "DataBase"))
+
+ecs.registerSingleSystem("TestGravity2", function(this, value)
+    for _, v in pairs(ecs.entities) do -- ecs.getCache()[ecs.allOf("Active", "Physics", "BDY")]
+        if this ~= v then
+            if v._bit | ecs.allOf("Gravity") ~= v._bit and this ~= v then
+
+                ecs.addComponent(v._eid, "Gravity")
+                ecs.applyEntity(v._eid)
+            end
+        end
+    end
+end, ecs.allOf("Active", "DataBase"))
+
+ecs.registerSingleSystem("TestFinder", function(this, value)
+
+    print("wocao")
+
+    for _, v in pairs(ecs.entities) do -- ecs.getCache()[ecs.allOf("Active", "Physics", "BDY")]
+
+        print("wocao1")
+
+        if v._bit | ecs.allOf("Parent") ~= v._bit and this ~= v and v.state == value.test then
+
+
+            if v._bit | ecs.allOf("Sleep") == v._bit then
+                -- print("wocao3")
+                ecs.removeComponent(v._eid, "Sleep")
+                ecs.applyEntity(v._eid)
+            end
+
+            if v._bit | ecs.allOf("Active") ~= v._bit then
+                -- print("wocao3")
+                ecs.addComponent(v._eid, "Active")
+                ecs.applyEntity(v._eid)
+            end
+
+            if v._bit | ecs.allOf("Gravity") == v._bit then
+                -- print("wocao3")
+                ecs.removeComponent(v._eid, "Gravity")
+                v.velocity.x = 0
+                v.velocity.y = 0
+                v.velocity.z = 0
+            end
+
+            print("wocao2")
+
+            ecs.addComponent(v._eid, "Parent", this, "gun2")
+
+            ecs.applyEntity(v._eid)
+            -- utils.changeState(v, value.state, nil)
+            -- break
+        end
+    end
+end, ecs.allOf("Active", "DataBase", "Children"))
+
+ecs.registerSingleSystem("DetachChild", function(this, value)
+
+    for _, object in pairs(this.children[value.id]) do
+        -- local object = this.children[value.id]
+
+        object.physics_object.transform:SetParent(nil, true)
+
+        object.parent = object
+        object.root = object
+
+
+        this.children[value.id][object._eid] = nil
+
+        ecs.removeComponent(object._eid, "Parent")
+
+        ecs.addComponent(object._eid, "Gravity")
+        ecs.applyEntity(object._eid)
+
+
+        object.rotation_velocity = 0
+
+        local r = CS.Tools.Instance:RandomRangeInt(0, 30 + 1) - 30 / 2 -- value.precise
+        local randomvector_x = 0
+        local randomvector_y = CS.Tools.Instance:RandomRangeFloat(0, 1)
+        local randomvector_z = CS.Tools.Instance:RandomRangeFloat(0, 1)
+
+        local length = utils.GetVector3Module(randomvector_x, randomvector_y, randomvector_z) -- 射线的长度
+        local dx = randomvector_x / length -- 方向
+        local dy = randomvector_y / length -- 方向
+        local dz = randomvector_z / length -- 方向
+        local rot_x, rot_y, rot_z, rot_w = CS.LuaUtil.QuaternionAngleAxis(r, dx, dy, dz)
+
+        local rx, ry, rw, rz = CS.LuaUtil.GetRotation(object.physics_object_id)
+        rot_x, rot_y, rot_z, rot_w = CS.LuaUtil.QuaternionMultiplyQuaternion(rot_x, rot_y, rot_z, rot_w, rx, ry, rw, rz)
+
+        local rrr = CS.Tools.Instance:RandomRangeFloat(0.9, 1)
+
+        local offset = CS.Tools.Instance:RandomRangeInt(0, value.x2 / 2)
+
+        local rrr_x = (value.x2 - offset) * rrr
+        local rrr_y = value.y2 * rrr
+        local rrr_z = value.z2 * rrr
+
+        local x, y, z = CS.LuaUtil.QuaternionMultiplyVector3(rot_x, rot_y, rot_z, rot_w, rrr_x, rrr_y, rrr_z)
+
+        object.velocity.x = x
+        object.velocity.y = y
+        object.velocity.z = z
+        -- utils.changeState(object, value.state, nil)
+    end
+
+    this.children[value.id] = nil
+
+end, ecs.allOf("Active", "DataBase", "Children"))
+
+ecs.registerSingleSystem("Attack", function(this, value)
+    print("wolai0")
+    for _, v in pairs(this.bodyArray) do
+        local cx, cy, cz = CS.LuaUtil.GetColliderBoundsCenter(v.collider_id)
+        print("wolai1")
+        for i = 0, v.hitObjects.Length - 1, 1 do
+            local k = v.hitObjects[i]
+            if k ~= nil and k.attachedRigidbody ~= v.collider.attachedRigidbody then
+                print("wolai2")
+                local go = k.attachedRigidbody.gameObject
+                local object2 = utils.getObject(go:GetInstanceID())
+				if object2 == nil then
+				else
+
+                    if this.team ~= object2.team or (this.team == object2.team and object2._bit | ecs.allOf("Active") ~= object2._bit) then
+                        if type(v.hitObject) ~= "table" then
+                            v.hitObject = {}
+                        end
+                
+                        if v.hitObject[k:GetInstanceID()] == nil then
+                
+                            -- print("asdasd")
+                
+                            v.hitObject[k:GetInstanceID()] = true
+                            -- self.isHit = 16
+                
+                            local rcx, rcy, rcz = CS.LuaUtil.GetColliderBoundsCenter(k:GetInstanceID())
+                
+                            local xx =  (rcx + 0) - cx
+                            local yy =  (rcy + 0) - cy
+                            local zz =  (rcz - 5) - cz
+                            local length = utils.GetVector3Module(xx, yy, zz) -- 射线的长度
+                            local dx = xx / length -- 方向
+                            local dy = yy / length -- 方向
+                            local dz = zz / length -- 方向
+                
+                            -- print(object2.state, dx)
+                
+                
+                            if object2._bit | 1 ~= object2._bit then
+                                ecs.addComponent(object2._eid, "Active")
+                                ecs.applyEntity(object2._eid)
+                
+                                object2.velocity.x = object2.velocity.x + dx * 10 / 3
+                                object2.velocity.y = object2.velocity.y + dy * 10 / 3
+                                object2.velocity.z = object2.velocity.z + dz * 10 / 3
+                
+                                -- object2.velocity.x = object2.velocity.x + xx
+                                -- object2.velocity.z = object2.velocity.z + zz
+                                -- object2.velocity.y = object2.velocity.y + yy
+                                object2.rotation_velocity = 0
+                            else
+                                object2.velocity.x = object2.velocity.x + dx * 10 / 3
+                                object2.velocity.y = object2.velocity.y + dy * 10 / 3
+                                object2.velocity.z = object2.velocity.z + dz * 10 / 3
+                
+                                -- object2.velocity.x = object2.velocity.x + xx / 10
+                                -- object2.velocity.z = object2.velocity.z + zz / 10
+                                -- object2.velocity.y = object2.velocity.y + yy / 10
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end, ecs.allOf("Active", "BDY"))
 
 ------------------------------------------------------------------------------------------------------------------
 

@@ -441,6 +441,14 @@ public class LuaUtil
         m_gameObjects[id].transform.localScale = new Vector3(x, y, z);
     }
 
+    public static void GetlocalScale(int id, out float x, out float y, out float z)
+    {
+        Vector3 scale = m_gameObjects[id].transform.localScale;
+        x = scale.x;
+        y = scale.y;
+        z = scale.z;
+    }
+
     public static void SetRotationByEuler(int id, float x, float y, float z)
     {
         m_gameObjects[id].transform.rotation = Quaternion.Euler(x, y, z);
@@ -534,9 +542,9 @@ public class LuaUtil
         return Physics.OverlapBox(new Vector3(cx, cy, cz), new Vector3(ex, ey, ez), new Quaternion(rx, ry, rz, rw), mask, q);
     }
 
-    public static RaycastHit[] PhysicsRaycastAll(float ox, float oy, float oz, float dx, float dy, float dz, float dis, int m)
+    public static RaycastHit[] PhysicsRaycastAll(float ox, float oy, float oz, float dx, float dy, float dz, float dis, int m, QueryTriggerInteraction q)
     {
-        return Physics.RaycastAll(new Vector3(ox, oy, oz), new Vector3(dx, dy, dz), dis, m);
+        return Physics.RaycastAll(new Vector3(ox, oy, oz), new Vector3(dx, dy, dz), dis, m, q);
     }
 
     public static void PhysicsRaycast(float ox, float oy, float oz, float dx, float dy, float dz, float dis, int m, out RaycastHit hit)

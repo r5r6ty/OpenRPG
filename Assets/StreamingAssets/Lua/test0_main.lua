@@ -270,7 +270,7 @@ function start()
 
     -- 创建系统集合
     _update = {"JudgePlayerSystem", "AnimationSystem11", "AnimationSystem1", "StateUpdateSystem", "AnimationSystem2", "SpriteRenderSystem", "SpineRenderSystem", "PointLightRenderSystem", "LineRenderSystem", "JudgeAISystem"}
-    _fixedUpdate = {"ColliderSystem", "StateFxiedUpdateSystem", "BDYSystem", "ResetAISystem", "ResetPlayerSystem"} -- , "PhysicsSystem", "SleepSystem", "ATKSystem"
+    _fixedUpdate = {"ColliderSystem", "BDYSystem", "StateFxiedUpdateSystem", "ResetAISystem", "ResetPlayerSystem"} -- , "PhysicsSystem", "SleepSystem", "ATKSystem"
 
     -- 创建一个实体
     -- for i = 1, 1, 1 do

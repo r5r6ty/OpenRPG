@@ -33,8 +33,8 @@ local LFont = nil
 local LFontTexture2D = nil
 local LFontMaterial = nil
 
--- local LObjectShader = CS.UnityEngine.Shader.Find("Sprites/Beat/Diffuse-Shadow")
 local LUIObjectShader = CS.UnityEngine.Shader.Find("Tutorial/007_Sprite")
+-- local LObjectShader = CS.UnityEngine.Shader.Find("Sprites/Beat/Diffuse-Shadow")
 -- local LObjectShader = CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph Unlit")
 -- local LObjectShader = CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph Unlit 1")
 local LObjectShader = CS.UnityEngine.Shader.Find("Shader Graphs/New Shader Graph Lit")
@@ -752,8 +752,8 @@ end
 function utils.SetParentAndRoot(self, object, id)
 	if object ~= nil and (self.physics_object.transform.parent == nil or self.physics_object.transform.parent ~= self.physics_object.transform) then
 
-		self.physics_object.transform:SetParent(object.physics_object.transform, true)
-		self.rigidbody.isKinematic = true
+		-- self.physics_object.transform:SetParent(object.physics_object.transform, true)
+		-- self.rigidbody.isKinematic = true
 		self.parent = object
 		if object.parent ~= nil then
 			self.root = object.parent

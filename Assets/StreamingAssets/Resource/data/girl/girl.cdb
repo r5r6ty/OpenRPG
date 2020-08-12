@@ -205,9 +205,6 @@
 						},
 						{
 							"component": "Gravity"
-						},
-						{
-							"component": "PointLight"
 						}
 					],
 					"name": "shell2",
@@ -287,6 +284,9 @@
 						},
 						{
 							"component": "Physics"
+						},
+						{
+							"component": "PointLight"
 						}
 					],
 					"active": true
@@ -2392,9 +2392,8 @@
 							"y": -0.5,
 							"width": 1,
 							"height": 1,
-							"bodyFlags": 1,
-							"bounciness": 0.7,
-							"wait": 600
+							"wait": 600,
+							"attackFlags": 2
 						},
 						{
 							"wait": 600,
@@ -5166,7 +5165,7 @@
 					"fixedUpdate": [
 						{
 							"category": "Object",
-							"active": true,
+							"active": false,
 							"trigger": "this.bodyArray[\"0\"] ~= nil and this.bodyArray[\"0\"].isHit == 16",
 							"json": {
 								"x": 0,
@@ -5184,7 +5183,7 @@
 						},
 						{
 							"category": "Destory",
-							"active": true,
+							"active": false,
 							"trigger": "(this.bodyArray[\"0\"] ~= nil and this.bodyArray[\"0\"].isHit ~= -1) or this.timeLine >= 1"
 						},
 						{
@@ -5230,6 +5229,34 @@
 							"category": "Destory",
 							"active": false,
 							"trigger": "(this.attckArray[\"0\"] ~= nil and this.attckArray[\"0\"].isHit ~= -1) or this.timeLine >= 1"
+						},
+						{
+							"category": "Attack",
+							"active": true
+						},
+						{
+							"category": "Object",
+							"active": true,
+							"trigger": "this.bodyArray[\"0\"] ~= nil and this.bodyArray[\"0\"].hitObjects.Length > 0",
+							"json": {
+								"x": 0,
+								"y": 0,
+								"z": 0,
+								"x2": 0,
+								"y2": 0,
+								"z2": 0,
+								"state": "fire_effect",
+								"animation": "blood_effect",
+								"id": "9",
+								"amount": 1,
+								"precise": 0,
+								"rotation": 0
+							}
+						},
+						{
+							"category": "Destory",
+							"active": true,
+							"trigger": " ( this.bodyArray[\"0\"] ~= nil and this.bodyArray[\"0\"].hitObjects.Length > 0) or this.timeLine >= 1"
 						}
 					],
 					"animation": "bullet",
@@ -5409,7 +5436,7 @@
 						},
 						{
 							"category": "Object",
-							"active": true,
+							"active": false,
 							"trigger": "1",
 							"json": {
 								"x": 0,
@@ -6179,7 +6206,7 @@
 						},
 						{
 							"category": "Object",
-							"active": false,
+							"active": true,
 							"trigger": "0",
 							"json": {
 								"x": 27,

@@ -153,6 +153,8 @@ function LCollider:setCollider(dir, x, y, width, height, depth, flags, layers, b
 		self.isRayCast = 2
 		-- self:deleteCollider()
 		-- self.collider.enabled = false
+	else
+		self.isRayCast = 0
 	end
 end
 
@@ -883,8 +885,24 @@ function LColliderBDY:Test()
 
 	local cx, cy, cz = CS.LuaUtil.GetColliderBoundsCenter(self.collider_id)
 	local ex, ey, ez = CS.LuaUtil.GetColliderBoundsExtents(self.collider_id)
-	local rx, ry, rz, rw = CS.LuaUtil.GetRotation(self.LObject.physics_object_id)
-	self.hitObjects = CS.LuaUtil.PhysicsOverlapBox(cx + velocity_x, cy + velocity_y, cz + velocity_z, ex, ey, ez, rx, ry, rz, rw, self.filter, self.queryTriggerInteraction)
+	
+
+	if self.isRayCast == 0 then
+		local rx, ry, rz, rw = CS.LuaUtil.GetRotation(self.LObject.physics_object_id)
+		self.hitObjects = CS.LuaUtil.PhysicsOverlapBox(cx + velocity_x, cy + velocity_y, cz + velocity_z, ex, ey, ez, rx, ry, rz, rw, self.filter, self.queryTriggerInteraction)
+
+	else
+		local rx, ry, rz = CS.LuaUtil.RigidbodyGetPosition(self.LObject.rigidbody)
+		local length = utils.GetVector3Module(velocity_x, velocity_y, velocity_z) -- 射线的长度
+		local dx = velocity_x / length -- 方向
+		local dy = velocity_y / length -- 方向
+		local dz = velocity_z / length -- 方向
+
+		CS.LuaUtil.DrawLine(rx, ry, rz, rx + velocity_x, ry + velocity_y, rz + velocity_z, 0, 0, 1, 1)
+		-- CS.LuaUtil.DrawLine(rx, ry + rz, rz, rx + velocity_x, ry + velocity_y + rz + velocity_z, rz + velocity_z, 0, 0, 1, 1)
+
+		self.hitObjects = CS.LuaUtil.PhysicsRaycastAll(rx, ry, rz, dx, dy, dz, length, self.filter, self.queryTriggerInteraction)
+	end
 end
 
 function LColliderBDY:Test2()

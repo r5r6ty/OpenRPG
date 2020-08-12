@@ -13,7 +13,7 @@ ecs.registerMultipleSystem("SpriteRenderSystem", function(self)
     self.rotation = self.rotation + self.rotation_velocity * self.speed
 
     local rrr_x, rrr_y, rrr_z = CS.LuaUtil.GetEulerAngles(self.physics_object_id)
-    local rrr_length = utils.GetVector3Module(rrr_x, rrr_y, rrr_z)
+    
     -- if (self.root == self and self.direction.x == 1) or (self.root ~= self and self.root.direction.x * self.direction.x == 1) then
     --     if rrr_length > 0 then
     --         CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, 0, 360 - rrr_y + self.rotation)
@@ -28,8 +28,18 @@ ecs.registerMultipleSystem("SpriteRenderSystem", function(self)
     --     end
     -- end
 
+    local sx, sy, sz = CS.LuaUtil.GetlocalScale(self.physics_object_id)
+    CS.LuaUtil.SetlocalScale(self.pic_offset_object_id, sx, sy, sz)
+    -- if sx < 0 then
+    --     rrr_z = rrr_z + 180
+    -- end
+
 
     CS.LuaUtil.SetRotationByEuler(self.pic_offset_object_id, 0, rrr_y, self.rotation + rrr_z)
+
+    -- local rot_x, rot_y, rot_z, rot_w = CS.LuaUtil.GetRotation(self.physics_object_id)
+    -- local dx, dy, dz = CS.LuaUtil.QuaternionMultiplyVector3(rot_x, rot_y, rot_z, rot_w, 1 * self.direction.x, 0, 0)
+    -- CS.LuaUtil.DrawLine(pos_x, pos_y, pos_z, pos_x + dx, pos_y + dy, pos_z + dz, 0, 0, 1, 1)
 end, ecs.allOf("Active", "DataBase", "SpriteRenderer", "Physics"))
 
 ecs.registerMultipleSystem("PointLightRenderSystem", function(self)
@@ -96,7 +106,14 @@ ecs.registerMultipleSystem("SpineRenderSystem", function(self)
 
     local rrr_x, rrr_y, rrr_z = CS.LuaUtil.GetEulerAngles(self.physics_object_id)
 
+    local sx, sy, sz = CS.LuaUtil.GetlocalScale(self.physics_object_id)
+    CS.LuaUtil.SetlocalScale(self.spine_offset_object_id, sx, sy, sz)
+
     CS.LuaUtil.SetRotationByEuler(self.spine_offset_object_id, 0, rrr_y, 0 + rrr_z)
+
+    -- local rot_x, rot_y, rot_z, rot_w = CS.LuaUtil.GetRotation(self.physics_object_id)
+    -- local dx, dy, dz = CS.LuaUtil.QuaternionMultiplyVector3(rot_x, rot_y, rot_z, rot_w, 1 * self.direction.x, 0, 0)
+    -- CS.LuaUtil.DrawLine(pos_x, pos_y, pos_z, pos_x + dx, pos_y + dy, pos_z + dz, 0, 0, 1, 1)
 end, ecs.allOf("Active", "DataBase", "SpineRenderer", "Physics"))
 
 -- 渲染line
@@ -277,6 +294,9 @@ ecs.registerMultipleSystem("BDYSystem", function(self)
         
         if v.isBDY then
             self.isOnGround, x, y, z = v:Test2()
+
+
+            f = f + 1
         end
 
 
@@ -287,7 +307,7 @@ ecs.registerMultipleSystem("BDYSystem", function(self)
         --         self.velocity.y = -0.01
         --     end
         -- end
-        f = f + 1
+        
     end
     if f == 0 then
         local dt = CS.UnityEngine.Time.deltaTime * self.speed
@@ -713,9 +733,29 @@ ecs.registerSingleSystem("Aim", function(this, value)
     local mousePosition = CS.UnityEngine.Input.mousePosition
     local worldMousePosition = CS.UnityEngine.Camera.main:ScreenToWorldPoint(mousePosition)
 
-    local skeletonSpacePoint = this.skeletonAnimation.transform:InverseTransformPoint(worldMousePosition);
-    if  this.skeletonAnimation.Skeleton.FlipX then
-        skeletonSpacePoint.x = skeletonSpacePoint.x * -1
+    local skeletonSpacePoint = this.skeletonAnimation.transform:InverseTransformPoint(worldMousePosition)
+
+    if this.direction.x == -1 then
+
+        if skeletonSpacePoint.x < 0 then
+
+            -- this.skeletonAnimation.Skeleton.FlipX = false
+            this.direction.x = 1
+
+            local sx, sy, sz = CS.LuaUtil.GetlocalScale(this.physics_object_id)
+            CS.LuaUtil.SetlocalScale(this.physics_object_id, math.abs(sx) * this.direction.x, sy, sz)
+        end
+
+        -- skeletonSpacePoint.x = skeletonSpacePoint.x * -1
+    else
+        if skeletonSpacePoint.x < 0 then
+
+            -- this.skeletonAnimation.Skeleton.FlipX = true
+            this.direction.x = -1
+
+            local sx, sy, sz = CS.LuaUtil.GetlocalScale(this.physics_object_id)
+            CS.LuaUtil.SetlocalScale(this.physics_object_id, math.abs(sx) * this.direction.x, sy, sz)
+        end
     end
     -- print(this.bone.Data.Name, this.bone.ScaleX, this.bone.ScaleY, skeletonSpacePoint)
     -- spine3.6是SetPosition，3.8不是，是SetLocalPosition
@@ -799,9 +839,27 @@ ecs.registerSingleSystem("Bone", function(this, value)
                 local rotation = CS.Spine.Unity.SkeletonExtensions.GetQuaternion(bone)
                 -- object.rotation = value.rotation
                 local r = rotation.eulerAngles
-                CS.LuaUtil.SetRotationByEuler(object.physics_object_id, r.x, r.y, r.z)
+                
 
-                CS.LuaUtil.SetLocalPos(object.physics_object_id, pos.x, 0, -pos.y)
+                if this.direction.x ~= object.direction.x then
+                    if this.direction.x == -1 then
+                        object.direction.x = -1
+                        local sx, sy, sz = CS.LuaUtil.GetlocalScale(object.physics_object_id)
+                        CS.LuaUtil.SetlocalScale(object.physics_object_id, math.abs(sx) * object.direction.x, sy, sz)
+                    else
+                        object.direction.x = 1
+                        local sx, sy, sz = CS.LuaUtil.GetlocalScale(object.physics_object_id)
+                        CS.LuaUtil.SetlocalScale(object.physics_object_id, math.abs(sx) * object.direction.x, sy, sz)
+                    end
+                end
+
+                CS.LuaUtil.SetRotationByEuler(object.physics_object_id, r.x, r.y, r.z * object.direction.x)
+
+                -- CS.LuaUtil.SetLocalPos(object.physics_object_id, pos.x, 0, -pos.y)
+                local px, py, pz = CS.LuaUtil.GetPos(this.physics_object_id)
+                CS.LuaUtil.SetPos(object.physics_object_id, px + pos.x * 2 * object.direction.x, py, pz - pos.y * 2)
+
+
 
                 -- print(pos.x, pos.y)
 
@@ -1028,23 +1086,24 @@ ecs.registerSingleSystem("Object", function(this, value)
 		local dy = randomvector_y / length -- 方向
         local dz = randomvector_z / length -- 方向
 
-        local rot_x, rot_y, rot_z, rot_w = CS.LuaUtil.QuaternionAngleAxis(r, dx, dy, dz)
+        local rot_x, rot_y, rot_z, rot_w = CS.LuaUtil.QuaternionAngleAxis(r * this.direction.x, dx, dy, dz)
 
         local rx, ry, rw, rz = CS.LuaUtil.GetRotation(this.physics_object_id)
         rot_x, rot_y, rot_z, rot_w = CS.LuaUtil.QuaternionMultiplyQuaternion(rot_x, rot_y, rot_z, rot_w, rx, ry, rw, rz)
 
-        local rrrrrx, rrrrry, rrrrrz, rrrrrw = CS.LuaUtil.QuaternionAngleAxis(value.rotation, 0, 0, 1)
+        -- 附加旋转角度
+        local rrrrrx, rrrrry, rrrrrz, rrrrrw = CS.LuaUtil.QuaternionAngleAxis(value.rotation * this.direction.x, 0, 0, 1)
 
         rot_x, rot_y, rot_z, rot_w = CS.LuaUtil.QuaternionMultiplyQuaternion(rot_x, rot_y, rot_z, rot_w, rrrrrx, rrrrry, rrrrrz, rrrrrw)
 
 
         local rrr = CS.Tools.Instance:RandomRangeFloat(0.9, 1)
-        local rrr_x = (value.x2 - offset) * rrr
+        local rrr_x = (value.x2 - offset) * rrr * this.direction.x
         local rrr_y = value.y2 * rrr
         local rrr_z = value.z2 * rrr
         local velocityyy_x, velocityyy_y, velocityyy_z = CS.LuaUtil.QuaternionMultiplyVector3(rot_x, rot_y, rot_z, rot_w, rrr_x, rrr_y, rrr_z)
 
-        local pos_x, pos_y, pos_z = CS.LuaUtil.QuaternionMultiplyVector3(rx, ry, rw, rz, value.x / 100 * 2, -value.z / 100 * 2, value.y / 100 * 2)
+        local pos_x, pos_y, pos_z = CS.LuaUtil.QuaternionMultiplyVector3(rx, ry, rw, rz, value.x / 100 * 2 * this.direction.x, -value.z / 100 * 2, value.y / 100 * 2)
 
         -- local kk = nil
         -- if value.animation == "shell1" or value.animation == "shell2" then
@@ -1087,6 +1146,8 @@ ecs.registerSingleSystem("Object", function(this, value)
 
         -- object.direction.x = d
 
+        local sx, sy, sz = CS.LuaUtil.GetlocalScale(this.physics_object_id)
+        CS.LuaUtil.SetlocalScale(object.physics_object_id, sx, sy, sz)
         CS.LuaUtil.SetRotation(object.physics_object_id, rot_x, rot_y, rot_z, rot_w)
 
         -- object.rotation = rot.eulerAngles.z
@@ -1224,7 +1285,7 @@ ecs.registerSingleSystem("DetachChild", function(this, value)
     for _, object in pairs(this.children[value.id]) do
         -- local object = this.children[value.id]
 
-        object.physics_object.transform:SetParent(nil, true)
+        -- object.physics_object.transform:SetParent(nil, true)
 
         object.parent = object
         object.root = object
@@ -1280,7 +1341,12 @@ ecs.registerSingleSystem("Attack", function(this, value)
         local cx, cy, cz = CS.LuaUtil.GetColliderBoundsCenter(v.collider_id)
         print("wolai1")
         for i = 0, v.hitObjects.Length - 1, 1 do
-            local k = v.hitObjects[i]
+            local k = nil
+            if v.isRayCast == 0 then
+                k = v.hitObjects[i]
+            else
+                k = v.hitObjects[i].collider
+            end
             if k ~= nil and k.attachedRigidbody ~= v.collider.attachedRigidbody then
                 print("wolai2")
                 local go = k.attachedRigidbody.gameObject

@@ -35,12 +35,11 @@ namespace XLuaTest
         private float _fps;
         private string mark = "";
 
-        //public TextAsset luaScript;
         public Injection[] injections;
 
         internal static LuaEnv luaEnv = new LuaEnv(); // all lua behaviour shared one luaenv only!
         internal static float lastGCTime = 0;
-        internal const float GCInterval = 1;// 1 second 
+        internal const float GCInterval = 1;// 1 second
 
         private Action luaStart;
         private Action luaUpdate;
@@ -50,60 +49,57 @@ namespace XLuaTest
         private Action luaOnGui;
         private Action luaOnDrawGizmos;
 
-        //private Action<Collider2D> luaOnTriggerEnter2D;
-        //private Action<Collider2D> luaOnTriggerExit2D;
-        //private Action<Collider2D> luaOnTriggerStay2D;
-        //private Action<Collision2D> luaOnCollisionEnter2D;
-        //private Action<Collision2D> luaOnCollisionExit2D;
-        //private Action<Collision2D> luaOnCollisionStay2D;
-
-        //private Action<Collider> luaOnTriggerEnter;
-        //private Action<Collider> luaOnTriggerExit;
-        //private Action<Collider> luaOnTriggerStay;
-        //private Action<Collision> luaOnCollisionEnter;
-        //private Action<Collision> luaOnCollisionExit;
-        //private Action<Collision> luaOnCollisionStay;
-
-        //private Action<GameObject, AnimationEvent> luaPlayAnimationEvent;
-
-        //private Action<int> luaOnAnimatorIK;
-
-        // 教程中是私有的，不过为了在lua脚本里能拿到这个变量所以改成了共有的，不知道能否这样做
+        // 教程中是私有的，不过为了在lua脚本里能拿到这个变量所以改成了共有的
         public LuaTable scriptEnv;
+
+        // 取一段脚本的原始字节：先查 GameLoader 预载的字节缓存，桌面端再落盘读文件。
+        // 存字节不存 text：lua 源文件按字节喂给 lua，编码由文件本身决定，不会被 UTF-8 解码弄坏。
+        internal static byte[] LoadScriptBytes(string name)
+        {
+            byte[] cached = LuaManager.Instance.GetScriptBytes(name);
+            if (cached != null)
+            {
+                return cached;
+            }
+#if !UNITY_WEBGL
+            string path = GameLoader.Getluapath() + name.Replace('.', '/') + ".lua";
+            if (File.Exists(path))
+            {
+                return File.ReadAllBytes(path);
+            }
+#endif
+            return null;
+        }
 
         private byte[] CustomLoaderMethod(ref string fileName)
         {
-            // 找到指定文件
-            fileName = GameLoader.Getluapath() + fileName.Replace('.', '/') + ".lua";
-            print(fileName);
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-            if (File.Exists(fileName))
+            byte[] code = LoadScriptBytes(fileName);
+#if UNITY_WEBGL
+            if (code == null)
             {
-                return File.ReadAllBytes(fileName);
-            }
-            else
-            {
-                return null;
+                Debug.LogError("CustomLoader: WebGL 下找不到未预载的脚本：" + fileName);
             }
 #else
-            WWW www = new WWW(fileName);
-            while (!www.isDone)
+            if (code != null)
             {
-                if (www.error != null && www.error != "")
-                {
-                    print(www.error);
-                    return null;
-                }
+                // 和文件加载器对齐路径（xLua 拿它当 chunk 名）
+                fileName = GameLoader.Getluapath() + fileName.Replace('.', '/') + ".lua";
             }
-            return www.bytes;
 #endif
+            return code;
         }
+
+        // AddLoader 只要加一次，加多了每条 require 都会白走一遍全部 loader
+        internal static bool loaderAdded = false;
 
         void Awake()
         {
-            LuaEnv.CustomLoader method = CustomLoaderMethod; // 自定义加载方法
-            // 添加自定义装载机Loader  
-            luaEnv.AddLoader(method);
+            if (!loaderAdded)
+            {
+                LuaEnv.CustomLoader method = CustomLoaderMethod; // 自定义加载方法
+                luaEnv.AddLoader(method); // 添加自定义装载机Loader
+                loaderAdded = true;
+            }
 
             scriptEnv = luaEnv.NewTable();
 
@@ -122,15 +118,21 @@ namespace XLuaTest
                 }
             }
 
-            // 教程代码
-            //luaEnv.DoString(luaScript.text, "LuaTestScript", scriptEnv);
-
             // 通过gameobject的名字来获取对应的lua脚本
-            // 为了能够给gameobject挂上想要的lua，必须在awake之前就让他知道要哪个lua脚本，目前用gameobject的name取，不知道有没有更好的方法
-            string scripts = LuaManager.Instance.GetScripts(gameObject.name.ToLower());
-            luaEnv.DoString(scripts, gameObject.name, scriptEnv);
-
-            //luaEnv.DoString(@"require('test')");
+            // 为了能够给gameobject挂上想要的lua，必须在awake之前就让他知道要哪个lua脚本，目前用gameobject的name取
+            // Instantiate 出来的物体名字带 " (Clone)" 后缀，剥掉再查
+            string objName = gameObject.name.ToLower();
+            if (objName.EndsWith("(clone)"))
+            {
+                objName = objName.Substring(0, objName.Length - "(clone)".Length).Trim();
+            }
+            byte[] code = LoadScriptBytes(objName);
+            if (code == null)
+            {
+                Debug.LogError("LuaBehaviour: 找不到物体 " + gameObject.name + " 对应的 lua 脚本（" + objName + "）");
+                return;
+            }
+            luaEnv.DoString(code, gameObject.name, scriptEnv);
 
             Action luaAwake = scriptEnv.Get<Action>("awake");
             scriptEnv.Get("start", out luaStart);
@@ -141,24 +143,6 @@ namespace XLuaTest
             scriptEnv.Get("ongui", out luaOnGui);
             scriptEnv.Get("onDrawGizmos", out luaOnDrawGizmos);
 
-            //scriptEnv.Get("onTriggerEnter2D", out luaOnTriggerEnter2D);
-            //scriptEnv.Get("onTriggerExit2D", out luaOnTriggerExit2D);
-            //scriptEnv.Get("onTriggerStay2D", out luaOnTriggerStay2D);
-            //scriptEnv.Get("onCollisionEnter2D", out luaOnCollisionEnter2D);
-            //scriptEnv.Get("onCollisionExit2D", out luaOnCollisionExit2D);
-            //scriptEnv.Get("onCollisionEnter2D", out luaOnCollisionStay2D);
-
-            //scriptEnv.Get("onTriggerEnter", out luaOnTriggerEnter);
-            //scriptEnv.Get("onTriggerExit", out luaOnTriggerExit);
-            //scriptEnv.Get("onTriggerStay", out luaOnTriggerStay);
-            //scriptEnv.Get("onCollisionEnter", out luaOnCollisionEnter);
-            //scriptEnv.Get("onCollisionExit", out luaOnCollisionExit);
-            //scriptEnv.Get("onCollisionStay", out luaOnCollisionStay);
-
-            //scriptEnv.Get("playanimationevent", out luaPlayAnimationEvent);
-
-            //scriptEnv.Get("onAnimatorIK", out luaOnAnimatorIK);
-
             if (luaAwake != null)
             {
                 luaAwake();
@@ -168,7 +152,7 @@ namespace XLuaTest
         // Use this for initialization
         void Start()
         {
-            UpdateInterval = Time.realtimeSinceStartup;
+            _lastInterval = Time.realtimeSinceStartup;
             _frames = 0;
             if (luaStart != null)
             {
@@ -227,9 +211,13 @@ namespace XLuaTest
             {
                 luaOnDestroy();
             }
-            luaOnDestroy = null;
-            luaUpdate = null;
             luaStart = null;
+            luaUpdate = null;
+            luaLateUpdate = null;
+            luaFixedUpdate = null;
+            luaOnDestroy = null;
+            luaOnGui = null;
+            luaOnDrawGizmos = null;
             scriptEnv.Dispose();
             injections = null;
         }
@@ -250,118 +238,5 @@ namespace XLuaTest
                 luaOnDrawGizmos();
             }
         }
-
-        //void OnTriggerEnter2D(Collider2D c)
-        //{
-        //    if (luaOnTriggerEnter2D != null)
-        //    {
-        //        luaOnTriggerEnter2D(c);
-        //    }
-        //}
-
-        //void OnTriggerExit2D(Collider2D c)
-        //{
-        //    if (luaOnTriggerExit2D != null)
-        //    {
-        //        luaOnTriggerExit2D(c);
-        //    }
-        //}
-
-        //void OnTriggerStay2D(Collider2D c)
-        //{
-        //    if (luaOnTriggerStay2D != null)
-        //    {
-        //        luaOnTriggerStay2D(c);
-        //    }
-        //}
-
-        //void OnCollisionEnter2D(Collision2D c)
-        //{
-        //    if (luaOnCollisionEnter2D != null)
-        //    {
-        //        luaOnCollisionEnter2D(c);
-        //    }
-        //}
-
-        //void OnCollisionExit2D(Collision2D c)
-        //{
-        //    if (luaOnCollisionExit2D != null)
-        //    {
-        //        luaOnCollisionExit2D(c);
-        //    }
-        //}
-
-        //void OnCollisionStay2D(Collision2D c)
-        //{
-        //    if (luaOnCollisionStay2D != null)
-        //    {
-        //        luaOnCollisionStay2D(c);
-        //    }
-        //}
-
-        //void OnTriggerEnter(Collider c)
-        //{
-        //    if (luaOnTriggerEnter != null)
-        //    {
-        //        luaOnTriggerEnter(c);
-        //    }
-        //}
-
-        //void OnTriggerExit(Collider c)
-        //{
-        //    if (luaOnTriggerExit != null)
-        //    {
-        //        luaOnTriggerExit(c);
-        //    }
-        //}
-
-        //void OnTriggerStay(Collider c)
-        //{
-        //    if (luaOnTriggerStay != null)
-        //    {
-        //        luaOnTriggerStay(c);
-        //    }
-        //}
-
-        //void OnCollisionEnter(Collision c)
-        //{
-        //    if (luaOnCollisionEnter != null)
-        //    {
-        //        luaOnCollisionEnter(c);
-        //    }
-        //}
-
-        //void OnCollisionExit(Collision c)
-        //{
-        //    if (luaOnCollisionExit != null)
-        //    {
-        //        luaOnCollisionExit(c);
-        //    }
-        //}
-
-        //void OnCollisionStay(Collision c)
-        //{
-        //    if (luaOnCollisionStay != null)
-        //    {
-        //        luaOnCollisionStay(c);
-        //    }
-        //}
-
-        //public void PlayAnimationEvent(GameObject go, AnimationEvent ae)
-        //{
-        //    if (luaPlayAnimationEvent != null)
-        //    {
-        //        luaPlayAnimationEvent(go, ae);
-        //    }
-        //}
-
-
-        //public void OnAnimatorIK(int layerIndex)
-        //{
-        //    if (luaOnAnimatorIK != null)
-        //    {
-        //        luaOnAnimatorIK(layerIndex);
-        //    }
-        //}
     }
 }

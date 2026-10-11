@@ -68,7 +68,6 @@ public static class CopyData
 
     private static bool CopyDirectory(string SourcePath, string DestinationPath, bool overwriteexisting)
     {
-        bool ret;
         try
         {
             SourcePath = SourcePath.EndsWith(@"\") ? SourcePath : SourcePath + @"\";
@@ -85,30 +84,21 @@ public static class CopyData
                     if (flinfo.Extension != ".meta")
                     {
                         flinfo.CopyTo(DestinationPath + flinfo.Name, overwriteexisting);
-
-                        //if (flinfo.DirectoryName.Equals((Application.dataPath + @"\StreamingAssets\Lua").Replace("/", @"\")))
-                        //{
-                        //    using (System.IO.StreamWriter file = new System.IO.StreamWriter(Application.dataPath + @"\StreamingAssets\vlist.txt", true))
-                        //    {
-                        //        file.WriteLine(fls.Replace(Application.dataPath + @"\StreamingAssets\", ""));
-                        //    }
-                        //}
                     }
                 }
                 foreach (string drs in Directory.GetDirectories(SourcePath))
                 {
                     DirectoryInfo drinfo = new DirectoryInfo(drs);
                     if (CopyDirectory(drs, DestinationPath + drinfo.Name, overwriteexisting) == false)
-                        ret = false;
+                        return false; // 子目录失败不能被结尾的 ret = true 覆盖
                 }
             }
-            ret = true;
+            return true;
         }
         catch (Exception ex)
         {
             UnityEngine.Debug.LogError(ex.Message);
-            ret = false;
+            return false;
         }
-        return ret;
     }
 }

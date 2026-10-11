@@ -1,4 +1,4 @@
-require "LTestComp"
+-- require "LTestComp"  -- 文件从未提交，挂载走下面的 "test2_testfun"
 
 local a = nil
 local b = nil
@@ -71,7 +71,7 @@ function createbox(flg, x, y, z, name)
     -- end
 
 
-    CS.LuaUtil.AddLuaComponent(deubg_object, LTestComp:new(name))
+    CS.LuaUtil.AddLuaComponent(deubg_object, "test2_testfun")
 
     -- deubg_object:AddComponent(typeof(CS.BulletUnity.Primitives.BBox))
 
